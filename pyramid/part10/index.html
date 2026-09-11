@@ -1,16 +1,28 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>10부</title>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>10부 | 피라밋</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#0b0f19;color:#eef2ff;font-family:'Segoe UI','Malgun Gothic',sans-serif}
 .wrap{max-width:1100px;margin:0 auto;padding:52px 28px}
-h1{margin:0 0 8px;font-size:32px}
-.sub{color:#94a3b8;margin-bottom:30px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
+h1{margin:0 0 8px;font-size:32px}.sub{color:#94a3b8;margin-bottom:26px}
+.section{margin-top:34px}.section h2{font-size:13px;letter-spacing:.14em;color:#7887a5;text-transform:uppercase;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px}
 .card{display:block;text-decoration:none;color:#fff;background:#111827;border:1px solid #263244;border-radius:14px;padding:22px;transition:.15s}
 .card:hover{border-color:#5b82ff;transform:translateY(-2px);background:#151e30}
-.title{font-size:21px;font-weight:800}.meta{font-size:12px;color:#8291aa;margin-top:8px}
+.title{font-size:21px;font-weight:800}.meta{font-size:12px;color:#8291aa;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .back{display:inline-block;margin-bottom:22px;color:#8fb0ff;text-decoration:none}
-.empty{color:#64748b;padding:22px;border:1px dashed #334155;border-radius:14px}
+.empty{color:#64748b;padding:18px;border:1px dashed #334155;border-radius:14px}
+.badge{display:inline-block;font-size:10px;color:#9fb5ff;margin-bottom:8px}
 </style>
 </head>
-<body><main class="wrap"><a class="back" href="../index.html">← 전체 목록</a><h1>10부</h1><div class="sub">씬을 선택하세요.</div><div class="grid"><div class="empty">아직 등록된 씬이 없습니다.</div></div></main></body></html>
+<body><main class="wrap"><a class="back" href="../index.html">← 피라밋</a><h1>10부</h1><div class="sub">씬을 선택하세요.</div>
+<section class="section"><h2>기존 페이지</h2><div class="grid"><div class="empty">기존 등록 씬이 없습니다.</div></div></section>
+<section class="section"><h2>웹에서 업로드한 페이지</h2><div id="uploaded" class="grid"><div class="empty">불러오는 중...</div></div></section>
+</main>
+<script>
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+fetch('/.netlify/functions/catalog?project=pyramid&part=10부').then(r=>r.json()).then(({items=[]})=>{
+ const box=document.getElementById('uploaded');
+ if(!items.length){box.innerHTML='<div class="empty">웹에서 추가한 파일이 없습니다.</div>';return;}
+ box.innerHTML=items.map(x=>`<a class="card" href="${x.url}" target="_blank"><div class="badge">WEB UPLOAD</div><div class="title">${esc(x.scene)}</div><div class="meta">${esc(x.title||x.filename)}</div></a>`).join('');
+}).catch(()=>document.getElementById('uploaded').innerHTML='<div class="empty">목록을 불러오지 못했습니다.</div>');
+</script></body></html>
