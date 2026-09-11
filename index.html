@@ -63,6 +63,11 @@ body{
 .placeholder{opacity:.48;pointer-events:none}
 .footer{margin-top:70px;padding-top:24px;border-top:1px solid #171c26;color:#566071;font-size:11px;display:flex;justify-content:space-between}
 @media(max-width:640px){.shell{padding:28px 18px 50px}.topbar{margin-bottom:56px}.navnote{display:none}.hero{margin-bottom:46px}.project{min-height:230px}.project-title{font-size:32px}}
+
+.quick-search{display:flex;gap:10px;max-width:720px;margin-top:30px}
+.quick-search input{flex:1;background:#0d121b;border:1px solid #263147;border-radius:12px;color:#fff;padding:13px 14px;outline:none}
+.quick-search input:focus{border-color:#607ee3}
+.quick-search button{border:0;border-radius:12px;background:#7590ff;color:#fff;font-weight:800;padding:0 18px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -78,6 +83,7 @@ body{
   <section class="hero">
     <div class="eyebrow">DIGITAL PROP · SCREEN ARCHIVE</div>
     <h1>Disolve<span class="thin">Works</span></h1>
+    <p>프로젝트별 화면 소품과 씬 페이지를 정리하는 작업 아카이브입니다. 프로젝트를 선택하면 각 부와 씬별 페이지로 이동합니다.</p><form class="quick-search" action="./search/" method="get"><input name="q" placeholder="씬 번호, 제목, 파일명 검색"><button type="submit">검색</button></form>
   </section>
 
   <section>

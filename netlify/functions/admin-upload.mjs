@@ -1,6 +1,6 @@
 
 import { getStore } from "@netlify/blobs";
-import { isAdmin } from "../lib/auth.mjs";
+import { isAdmin } from "./_auth.mjs";
 
 const MAX = 4 * 1024 * 1024;
 const ALLOWED = new Set(["html","htm","png","jpg","jpeg","webp","gif","pdf","pptx","xlsx","docx","txt","zip"]);
@@ -11,16 +11,15 @@ function cleanName(name) {
     .replace(/\s+/g, "_")
     .slice(0, 120);
 }
-function cleanText(v, max=120) {
-  return String(v || "").trim().slice(0,max);
-}
+function cleanText(v, max=120) { return String(v || "").trim().slice(0,max); }
+
 export default async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status:405 });
   if (!isAdmin(req)) return Response.json({ ok:false, error:"로그인이 필요합니다." }, { status:401 });
 
   const form = await req.formData();
   const file = form.get("file");
-  if (!file || typeof file.arrayBuffer !== "function") return Response.json({ ok:false, error:"파일을 선택해 주세요." }, { status:400 });
+  if (!(file instanceof File)) return Response.json({ ok:false, error:"파일을 선택해 주세요." }, { status:400 });
   if (file.size > MAX) return Response.json({ ok:false, error:"현재 웹 업로드는 파일당 4MB까지 지원합니다." }, { status:413 });
 
   const ext = (file.name.split(".").pop() || "").toLowerCase();
@@ -34,20 +33,23 @@ export default async (req) => {
   const scene = /씬$/.test(sceneRaw) ? sceneRaw : `${sceneRaw}씬`;
   const title = cleanText(form.get("title"), 100) || file.name.replace(/\.[^.]+$/,"");
   const visible = String(form.get("visible")) !== "false";
+  const pinned = String(form.get("pinned")) === "true";
   const filename = cleanName(file.name);
 
-  const key = `${project}/part${partNum}/scene-${sceneRaw}/${Date.now()}-${crypto.randomUUID()}-${filename}`;
+  const id = crypto.randomUUID();
+  const key = `${project}/part${partNum}/scene-${sceneRaw}/${Date.now()}-${id}-${filename}`;
+  const now = new Date().toISOString();
   const store = getStore("disolveworks-uploads");
+
   await store.set(key, file, {
     metadata: {
-      project, projectName, part:`${partNum}부`, partNum, scene, title,
-      filename:file.name, contentType:file.type || "application/octet-stream",
-      size:file.size, uploadedAt:new Date().toISOString(), visible
+      id, project, projectName, part:`${partNum}부`, partNum, scene, sceneRaw,
+      title, filename:file.name, contentType:file.type || "application/octet-stream",
+      size:file.size, uploadedAt:now, updatedAt:now, visible, pinned,
+      deleted:false, deletedAt:null
     }
   });
 
-  return Response.json({
-    ok:true, key,
-    url:`/.netlify/functions/file?key=${encodeURIComponent(key)}`
-  }, { headers:{ "Cache-Control":"no-store" }});
+  return Response.json({ ok:true, key, url:`/.netlify/functions/file?key=${encodeURIComponent(key)}` },
+    { headers:{ "Cache-Control":"no-store" }});
 };

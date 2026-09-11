@@ -9,10 +9,12 @@ export default async (req) => {
   const store = getStore("disolveworks-uploads");
   const metaEntry = await store.getMetadata(key);
   if (!metaEntry) return new Response("Not found", { status:404 });
+  const m = metaEntry.metadata || {};
+  if (m.deleted) return new Response("This file is in trash.", { status:410 });
+
   const data = await store.get(key, { type:"arrayBuffer" });
   if (data === null) return new Response("Not found", { status:404 });
 
-  const m = metaEntry.metadata || {};
   const type = m.contentType || "application/octet-stream";
   const inline = type.startsWith("text/html") || type.startsWith("image/") || type === "application/pdf";
   const filename = String(m.filename || "file").replace(/[\r\n"]/g,"_");
@@ -21,8 +23,8 @@ export default async (req) => {
     headers: {
       "Content-Type": type,
       "Content-Disposition": `${inline ? "inline" : "attachment"}; filename*=UTF-8''${encodeURIComponent(filename)}`,
-      "Cache-Control": "public, max-age=60",
-      "X-Content-Type-Options": "nosniff"
+      "Cache-Control":"public, max-age=60",
+      "X-Content-Type-Options":"nosniff"
     }
   });
 };
