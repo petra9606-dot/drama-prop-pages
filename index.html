@@ -1,16 +1,105 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>페이지 목록</title>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DisolveWorks</title>
 <style>
+:root{
+  --bg:#07090e;
+  --panel:#0f131d;
+  --panel2:#141925;
+  --line:#242b3a;
+  --text:#f6f7fb;
+  --muted:#8d96aa;
+  --accent:#8fa8ff;
+}
 *{box-sizing:border-box}
-body{margin:0;background:#0b0f19;color:#eef2ff;font-family:'Segoe UI','Malgun Gothic',sans-serif}
-.wrap{max-width:1100px;margin:0 auto;padding:52px 28px}
-h1{margin:0 0 8px;font-size:32px}
-.sub{color:#94a3b8;margin-bottom:30px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
-.card{display:block;text-decoration:none;color:#fff;background:#111827;border:1px solid #263244;border-radius:14px;padding:22px;transition:.15s}
-.card:hover{border-color:#5b82ff;transform:translateY(-2px);background:#151e30}
-.title{font-size:21px;font-weight:800}.meta{font-size:12px;color:#8291aa;margin-top:8px}
-.back{display:inline-block;margin-bottom:22px;color:#8fb0ff;text-decoration:none}
-.empty{color:#64748b;padding:22px;border:1px dashed #334155;border-radius:14px}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,"Segoe UI","Malgun Gothic",sans-serif}
+body{
+  background:
+    radial-gradient(circle at 18% 18%,rgba(70,91,170,.18),transparent 30%),
+    radial-gradient(circle at 82% 5%,rgba(132,87,255,.12),transparent 26%),
+    #07090e;
+}
+.shell{max-width:1240px;margin:0 auto;padding:44px 30px 70px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:84px}
+.brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:white}
+.mark{width:36px;height:36px;position:relative}
+.mark:before,.mark:after{content:"";position:absolute;inset:5px;border:2px solid #a9b8ff;transform:rotate(45deg)}
+.mark:after{inset:11px;border-color:#fff;opacity:.9}
+.wordmark{font-size:18px;font-weight:800;letter-spacing:.18em}
+.wordmark span{color:#8fa8ff}
+.navnote{font-size:12px;color:#667085;letter-spacing:.12em}
+.hero{margin-bottom:62px}
+.eyebrow{font-size:12px;letter-spacing:.24em;color:#7481a4;margin-bottom:18px}
+.hero h1{font-size:clamp(48px,7vw,92px);line-height:.95;margin:0;letter-spacing:-.055em;font-weight:800}
+.hero h1 .thin{font-weight:300;color:#a7afc0}
+.hero p{max-width:620px;margin:24px 0 0;color:#8f98aa;font-size:15px;line-height:1.8}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin:0 0 20px}
+.section-head h2{font-size:15px;margin:0;letter-spacing:.14em;text-transform:uppercase}
+.section-head span{font-size:12px;color:#5f6879}
+.projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.project{
+  position:relative;display:block;min-height:290px;padding:30px;border-radius:20px;
+  border:1px solid var(--line);background:
+  linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,255,255,0)),
+  var(--panel);text-decoration:none;color:white;overflow:hidden;
+  transition:.22s ease;
+}
+.project:hover{transform:translateY(-4px);border-color:#5367a5;background-color:var(--panel2)}
+.project:before{
+  content:"";position:absolute;width:250px;height:250px;right:-90px;top:-95px;
+  border:1px solid rgba(143,168,255,.22);transform:rotate(45deg);
+}
+.project:after{
+  content:"";position:absolute;width:145px;height:145px;right:-35px;top:-42px;
+  border:1px solid rgba(255,255,255,.09);transform:rotate(45deg);
+}
+.no{font-size:11px;letter-spacing:.2em;color:#66718e}
+.project-title{position:absolute;left:30px;bottom:64px;font-size:38px;font-weight:800;letter-spacing:-.035em}
+.meta{position:absolute;left:30px;bottom:30px;color:#737e95;font-size:12px}
+.arrow{position:absolute;right:28px;bottom:28px;width:42px;height:42px;border:1px solid #30394c;border-radius:50%;display:grid;place-items:center;font-size:18px}
+.placeholder{opacity:.48;pointer-events:none}
+.footer{margin-top:70px;padding-top:24px;border-top:1px solid #171c26;color:#566071;font-size:11px;display:flex;justify-content:space-between}
+@media(max-width:640px){.shell{padding:28px 18px 50px}.topbar{margin-bottom:56px}.navnote{display:none}.hero{margin-bottom:46px}.project{min-height:230px}.project-title{font-size:32px}}
 </style>
 </head>
-<body><main class="wrap"><h1>페이지 목록</h1><div class="sub">1부 ~ 12부</div><div class="grid"><a class="card" href="part1/index.html"><div class="title">1부</div><div class="meta">46씬</div></a><a class="card" href="part2/index.html"><div class="title">2부</div><div class="meta">등록된 씬 없음</div></a><a class="card" href="part3/index.html"><div class="title">3부</div><div class="meta">등록된 씬 없음</div></a><a class="card" href="part4/index.html"><div class="title">4부</div><div class="meta">23씬</div></a><a class="card" href="part5/index.html"><div class="title">5부</div><div class="meta">등록된 씬 없음</div></a><a class="card" href="part6/index.html"><div class="title">6부</div><div class="meta">등록된 씬 없음</div></a><a class="card" href="part7/index.html"><div class="title">7부</div><div class="meta">등록된 씬 없음</div></a><a class="card" href="part8/index.html"><div class="title">8부</div><div class="meta">등록된 씬 없음</div></a><a class="card" href="part9/index.html"><div class="title">9부</div><div class="meta">등록된 씬 없음</div></a><a class="card" href="part10/index.html"><div class="title">10부</div><div class="meta">등록된 씬 없음</div></a><a class="card" href="part11/index.html"><div class="title">11부</div><div class="meta">등록된 씬 없음</div></a><a class="card" href="part12/index.html"><div class="title">12부</div><div class="meta">등록된 씬 없음</div></a></div></main></body></html>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a class="brand" href="./index.html" aria-label="DisolveWorks Home">
+      <div class="mark"></div>
+      <div class="wordmark">DISOLVE<span>WORKS</span></div>
+    </a>
+    <div class="navnote">PROJECT ARCHIVE</div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">DIGITAL PROP · SCREEN ARCHIVE</div>
+    <h1>Disolve<span class="thin">Works</span></h1>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Projects</h2>
+      <span>01 PROJECT</span>
+    </div>
+
+    <div class="projects">
+      <a class="project" href="./pyramid/index.html">
+        <div class="no">PROJECT 001</div>
+        <div class="project-title">피라밋</div>
+        <div class="meta">1부 — 12부 · Scene Pages</div>
+        <div class="arrow">↗</div>
+      </a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>DISOLVEWORKS</span>
+    <span>PROJECT ARCHIVE</span>
+  </footer>
+</div>
+</body>
+</html>

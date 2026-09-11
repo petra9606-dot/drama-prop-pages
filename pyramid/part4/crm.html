@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINEX LOAN CRM | 금융 대출 심사 및 아웃바운드 TM 통합 콘솔</title>
+  
+  <!-- Pretendard Web Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            },
+            gold: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            }
+          },
+          animation: {
+            'pulse-fast': 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'wave': 'wave 1.5s ease-in-out infinite',
+          },
+          keyframes: {
+            wave: {
+              '0%, 100%': { transform: 'scaleY(0.4)' },
+              '50%': { transform: 'scaleY(1.0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Canvas Confetti for Celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.8);
+    }
+    
+    /* Glassmorphism effects */
+    .glass-card {
+      background: rgba(17, 24, 39, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .light .glass-card {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 1);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+    }
+    
+    /* Audio soundwave bars animation */
+    .audio-bar {
+      width: 3px;
+      border-radius: 9999px;
+      background: linear-gradient(to top, #3b82f6, #10b981);
+      animation: wave 1.2s ease-in-out infinite alternate;
+    }
+    .audio-bar:nth-child(2) { animation-delay: 0.2s; height: 16px; }
+    .audio-bar:nth-child(3) { animation-delay: 0.4s; height: 24px; }
+    .audio-bar:nth-child(4) { animation-delay: 0.1s; height: 12px; }
+    .audio-bar:nth-child(5) { animation-delay: 0.5s; height: 20px; }
+    .audio-bar:nth-child(6) { animation-delay: 0.3s; height: 14px; }
+  </style>
+</head>
+
+<body class="bg-[#090d16] text-slate-100 font-sans h-screen flex flex-col overflow-hidden select-none transition-colors duration-300">
+
+  <!-- ========================================================================= -->
+  <!-- 1. TOP GLOBAL NAVIGATION & LOAN CTI CONTROLLER BAR                        -->
+  <!-- ========================================================================= -->
+  <header class="h-20 bg-[#101726]/95 border-b border-slate-800/80 px-5 flex items-center justify-between shrink-0 z-40 backdrop-blur-md gap-3 select-none">
+    
+    <!-- Left: Brand & Agent Info -->
+    <div class="flex items-center space-x-3 shrink-0">
+      <div class="flex items-center space-x-2.5 shrink-0">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-blue-500/25 shrink-0">
+          <i class="fa-solid fa-sack-dollar text-white text-xl"></i>
+        </div>
+        <div class="shrink-0">
+          <div class="flex items-center space-x-1.5">
+            <span class="font-black tracking-wider text-base bg-gradient-to-r from-white via-blue-200 to-emerald-300 bg-clip-text text-transparent whitespace-nowrap">FINEX LOAN CRM</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 whitespace-nowrap">대출영업 TM v4.0</span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-medium whitespace-nowrap">여신금융 / 대환·신용대출 아웃바운드 통합 콘솔</p>
+        </div>
+      </div>
+
+      <div class="h-7 w-px bg-slate-700/60 hidden lg:block"></div>
+
+      <!-- Agent Status Badge -->
+      <div class="hidden lg:flex items-center space-x-2 bg-slate-800/90 px-3.5 py-2 rounded-xl border border-slate-700/70 shadow-sm shrink-0 whitespace-nowrap">
+        <div class="relative shrink-0">
+          <div class="w-3 h-3 rounded-full bg-rose-500" id="agent-status-indicator"></div>
+          <div class="w-3 h-3 rounded-full bg-rose-500 animate-ping absolute inset-0 opacity-75" id="agent-status-ping"></div>
+        </div>
+        <select id="agent-status-select" onchange="changeAgentStatus(this.value)" class="bg-transparent text-xs font-bold text-slate-200 focus:outline-none cursor-pointer pr-1">
+          <option value="ready" class="bg-slate-900 text-emerald-400">🟢 상담 대기 (Auto Dial Ready)</option>
+          <option value="busy" class="bg-slate-900 text-rose-400" selected>🔴 대출 상담 통화중 (In Call)</option>
+          <option value="wrapup" class="bg-slate-900 text-amber-400">🟡 가심사/서류 후처리 (ACW)</option>
+          <option value="away" class="bg-slate-900 text-slate-400">⚪ 이석 / 휴식 (Break)</option>
+        </select>
+        <span class="text-[11px] text-slate-400 border-l border-slate-700 pl-2 whitespace-nowrap">김도현 수석상담원</span>
+      </div>
+    </div>
+
+    <!-- Center: Live CTI Call & Loan Action Bar (Super Spacious & High-Visibility) -->
+    <div class="flex items-center bg-slate-900/95 rounded-2xl px-6 py-2 border-2 border-blue-500/40 shadow-2xl shadow-blue-950/60 space-x-5 shrink-0 whitespace-nowrap">
+      
+      <!-- 1. Live Call Timer & Soundwave (초대형 타이머) -->
+      <div class="flex items-center space-x-4 pr-5 border-r-2 border-slate-800 shrink-0 whitespace-nowrap">
+        <!-- Animated Soundwave -->
+        <div class="flex items-center space-x-1.5 h-10 px-2.5 bg-blue-950/70 rounded-xl border border-blue-800/50 shrink-0 shadow-inner" id="soundwave-container">
+          <div class="audio-bar h-3.5"></div>
+          <div class="audio-bar h-7"></div>
+          <div class="audio-bar h-9"></div>
+          <div class="audio-bar h-5"></div>
+          <div class="audio-bar h-8"></div>
+        </div>
+        <div class="text-left shrink-0">
+          <div class="flex items-center space-x-2 mb-0.5">
+            <span class="inline-flex items-center px-2 py-0.5 bg-blue-900/80 text-blue-200 border border-blue-600/50 rounded-md font-mono text-[10px] font-bold whitespace-nowrap" id="call-channel-badge">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span>
+              TM 아웃바운드
+            </span>
+            <span id="call-status-label" class="hidden">대출 권유 통화중</span>
+          </div>
+          <!-- Ultra-Large Monospace Timer -->
+          <div class="text-3xl lg:text-[34px] font-black font-mono tracking-wider text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.35)] leading-none whitespace-nowrap" id="call-timer">00:03:42</div>
+        </div>
+      </div>
+
+      <!-- 2. Primary Large Action Buttons (충분히 넓고 시원한 버튼) -->
+      <div class="flex items-center space-x-3 shrink-0 whitespace-nowrap">
+        
+        <!-- Big Primary Call Button (통화 종료 / 통화 연결) -->
+        <button onclick="endCall()" id="btn-end-call" class="h-12 min-w-[130px] px-6 rounded-xl bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:from-rose-500 hover:to-red-500 text-white text-sm font-black flex items-center justify-center space-x-2 shadow-xl shadow-rose-600/40 border border-rose-400/30 active:scale-95 transition-all transform cursor-pointer whitespace-nowrap shrink-0">
+          <i class="fa-solid fa-phone-slash text-base"></i>
+          <span class="whitespace-nowrap tracking-wide">통화 종료</span>
+        </button>
+
+        <!-- Big Next Call Auto Dial Button (다음 고객 통화연결) -->
+        <button onclick="simulateNextCustomerCall()" id="btn-next-call" class="h-12 min-w-[175px] px-6 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white text-sm font-black flex items-center justify-center space-x-2 shadow-xl shadow-emerald-600/40 border border-emerald-400/30 active:scale-95 transition-all transform cursor-pointer whitespace-nowrap shrink-0" title="다음 타깃 고객 즉시 발신 연결">
+          <i class="fa-solid fa-phone-volume text-base animate-bounce"></i>
+          <span class="whitespace-nowrap tracking-wide">다음 고객 통화연결</span>
+        </button>
+
+        <div class="h-8 w-px bg-slate-800 mx-1"></div>
+
+        <!-- Supportive CTI Tools -->
+        <button id="btn-mute" onclick="toggleMute()" class="w-11 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white flex items-center justify-center transition border border-slate-700 shadow-md shrink-0" title="마이크 음소거">
+          <i class="fa-solid fa-microphone text-base" id="icon-mute"></i>
+        </button>
+        <button id="btn-hold" onclick="toggleHold()" class="w-11 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white flex items-center justify-center transition border border-slate-700 shadow-md shrink-0" title="통화 보류">
+          <i class="fa-solid fa-pause text-base" id="icon-hold"></i>
+        </button>
+        <button onclick="sendMobileSmsLink()" class="h-11 px-4 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/50 text-xs font-bold flex items-center space-x-1.5 transition shadow-md whitespace-nowrap shrink-0" title="한도조회 모바일 URL SMS 발송">
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+          <span class="whitespace-nowrap hidden 2xl:inline">가심사 URL발송</span>
+        </button>
+        <button onclick="openKeypadModal()" class="w-11 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white flex items-center justify-center transition border border-slate-700 shadow-md shrink-0" title="다이얼패드">
+          <i class="fa-solid fa-table-cells text-base"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: Customer DB Switch & Performance -->
+    <div class="flex items-center space-x-3 shrink-0">
+      <!-- Fast DB Search -->
+      <div class="relative hidden xl:block w-44 2xl:w-52">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        <input type="text" id="global-search-input" placeholder="고객명, 직장, 번호..." 
+          onkeydown="if(event.key==='Enter') searchCustomer(this.value)"
+          class="w-full bg-slate-800/90 text-xs text-slate-200 pl-8 pr-12 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-blue-500 placeholder-slate-500 transition" />
+        <button onclick="searchCustomer(document.getElementById('global-search-input').value)" class="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] bg-slate-700 hover:bg-slate-600 text-slate-300 px-2 py-0.5 rounded-lg whitespace-nowrap">
+          검색
+        </button>
+      </div>
+
+      <!-- 20-Customer DB Selector -->
+      <div class="hidden xl:flex items-center space-x-1.5 bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700/60 shrink-0 whitespace-nowrap shadow-sm">
+        <span class="text-[11px] text-blue-400 font-bold flex items-center">
+          <i class="fa-solid fa-users mr-1 text-[10px]"></i> DB (20명)
+        </span>
+        <select id="customer-db-select" onchange="loadCustomerData(this.value)" class="bg-slate-900 text-xs font-bold text-slate-200 px-2 py-1 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500 cursor-pointer pr-1 max-w-[210px] truncate">
+          <option value="kim">01. 김건우 (한울테크 - KCB 865)</option>
+          <option value="park">02. 박서연 (미르소프트 - KCB 940)</option>
+          <option value="lee">03. 이지훈 (가온유통 - KCB 780)</option>
+          <option value="choi">04. 최민재 (대가모빌리티 - KCB 920)</option>
+          <option value="jung">05. 정다은 (늘푸른메디컬 - KCB 890)</option>
+          <option value="kang">06. 강현우 (행정공공기관 - KCB 950)</option>
+          <option value="yoon">07. 윤서준 (넥스트포털 - KCB 915)</option>
+          <option value="han">08. 한지민 (하람미디어 - KCB 875)</option>
+          <option value="song">09. 송태양 (솔라F&B - KCB 795)</option>
+          <option value="cho">10. 조은채 (대한에너지 - KCB 935)</option>
+          <option value="lim">11. 임동현 (하이세미컨 - KCB 905)</option>
+          <option value="shin">12. 신유진 (꿈나무초교 - KCB 960)</option>
+          <option value="oh">13. 오승환 (로지스익스프레스 - KCB 840)</option>
+          <option value="bae">14. 배수현 (법무법인정율 - KCB 880)</option>
+          <option value="kwon">15. 권지호 (대가전자 - KCB 925)</option>
+          <option value="hwang">16. 황보람 (핀웨이브테크 - KCB 895)</option>
+          <option value="ahn">17. 안태준 (대명회계법인 - KCB 945)</option>
+          <option value="ryu">18. 류하은 (스카이윙스항공 - KCB 870)</option>
+          <option value="moon">19. 문성민 (골든에셋자문 - KCB 910)</option>
+          <option value="jang">20. 장예린 (한빛종합병원 - KCB 885)</option>
+        </select>
+      </div>
+
+      <!-- Today TM Target Stats -->
+      <div class="hidden 2xl:flex items-center space-x-3 text-xs bg-slate-800/80 px-3.5 py-2 rounded-xl border border-slate-700/60 shrink-0 whitespace-nowrap">
+        <div class="flex items-center space-x-1 whitespace-nowrap">
+          <span class="text-slate-400">금일 콜:</span>
+          <span class="font-bold text-cyan-400" id="today-call-count">64건</span>
+        </div>
+        <div class="h-3 w-px bg-slate-700"></div>
+        <div class="flex items-center space-x-1 whitespace-nowrap">
+          <span class="text-slate-400">가심사:</span>
+          <span class="font-bold text-emerald-400" id="today-approval-count">8건</span>
+        </div>
+      </div>
+
+      <!-- Theme & Noti -->
+      <div class="flex items-center space-x-2 shrink-0">
+        <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 flex items-center justify-center transition border border-slate-700/70 shrink-0" title="화면 테마 변경 (다크/라이트)">
+          <i class="fa-solid fa-moon text-sm" id="theme-icon"></i>
+        </button>
+        <button onclick="showToast('금융 공지', '2026년 하반기 정책 서민금융 특별대환 지원 한도가 증액되었습니다.', 'info')" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-blue-400 flex items-center justify-center relative transition border border-slate-700/70 shrink-0" title="알림">
+          <i class="fa-regular fa-bell text-sm"></i>
+          <span class="w-2 h-2 rounded-full bg-rose-500 absolute top-2 right-2"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN 3-COLUMN WORKSPACE                                                -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 flex overflow-hidden p-3 gap-3">
+
+    <!-- ----------------------------------------------------------------------- -->
+    <!-- COLUMN 1: CUSTOMER FINANCIAL PROFILE & CREDIT 360° (좌측 1열 - 325px)   -->
+    <!-- ----------------------------------------------------------------------- -->
+    <section class="w-80 2xl:w-[340px] flex flex-col gap-3 shrink-0 h-full overflow-hidden">
+      
+      <!-- Customer Info & Credit Card -->
+      <div class="glass-card rounded-2xl p-3.5 flex flex-col shadow-xl border border-slate-800 shrink-0">
+        <div class="flex items-start justify-between mb-2.5">
+          <div class="flex items-center space-x-3">
+            <div class="relative">
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-700 flex items-center justify-center text-white text-base font-black shadow-md" id="cust-avatar">
+                김
+              </div>
+              <span class="absolute -bottom-1 -right-1 bg-emerald-500 text-slate-950 text-[9px] font-black px-1.5 py-0.2 rounded-full border border-slate-900 shadow">
+                KCB 1등급
+              </span>
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h2 class="text-sm font-bold text-white" id="cust-name">김건우 고객님</h2>
+                <button onclick="toggleMasking()" class="text-slate-400 hover:text-blue-300 text-xs p-0.5" title="개인정보 마스킹 해제">
+                  <i class="fa-solid fa-eye" id="masking-icon"></i>
+                </button>
+              </div>
+              <p class="text-[11px] text-blue-300 font-medium" id="cust-job">(주)한울테크솔루션 (재직 4년차/대리)</p>
+            </div>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold" id="cust-approval-badge">
+            가심사 승인가능
+          </span>
+        </div>
+
+        <!-- Detail Financial Grid -->
+        <div class="grid grid-cols-2 gap-1.5 text-xs bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80 mb-2.5">
+          <div>
+            <span class="text-[10px] text-slate-400 block">휴대폰 번호</span>
+            <span class="font-mono font-bold text-slate-200 text-xs" id="cust-phone">010-5829-5678</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 block">생년월일/연령</span>
+            <span class="font-semibold text-slate-200 text-xs" id="cust-birth">1992.03.21 (만 34세)</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 block">연소득 (건보료 기준)</span>
+            <span class="font-bold text-emerald-400 text-xs" id="cust-income">4,800 만원</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 block">신용평점 (KCB/NICE)</span>
+            <span class="font-bold text-cyan-300 text-xs" id="cust-credit-score">865점 / 880점</span>
+          </div>
+        </div>
+
+        <!-- Existing Debt vs Refinancing Opportunity (기대출 현황 분석) -->
+        <div class="bg-blue-950/40 p-2.5 rounded-xl border border-blue-800/50 mb-2.5">
+          <div class="flex items-center justify-between text-[11px] mb-1.5">
+            <span class="text-blue-300 font-bold flex items-center">
+              <i class="fa-solid fa-chart-pie mr-1 text-[10px]"></i> 보유 기대출 및 대환 타깃
+            </span>
+            <span class="text-[10px] text-amber-400 font-bold" id="cust-debt-total">총 4,700만원</span>
+          </div>
+          
+          <div class="space-y-1 text-[10px]">
+            <div class="flex justify-between items-center bg-slate-900/80 px-2 py-1 rounded">
+              <span class="text-slate-300">1금융(시중은행) 신용대출</span>
+              <span class="font-mono text-slate-200">3,500만 <span class="text-slate-400">(연 5.2%)</span></span>
+            </div>
+            <div class="flex justify-between items-center bg-rose-950/40 border border-rose-800/40 px-2 py-1 rounded">
+              <span class="text-rose-300 font-bold">2금융(캐피탈/카드론) ★대환권유</span>
+              <span class="font-mono font-bold text-rose-300">1,200만 <span class="text-rose-400">(연 14.5%)</span></span>
+            </div>
+          </div>
+          <div class="mt-1.5 pt-1.5 border-t border-blue-800/40 flex items-center justify-between text-[10px]">
+            <span class="text-slate-400">대환 시 예상 월 이자 절감:</span>
+            <span class="text-emerald-400 font-black" id="cust-interest-saved">매월 약 11.2만원 절감!</span>
+          </div>
+        </div>
+
+        <!-- Pre-Approved Loan Limits Card -->
+        <div class="bg-gradient-to-r from-emerald-950/60 to-blue-950/60 p-2.5 rounded-xl border border-emerald-500/40 mb-2">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-emerald-300 font-bold block">특별 승인 가능 한도 (가심사)</span>
+              <span class="text-sm font-black text-white font-mono" id="cust-max-limit">최대 6,500 만원</span>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] text-slate-400 block">최저 우대금리</span>
+              <span class="text-xs font-bold text-amber-300 font-mono" id="cust-min-rate">연 4.35% ~</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Target Tags -->
+        <div class="flex flex-wrap gap-1" id="cust-tags">
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">#고금리대환_1순위</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">#직장인_4대보험</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">#연체이력_전무</span>
+        </div>
+      </div>
+
+      <!-- Live Loan Calculator & Simulator (실시간 대출 계산기) -->
+      <div class="glass-card rounded-2xl p-3.5 flex-1 flex flex-col shadow-xl border border-slate-800 overflow-hidden">
+        <div class="flex items-center justify-between mb-2 shrink-0">
+          <div class="flex items-center space-x-1.5">
+            <i class="fa-solid fa-calculator text-emerald-400 text-xs"></i>
+            <h3 class="text-xs font-bold text-slate-200 tracking-wide uppercase">실시간 대출 시뮬레이터</h3>
+          </div>
+          <span class="text-[10px] text-slate-400 font-mono">원리금균등</span>
+        </div>
+
+        <div class="space-y-2.5 overflow-y-auto pr-1 flex-1 text-xs">
+          <!-- Loan Amount -->
+          <div>
+            <div class="flex justify-between text-[11px] mb-1">
+              <span class="text-slate-400">대출 신청(한도) 금액</span>
+              <span class="font-bold text-cyan-300 font-mono" id="calc-amount-display">3,000 만원</span>
+            </div>
+            <input type="range" min="500" max="8000" step="100" value="3000" id="calc-amount-range" oninput="updateLoanCalculator()" class="w-full accent-blue-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg">
+          </div>
+
+          <!-- Loan Period & Interest Rate -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <span class="text-[10px] text-slate-400 block mb-0.5">상환 기간</span>
+              <select id="calc-period" onchange="updateLoanCalculator()" class="w-full bg-slate-900 text-xs text-slate-200 p-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500">
+                <option value="12">12개월 (1년)</option>
+                <option value="24">24개월 (2년)</option>
+                <option value="36" selected>36개월 (3년)</option>
+                <option value="48">48개월 (4년)</option>
+                <option value="60">60개월 (5년)</option>
+              </select>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block mb-0.5">적용 예상 금리</span>
+              <div class="relative">
+                <input type="number" step="0.1" value="4.8" id="calc-rate" oninput="updateLoanCalculator()" class="w-full bg-slate-900 text-xs text-amber-300 font-bold p-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500 font-mono pr-5">
+                <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calculated Output Box -->
+          <div class="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 space-y-1.5">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400 text-[10px]">예상 월 납입 원리금:</span>
+              <span class="text-sm font-black text-emerald-400 font-mono" id="calc-monthly-payment">896,570 원</span>
+            </div>
+            <div class="flex justify-between items-center text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+              <span>총 대출 원금:</span>
+              <span class="font-mono text-slate-300" id="calc-total-principal">30,000,000 원</span>
+            </div>
+            <div class="flex justify-between items-center text-[10px] text-slate-400">
+              <span>총 예상 이자:</span>
+              <span class="font-mono text-slate-300" id="calc-total-interest">2,276,520 원</span>
+            </div>
+          </div>
+
+          <!-- Fast Insert to Chat Button -->
+          <button onclick="insertCalculatorResultToChat()" class="w-full py-1.5 bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 border border-blue-500/40 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1 transition">
+            <i class="fa-solid fa-arrow-turn-down text-[10px]"></i>
+            <span>계산 결과를 대화/기록에 복사</span>
+          </button>
+        </div>
+
+        <!-- Sticky Note -->
+        <div class="mt-2 pt-2 border-t border-slate-800/80 shrink-0">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] text-amber-400 font-bold flex items-center">
+              <i class="fa-solid fa-thumbtack mr-1 text-[9px]"></i> 상담원 특별 심사 메모
+            </span>
+            <button onclick="saveStickyMemo()" class="text-[10px] text-slate-400 hover:text-blue-300">저장</button>
+          </div>
+          <textarea id="sticky-memo-text" rows="2" class="w-full bg-amber-950/20 text-amber-200 text-xs p-1.5 rounded-lg border border-amber-700/40 focus:outline-none focus:border-amber-500 resize-none placeholder-amber-500/40" placeholder="고객 특이사항">2금융권 1,200만원 고금리(14.5%) 대환 시 월 11만원 이상 이자 절감 포인트 강력 어필할 것.</textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------- -->
+    <!-- COLUMN 2: REAL-TIME LOAN WORKSTATION & CHAT / CRM (중앙 2열 - Flex-1)   -->
+    <!-- ----------------------------------------------------------------------- -->
+    <section class="flex-1 flex flex-col gap-3 min-w-0 h-full overflow-hidden">
+      
+      <!-- Top Section: Real-time Live Consultation & STT Transcript Window -->
+      <div class="glass-card rounded-2xl flex flex-col shadow-xl border border-slate-800 h-[52%] overflow-hidden">
+        
+        <!-- Chat Header -->
+        <div class="px-4 py-2.5 bg-slate-900/90 border-b border-slate-800/90 flex items-center justify-between shrink-0">
+          <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="text-xs font-black tracking-wide text-white uppercase">실시간 대출 상담 대화창 & STT 음성인식</span>
+            </div>
+            <div class="flex space-x-1 text-[11px] bg-slate-800 p-0.5 rounded-lg border border-slate-700">
+              <button class="px-2 py-0.5 rounded font-semibold bg-blue-600 text-white shadow" id="tab-chat-mode">실시간 대화/스크립트</button>
+              <button class="px-2 py-0.5 rounded font-medium text-slate-400 hover:text-white" onclick="showToast('STT 모드', '실시간 전화 음성이 텍스트로 자동 변환 기록 중입니다.', 'info')">실시간 STT</button>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="insertAiSmartReply()" class="text-xs px-2.5 py-1 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 border border-blue-500/40 flex items-center space-x-1 transition font-medium">
+              <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i>
+              <span>AI 거절극복 답변</span>
+            </button>
+            <button onclick="clearChatLog()" class="text-slate-400 hover:text-rose-400 text-xs p-1" title="대화창 초기화">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat Message Stream (Scrollable) -->
+        <div class="flex-1 p-4 overflow-y-auto space-y-3.5" id="chat-messages-container">
+          
+          <!-- System Welcome Bubble -->
+          <div class="flex justify-center">
+            <span class="text-[10px] px-3 py-1 rounded-full bg-slate-800/90 text-slate-400 border border-slate-700/60 flex items-center space-x-1.5 shadow-sm">
+              <i class="fa-solid fa-shield-halved text-[9px] text-emerald-400"></i>
+              <span>2026.08.26 17:58:10 - 금융소비자보호법 준수 및 보안 녹취 세션이 시작되었습니다.</span>
+            </span>
+          </div>
+
+          <!-- Agent Message (Opening Pitch) -->
+          <div class="flex items-start justify-end space-x-2.5 max-w-[85%] ml-auto">
+            <div class="text-right">
+              <div class="flex items-center justify-end space-x-1.5 mb-0.5">
+                <span class="text-[9px] text-slate-500 font-mono">17:58:14</span>
+                <span class="text-[11px] font-bold text-blue-300">상담원 (김도현)</span>
+              </div>
+              <div class="p-3 rounded-2xl rounded-tr-none bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-xs leading-relaxed shadow-lg shadow-blue-600/20">
+                안녕하십니까 김건우 고객님! FINEX 금융 우수직장인 전담 상담원 김도현입니다. 다름이 아니라 고객님 신용점수 및 4대보험 재직 기반으로 <strong>기존 고금리 대출을 연 4%대 저금리로 통합 대환</strong>하실 수 있는 특별 한도(최대 6,500만원)가 배정되어 안내차 연락드렸습니다.
+              </div>
+            </div>
+            <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5 shadow">상</div>
+          </div>
+
+          <!-- Customer Message (Objection / Hesitation) -->
+          <div class="flex items-start space-x-2.5 max-w-[85%]">
+            <div class="w-7 h-7 rounded-full bg-amber-600 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5 shadow">
+              김
+            </div>
+            <div>
+              <div class="flex items-center space-x-1.5 mb-0.5">
+                <span class="text-[11px] font-bold text-slate-300">고객 (김건우)</span>
+                <span class="text-[9px] text-slate-500 font-mono">17:58:32</span>
+              </div>
+              <div class="p-3 rounded-2xl rounded-tl-none bg-slate-800 text-slate-100 text-xs leading-relaxed border border-slate-700/80 shadow-md">
+                아, 대출 권유 전화인가요? 제가 지금 쓰고 있는 대출도 있고... 한도 조회하면 신용점수 떨어지는 거 아닌가요?
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Whisper Assistant Note -->
+          <div class="flex justify-center my-1" id="ai-whisper-bubble">
+            <div class="bg-blue-950/70 border border-blue-500/40 rounded-xl px-3.5 py-1.5 flex items-center space-x-2 text-[11px] text-blue-200 shadow">
+              <i class="fa-solid fa-brain text-emerald-400 animate-pulse text-xs"></i>
+              <span><strong>AI 실시간 코파일럿 코칭:</strong> [신용점수 하락 없음] 안심 안내 + [카드론 1,200만원 대환 시 이자절감] 포인트 제시를 권장합니다.</span>
+              <button onclick="applyTemplate('objection_credit')" class="px-2 py-0.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-[10px] font-bold">스크립트 적용</button>
+            </div>
+          </div>
+
+          <!-- Agent Message 2 (Reassurance & Hook) -->
+          <div class="flex items-start justify-end space-x-2.5 max-w-[85%] ml-auto">
+            <div class="text-right">
+              <div class="flex items-center justify-end space-x-1.5 mb-0.5">
+                <span class="text-[9px] text-slate-500 font-mono">17:59:02</span>
+                <span class="text-[11px] font-bold text-blue-300">상담원 (김도현)</span>
+              </div>
+              <div class="p-3 rounded-2xl rounded-tr-none bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-xs leading-relaxed shadow-lg shadow-blue-600/20">
+                네, 염려되실 수 있습니다! 하지만 단순 가심사 한도 조회는 금융감독원 규정에 따라 <strong>신용평점에 1점의 영향도 주지 않는 안심 가조회</strong>입니다. 특히 고객님께서 이용 중이신 연 14%대 고금리 상품을 연 4.8%대로 갈아타시면 <strong>매월 약 11만원 이상의 이자를 즉시 절감</strong>하실 수 있습니다!
+              </div>
+            </div>
+            <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5 shadow">상</div>
+          </div>
+
+        </div>
+
+        <!-- Chat Input & Instant Action Bar -->
+        <div class="p-2.5 bg-slate-900/95 border-t border-slate-800/90 shrink-0">
+          <form onsubmit="handleSendChatMessage(event)" class="flex items-center space-x-2">
+            <div class="relative flex-1">
+              <input type="text" id="chat-input" placeholder="고객에게 안내할 대출 상담 스크립트 또는 전송 메시지를 입력하세요... (Enter로 전송)" 
+                class="w-full bg-slate-800/90 text-xs text-white pl-3.5 pr-20 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder-slate-500 transition" />
+              <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1">
+                <button type="button" onclick="triggerQuickEmoji()" class="text-slate-400 hover:text-amber-400 text-xs p-1" title="정중한 어조">
+                  <i class="fa-regular fa-face-smile"></i>
+                </button>
+                <button type="button" onclick="enhanceToneWithAi()" class="text-[10px] bg-blue-950 text-blue-300 hover:bg-blue-900 px-1.5 py-0.5 rounded border border-blue-800 font-semibold" title="금융 전문 톤 교정">
+                  금융톤 ✨
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl flex items-center space-x-1.5 shadow-lg shadow-blue-600/30 transition shrink-0">
+              <span>전송</span>
+              <i class="fa-solid fa-paper-plane text-[10px]"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Bottom Section: Loan Application & Consultation CRM Record -->
+      <div class="glass-card rounded-2xl flex-1 flex flex-col shadow-xl border border-slate-800 overflow-hidden p-3.5">
+        <div class="flex items-center justify-between mb-2.5 shrink-0">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-xs"></i>
+            <h3 class="text-xs font-bold text-slate-200 tracking-wide uppercase">대출 심사 접수 및 상담 기록 (Loan CRM Record)</h3>
+          </div>
+          
+          <!-- AI Summary Button -->
+          <button onclick="generateAiSummary()" id="btn-ai-summary" class="text-xs px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 text-white font-bold flex items-center space-x-1.5 shadow-lg shadow-blue-500/20 hover:opacity-95 active:scale-95 transition">
+            <i class="fa-solid fa-sparkles text-amber-300"></i>
+            <span>AI 원클릭 대출상담 요약 생성</span>
+          </button>
+        </div>
+
+        <!-- Loan Category & Status Selectors -->
+        <div class="grid grid-cols-4 gap-2 mb-2 shrink-0">
+          <div>
+            <label class="text-[10px] text-slate-400 font-medium block mb-1">대출 상품 분류</label>
+            <select id="sel-loan-product" class="w-full bg-slate-900/90 text-xs text-slate-200 p-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500">
+              <option value="refinance" selected>저금리 통합 대환대출</option>
+              <option value="employee">우량직장인 신용대출</option>
+              <option value="business">소상공인/사업자대출</option>
+              <option value="mortgage">아파트 담보/후순위 대출</option>
+              <option value="sunshine">정부지원 햇살론/새희망</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-medium block mb-1">희망 신청금액</label>
+            <select id="sel-loan-amount" class="w-full bg-slate-900/90 text-xs text-slate-200 p-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500 font-mono">
+              <option value="1000">1,000 만원</option>
+              <option value="2000">2,000 만원</option>
+              <option value="3000" selected>3,000 만원 (가심사)</option>
+              <option value="5000">5,000 만원</option>
+              <option value="6500">6,500 만원 (최대)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-medium block mb-1">TM 처리 상태</label>
+            <select id="sel-tm-status" class="w-full bg-slate-900/90 text-xs text-emerald-400 font-bold p-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-emerald-500">
+              <option value="approved" selected>🟢 가심사 접수완료 (승인)</option>
+              <option value="docs_wait">🟡 서류 접수 대기 (SMS발송)</option>
+              <option value="callback">🔵 재통화 예약 (시간지정)</option>
+              <option value="rejected">⚪ 고객 거절 / 가입의사 없음</option>
+              <option value="unreachable">🔴 부재중 / 통화불능</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-medium block mb-1">대출 전환 가능성</label>
+            <select id="sel-probability" class="w-full bg-slate-900/90 text-xs text-amber-400 font-semibold p-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500">
+              <option value="high" selected>🔥 매우 높음 (90% 이상)</option>
+              <option value="mid">👍 보통 (50~80%)</option>
+              <option value="low">❄️ 낮음 (단순 조회)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Consultation Record Textarea -->
+        <div class="flex-1 flex flex-col relative min-h-0">
+          <textarea id="consultation-content" class="flex-1 w-full bg-slate-900/90 text-slate-100 text-xs p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-blue-500 font-mono leading-relaxed resize-none" placeholder="[대출 상담 기록]
+- 대출 목적 / 니즈:
+- 기대출 상환 계획:
+- 심사 조건 및 안내 금리:
+- 후속 조치 (SMS 서류 링크 발송 등):">[상담 및 가심사 내역]
+1. 인입 목적: 우수직장인 저금리 대환대출 특별한도(최대 6,500만원) 아웃바운드 안내.
+2. 고객 상태: (주)한울테크솔루션 4년차 대리, 연소득 4,800만, KCB 865점 우량.
+3. 대환 플랜: 2금융 고금리 카드론 1,200만원(14.5%) -> FINEX 우대 신용대출(연 4.8%)로 전액 대환 신청.
+4. 추가 자금: 여유자금 1,800만원 포함하여 총 3,000만원 36개월 원리금균등 신청 동의.
+5. 조치 사항: 본인인증 완료 및 모바일 전자서명 약정 URL SMS 즉시 발송 완료.</textarea>
+          
+          <!-- Bottom Action Buttons -->
+          <div class="flex items-center justify-between mt-2.5 shrink-0">
+            <div class="flex items-center space-x-2 text-[11px] text-slate-400">
+              <span class="flex items-center"><i class="fa-solid fa-shield-check text-emerald-400 mr-1"></i> 여신 전산 실시간 승인 연동</span>
+              <span class="h-3 w-px bg-slate-700"></span>
+              <span>기록 글자수: <strong class="text-slate-200" id="char-count">240자</strong></span>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <button onclick="resetRecordForm()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">
+                초기화
+              </button>
+              <button onclick="saveConsultationRecord()" class="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black rounded-xl shadow-lg shadow-emerald-600/30 flex items-center space-x-1.5 active:scale-95 transition">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>대출 가심사 접수 & 저장 (F9)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------- -->
+    <!-- COLUMN 3: LOAN AI COPILOT, TM SCRIPTS & FAQ (우측 3열 - 325px)           -->
+    <!-- ----------------------------------------------------------------------- -->
+    <section class="w-80 2xl:w-[340px] flex flex-col gap-3 shrink-0 h-full overflow-hidden">
+      
+      <!-- AI Loan Copilot & Objection Handler -->
+      <div class="glass-card rounded-2xl p-3.5 flex flex-col shadow-xl border border-slate-800 shrink-0">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center space-x-2">
+            <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-blue-500 to-emerald-500 flex items-center justify-center text-white text-xs shadow">
+              <i class="fa-solid fa-brain"></i>
+            </div>
+            <h3 class="text-xs font-bold text-slate-200 tracking-wide uppercase">AI 대출 세일즈 코파일럿</h3>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold animate-pulse">
+            대출 의향 분석중
+          </span>
+        </div>
+
+        <!-- Sentiment & Interest Gauge -->
+        <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80 mb-2">
+          <div class="flex items-center justify-between text-[11px] mb-1">
+            <span class="text-slate-400 font-medium">고객 대출 니즈 / 수락 확률</span>
+            <span class="text-emerald-400 font-bold" id="ai-sentiment-text">매우 긍정 (85% 전환 가능)</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden flex">
+            <div class="bg-emerald-500 h-full transition-all duration-500" style="width: 85%"></div>
+            <div class="bg-amber-500 h-full transition-all duration-500" style="width: 12%"></div>
+            <div class="bg-rose-500 h-full transition-all duration-500" style="width: 3%"></div>
+          </div>
+          <div class="flex justify-between text-[9px] text-slate-500 mt-1">
+            <span>수락 85%</span>
+            <span>관망 12%</span>
+            <span>거절 3%</span>
+          </div>
+        </div>
+
+        <!-- Instant TM Objection Handling Scripts -->
+        <div class="space-y-1.5">
+          <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">상황별 실시간 추천 스크립트 (클릭 시 삽입)</span>
+          
+          <div class="p-2 rounded-xl bg-blue-950/40 hover:bg-blue-900/50 border border-blue-800/50 transition cursor-pointer group" onclick="insertScript(1)">
+            <div class="flex items-center justify-between text-[11px] font-bold text-blue-300 mb-0.5">
+              <span>① "신용점수 떨어질까봐 불안해요"</span>
+              <i class="fa-solid fa-arrow-turn-down text-[10px] text-slate-500 group-hover:text-cyan-400"></i>
+            </div>
+            <p class="text-[11px] text-slate-300 leading-snug line-clamp-2">
+              "금감원 규정에 따른 단순 가심사 한도조회는 신용점수에 단 1점의 영향도 없습니다."
+            </p>
+          </div>
+
+          <div class="p-2 rounded-xl bg-emerald-950/30 hover:bg-emerald-900/40 border border-emerald-800/40 transition cursor-pointer group" onclick="insertScript(2)">
+            <div class="flex items-center justify-between text-[11px] font-bold text-emerald-300 mb-0.5">
+              <span>② "이미 쓰고 있는 대출이 많아요"</span>
+              <i class="fa-solid fa-arrow-turn-down text-[10px] text-slate-500 group-hover:text-emerald-400"></i>
+            </div>
+            <p class="text-[11px] text-slate-300 leading-snug line-clamp-2">
+              "바로 그 10%대 고금리 대출을 4%대로 낮춰 매달 10만원 이상 이자를 아껴드리는 상품입니다."
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outbound TM Script & Templates Library -->
+      <div class="glass-card rounded-2xl p-3.5 flex-1 flex flex-col shadow-xl border border-slate-800 overflow-hidden">
+        <div class="flex items-center justify-between mb-2 shrink-0">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-bolt text-amber-400 text-xs"></i>
+            <h3 class="text-xs font-bold text-slate-200 tracking-wide uppercase">대출 TM 표준 템플릿 (Scripts)</h3>
+          </div>
+          <span class="text-[10px] text-slate-400">원클릭 삽입</span>
+        </div>
+
+        <!-- Template Filter Tabs -->
+        <div class="flex space-x-1 mb-2 shrink-0 overflow-x-auto pb-1">
+          <button class="px-2 py-0.5 text-[10px] font-bold rounded-lg bg-blue-600 text-white shrink-0" onclick="filterTemplates('all')">전체</button>
+          <button class="px-2 py-0.5 text-[10px] font-medium rounded-lg bg-slate-800 text-slate-300 hover:text-white shrink-0" onclick="filterTemplates('opening')">오프닝</button>
+          <button class="px-2 py-0.5 text-[10px] font-medium rounded-lg bg-slate-800 text-slate-300 hover:text-white shrink-0" onclick="filterTemplates('refinance')">대환/한도</button>
+          <button class="px-2 py-0.5 text-[10px] font-medium rounded-lg bg-slate-800 text-slate-300 hover:text-white shrink-0" onclick="filterTemplates('closing')">서류/클로징</button>
+        </div>
+
+        <!-- Template Buttons List (Scrollable) -->
+        <div class="flex-1 overflow-y-auto space-y-1.5 pr-1" id="template-buttons-container">
+          
+          <button onclick="applyTemplate('opening_vip')" class="w-full text-left p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-blue-500/50 transition">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-200 mb-0.5">
+              <span>📞 우수 직장인 대출 오프닝</span>
+              <span class="text-[9px] px-1.5 py-0.2 bg-blue-950 text-blue-300 rounded">오프닝</span>
+            </div>
+            <p class="text-[11px] text-slate-400 line-clamp-1">안녕하십니까 고객님, FINEX 금융 우수고객 전담센터 김도현입니다...</p>
+          </button>
+
+          <button onclick="applyTemplate('objection_credit')" class="w-full text-left p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-blue-500/50 transition">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-200 mb-0.5">
+              <span>🛡️ 신용평점 무영향 안심 안내</span>
+              <span class="text-[9px] px-1.5 py-0.2 bg-slate-800 text-slate-400 rounded">안심</span>
+            </div>
+            <p class="text-[11px] text-slate-400 line-clamp-1">단순 가조회는 금융감독원 전산 기준으로 신용점수에 전혀 영향이 없습니다.</p>
+          </button>
+
+          <button onclick="applyTemplate('refinance_hook')" class="w-full text-left p-2 rounded-xl bg-emerald-950/30 hover:bg-emerald-900/40 border border-emerald-800/40 hover:border-emerald-500 transition">
+            <div class="flex items-center justify-between text-xs font-bold text-emerald-300 mb-0.5">
+              <span>💰 고금리 14% -> 4%대 대환 안내</span>
+              <span class="text-[9px] px-1.5 py-0.2 bg-emerald-900 text-emerald-300 rounded font-bold">인기</span>
+            </div>
+            <p class="text-[11px] text-slate-400 line-clamp-1">기존 이용 중이신 2금융 고금리 대출을 4.8%로 묶어 월 이자를 10만원 이상 절감...</p>
+          </button>
+
+          <button onclick="applyTemplate('sms_guide')" class="w-full text-left p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-blue-500/50 transition">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-200 mb-0.5">
+              <span>📱 모바일 가심사 링크 발송 안내</span>
+              <span class="text-[9px] px-1.5 py-0.2 bg-slate-800 text-slate-400 rounded">문자</span>
+            </div>
+            <p class="text-[11px] text-slate-400 line-clamp-1">고객님 휴대폰으로 안전한 공인인증 가심사 URL을 문자 발송해드렸습니다.</p>
+          </button>
+
+          <button onclick="applyTemplate('closing_done')" class="w-full text-left p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-blue-500/50 transition">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-200 mb-0.5">
+              <span>🤝 가심사 승인 및 상담 마무리</span>
+              <span class="text-[9px] px-1.5 py-0.2 bg-slate-800 text-slate-400 rounded">마무리</span>
+            </div>
+            <p class="text-[11px] text-slate-400 line-clamp-1">심사 서류 확인 후 1시간 내로 당일 즉시 송금 처리 진행해 드리겠습니다.</p>
+          </button>
+
+        </div>
+
+        <!-- Loan Knowledge Base / Regulations Quick Search -->
+        <div class="mt-2 pt-2 border-t border-slate-800/80 shrink-0">
+          <div class="relative">
+            <i class="fa-solid fa-book-open absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="text" placeholder="대출 규정 / DSR 한도 / 금리표 검색..." 
+              onkeydown="if(event.key==='Enter') searchKnowledgeBase(this.value)"
+              class="w-full bg-slate-900 text-xs text-slate-200 pl-7 pr-3 py-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500 placeholder-slate-500" />
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- 3. MODALS & POPUPS                                                        -->
+  <!-- ========================================================================= -->
+
+  <!-- Keypad Dialpad Modal -->
+  <div id="modal-keypad" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 w-80 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-sm font-bold text-white flex items-center"><i class="fa-solid fa-table-cells text-blue-400 mr-2"></i> 금융 소프트 다이얼패드</h4>
+        <button onclick="closeModal('modal-keypad')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <input type="text" id="keypad-display" readonly class="w-full bg-slate-950 text-cyan-400 text-lg font-mono text-center py-2 rounded-xl border border-slate-800 mb-4" placeholder="발신할 번호 입력" />
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <button onclick="pressKey('1')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">1</button>
+        <button onclick="pressKey('2')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">2</button>
+        <button onclick="pressKey('3')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">3</button>
+        <button onclick="pressKey('4')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">4</button>
+        <button onclick="pressKey('5')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">5</button>
+        <button onclick="pressKey('6')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">6</button>
+        <button onclick="pressKey('7')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">7</button>
+        <button onclick="pressKey('8')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">8</button>
+        <button onclick="pressKey('9')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">9</button>
+        <button onclick="pressKey('*')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">*</button>
+        <button onclick="pressKey('0')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">0</button>
+        <button onclick="pressKey('#')" class="h-11 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-base transition">#</button>
+      </div>
+      <div class="flex space-x-2">
+        <button onclick="clearKeypad()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold">지우기</button>
+        <button onclick="dialKeypadNumber()" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center space-x-1">
+          <i class="fa-solid fa-phone"></i><span>아웃바운드 발신</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. JAVASCRIPT LOGIC & LOAN TM ENGINE                                     -->
+  <!-- ========================================================================= -->
+  <script>
+    // State management
+    let timerInterval = null;
+    let secondsElapsed = 222; // 03:42 initial
+    let isCalling = true;
+    let isMuted = false;
+    let isHold = false;
+    let isMasked = true;
+    let currentCustomerKey = 'kim';
+
+    let currentCustomerIndex = 0;
+
+    const customerDatabase = {
+      kim: {
+        key: 'kim',
+        name: '김건우 고객님',
+        rawName: '김건우',
+        avatar: '김',
+        creditGrade: 'KCB 1등급 (우량)',
+        job: '(주)한울테크솔루션 (재직 4년차/대리)',
+        phone: '010-5829-5678',
+        rawPhone: '010-5829-5678',
+        birth: '1992.03.21 (만 34세, 남)',
+        income: '4,800 만원',
+        creditScore: '865점 / 880점',
+        debtTotal: '총 4,700만원 (1금융 3,500만 / 2금융 1,200만)',
+        interestSaved: '매월 약 11.2만원 절감!',
+        maxLimit: '최대 6,500 만원',
+        minRate: '연 4.35% ~',
+        tags: ['#고금리대환_1순위', '#직장인_4대보험', '#연체이력_전무'],
+        memo: '2금융권 1,200만원 고금리(14.5%) 대환 시 월 11만원 이상 이자 절감 포인트 강력 어필할 것.',
+        initialMsg: '아, 대출 권유 전화인가요? 제가 지금 쓰고 있는 대출도 있고... 한도 조회하면 신용점수 떨어지는 거 아닌가요?'
+      },
+      park: {
+        key: 'park',
+        name: '박서연 고객님',
+        rawName: '박서연',
+        avatar: '박',
+        creditGrade: 'KCB 1등급 (최우량)',
+        job: '(주)미르소프트연구소 (재직 6년차/선임연구원)',
+        phone: '010-3849-1102',
+        rawPhone: '010-3849-1102',
+        birth: '1995.07.19 (만 31세, 여)',
+        income: '6,200 만원',
+        creditScore: '940점 / 955점',
+        debtTotal: '총 2,000만원 (1금융 주담대)',
+        interestSaved: '신규 여유자금 최저금리 연 3.9%',
+        maxLimit: '최대 1억 2,000 만원',
+        minRate: '연 3.92% ~',
+        tags: ['#최우량_직장인', '#추가신용대출_타깃', '#당일송금가능'],
+        memo: '기대출 적고 신용 최우량. 추가 생활안정자금 및 마이너스통장 개설 권유 시 즉시 체결 가능.',
+        initialMsg: '안녕하세요. 마침 전세 자금이랑 여유자금 대출 금리 비교하고 있었는데, 최저 금리가 어떻게 되나요?'
+      },
+      lee: {
+        key: 'lee',
+        name: '이지훈 고객님',
+        rawName: '이지훈',
+        avatar: '이',
+        creditGrade: 'KCB 3등급 (사업자)',
+        job: '(주)가온글로벌유통 (사업 3년차/대표)',
+        phone: '010-7712-9934',
+        rawPhone: '010-7712-9934',
+        birth: '1988.11.04 (만 37세, 남)',
+        income: '연매출 2억 4천만원',
+        creditScore: '780점 / 795점',
+        debtTotal: '총 8,500만원 (보증재단 5천 / 캐피탈 3.5천)',
+        interestSaved: '고금리 사업자 대출 통합 시 월 28만원 절감!',
+        maxLimit: '최대 5,000 만원',
+        minRate: '연 5.8% ~',
+        tags: ['#개인사업자_대환', '#매출증빙_완료', '#부가세대환_가능'],
+        memo: '캐피탈 고금리 사업자금 3,500만원을 정부특례 보증 대환으로 유도할 것.',
+        initialMsg: '요즘 물품 대금 때문에 운전자금이 좀 필요한데 사업자 등록증만 있으면 바로 가능한가요?'
+      },
+      choi: {
+        key: 'choi',
+        name: '최민재 고객님',
+        rawName: '최민재',
+        avatar: '최',
+        creditGrade: 'KCB 1등급 (우량)',
+        job: '(주)대가모빌리티 (재직 8년차/책임연구원)',
+        phone: '010-4821-9923',
+        rawPhone: '010-4821-9923',
+        birth: '1989.05.14 (만 37세, 남)',
+        income: '7,800 만원',
+        creditScore: '920점 / 930점',
+        debtTotal: '총 5,800만원 (1금융 4,000만 / 카드론 1,800만)',
+        interestSaved: '카드론 대환 시 월 16.5만원 절감!',
+        maxLimit: '최대 9,000 만원',
+        minRate: '연 4.15% ~',
+        tags: ['#대가모빌리티_우량', '#카드론_대환타깃', '#한도여유'],
+        memo: '카드론 1,800만원(13.8%) 사용 중. 4.15%로 대환 시 연 이자 170만원 이상 절감 포인트 제시.',
+        initialMsg: '카드론 이자가 너무 비싸서 갈아타고 싶었는데, 직장인 서류 간소화로 오늘 바로 되나요?'
+      },
+      jung: {
+        key: 'jung',
+        name: '정다은 고객님',
+        rawName: '정다은',
+        avatar: '정',
+        creditGrade: 'KCB 2등급 (의료직)',
+        job: '늘푸른중앙메디컬 (재직 7년차/수간호사)',
+        phone: '010-6391-4452',
+        rawPhone: '010-6391-4452',
+        birth: '1993.10.08 (만 32세, 여)',
+        income: '5,400 만원',
+        creditScore: '890점 / 905점',
+        debtTotal: '총 3,500만원 (1금융 2,500만 / 저축은행 1,000만)',
+        interestSaved: '2금융 대환 시 월 12.8만원 절감!',
+        maxLimit: '최대 7,000 만원',
+        minRate: '연 4.28% ~',
+        tags: ['#종합병원_전문직', '#2금융_갈아타기', '#건보료_우대'],
+        memo: '저축은행 15.2% 대환 목적. 모바일 공동인증서 간편 스크래핑으로 10분 심사 안내.',
+        initialMsg: '저축은행 쓰던 거 대환대출 신청하면 기존 대출은 알아서 상환 처리가 되는 건가요?'
+      },
+      kang: {
+        key: 'kang',
+        name: '강현우 고객님',
+        rawName: '강현우',
+        avatar: '강',
+        creditGrade: 'KCB 1등급 (공무원)',
+        job: '중앙행정공공기관 (재직 5년차/7급 주무관)',
+        phone: '010-9182-3341',
+        rawPhone: '010-9182-3341',
+        birth: '1994.02.17 (만 32세, 남)',
+        income: '4,500 만원',
+        creditScore: '950점 / 965점',
+        debtTotal: '총 1,500만원 (1금융 신용)',
+        interestSaved: '공무원 우대 특별금리 연 3.85%',
+        maxLimit: '최대 8,000 만원',
+        minRate: '연 3.85% ~',
+        tags: ['#공무원_특례', '#최저금리_보장', '#마이너스통장'],
+        memo: '공무원연금 납부 확인 및 기관 재직 확인 완료. 3.85% 마통 개설 적극 유치 권장.',
+        initialMsg: '공무원 전용 특례 상품이라고 문자 왔던데, 중도상환수수료는 면제인가요?'
+      },
+      yoon: {
+        key: 'yoon',
+        name: '윤서준 고객님',
+        rawName: '윤서준',
+        avatar: '윤',
+        creditGrade: 'KCB 1등급 (고소득)',
+        job: '(주)넥스트포털랩 (재직 6년차/개발리더)',
+        phone: '010-2274-8819',
+        rawPhone: '010-2274-8819',
+        birth: '1990.12.03 (만 35세, 남)',
+        income: '8,900 만원',
+        creditScore: '915점 / 930점',
+        debtTotal: '총 8,500만원 (1금융 6,000만 / 캐피탈 2,500만)',
+        interestSaved: '캐피탈 대환 시 월 24.3만원 절감!',
+        maxLimit: '최대 1억 5,000 만원',
+        minRate: '연 4.05% ~',
+        tags: ['#빅테크_고소득', '#대형대환_2500만', '#비대면승인'],
+        memo: '고소득자 DSR 여유 충분. 캐피탈 2,500만원(12.5%) 즉시 전액 대환 가능.',
+        initialMsg: '금리가 연 4% 초반이면 지금 쓰는 캐피탈 대출 전부 갈아타고 싶은데요. 비대면 약정 되나요?'
+      },
+      han: {
+        key: 'han',
+        name: '한지민 고객님',
+        rawName: '한지민',
+        avatar: '한',
+        creditGrade: 'KCB 2등급 (직장인)',
+        job: '(주)하람미디어엔터 (재직 6년차/마케팅 과장)',
+        phone: '010-5519-7720',
+        rawPhone: '010-5519-7720',
+        birth: '1991.08.25 (만 35세, 여)',
+        income: '5,800 만원',
+        creditScore: '875점 / 890점',
+        debtTotal: '총 4,500만원 (1금융 3,000만 / 카드론 1,500만)',
+        interestSaved: '카드론 대환 시 월 13.5만원 절감!',
+        maxLimit: '최대 6,800 만원',
+        minRate: '연 4.42% ~',
+        tags: ['#대형미디어_재직', '#카드론_통합', '#신용관리선호'],
+        memo: '카드론 2건 통합 대환 안내. 신용점수 30점 이상 상승 효과 강조할 것.',
+        initialMsg: '카드론 2개 쪼개서 쓰고 있는데 하나로 묶어서 낼 수 있나요?'
+      },
+      song: {
+        key: 'song',
+        name: '송태양 고객님',
+        rawName: '송태양',
+        avatar: '송',
+        creditGrade: 'KCB 3등급 (가맹점주)',
+        job: '(주)솔라에프앤비 (사업 4년차/프랜차이즈 대표)',
+        phone: '010-8830-1194',
+        rawPhone: '010-8830-1194',
+        birth: '1987.04.11 (만 39세, 남)',
+        income: '연매출 3억 8천만원',
+        creditScore: '795점 / 810점',
+        debtTotal: '총 1억 2,000만원 (기업은행 8천 / 2금융 4천)',
+        interestSaved: '사업자 고금리 대환 시 월 32만원 절감!',
+        maxLimit: '최대 7,500 만원',
+        minRate: '연 5.45% ~',
+        tags: ['#가맹점_사업자', '#카드매출_증빙', '#사업확장자금'],
+        memo: 'POS 매출 증빙 및 부가세 과세표준 증명 완료. 사업자 운전자금 4,000만원 대환 타깃.',
+        initialMsg: '매출은 꾸준히 나오는데 카드매출 선정산 고금리 쓰던 거 대환 가능할까요?'
+      },
+      cho: {
+        key: 'cho',
+        name: '조은채 고객님',
+        rawName: '조은채',
+        avatar: '조',
+        creditGrade: 'KCB 1등급 (공기업)',
+        job: '대한에너지공사 (재직 4년차/선임주임)',
+        phone: '010-3348-6612',
+        rawPhone: '010-3348-6612',
+        birth: '1996.09.19 (만 29세, 여)',
+        income: '5,100 만원',
+        creditScore: '935점 / 945점',
+        debtTotal: '총 2,000만원 (1금융 신용)',
+        interestSaved: '공기업 임직원 특별우대금리 연 3.98%',
+        maxLimit: '최대 8,500 만원',
+        minRate: '연 3.98% ~',
+        tags: ['#대한에너지_공기업', '#최우량_신용', '#결혼자금_타깃'],
+        memo: '올해 가을 결혼 준비 자금 문의 이력 있음. 3.98% 고정금리형 특례 신용대출 안내.',
+        initialMsg: '결혼 준비하면서 전세 보증금 보태려고 하는데 당일 심사 바로 나오나요?'
+      },
+      lim: {
+        key: 'lim',
+        name: '임동현 고객님',
+        rawName: '임동현',
+        avatar: '임',
+        creditGrade: 'KCB 1등급 (반도체)',
+        job: '(주)하이세미컨 (재직 5년차/기술선임)',
+        phone: '010-7612-5503',
+        rawPhone: '010-7612-5503',
+        birth: '1992.01.28 (만 34세, 남)',
+        income: '7,200 만원',
+        creditScore: '905점 / 920점',
+        debtTotal: '총 7,000만원 (1금융 5,000만 / 카드론 2,000만)',
+        interestSaved: '2금융 통합 시 월 19.4만원 절감!',
+        maxLimit: '최대 1억 1,000 만원',
+        minRate: '연 4.18% ~',
+        tags: ['#하이세미컨_선임', '#카드론_2000만대환', '#한도넉넉'],
+        memo: '성과급 수령 전 일시적 카드론 사용 중. 4.18%로 대환 후 1년 만기일시 상환 추천.',
+        initialMsg: '카드론 2천만원 쓰고 있는데 이걸로 갈아타면 한도 얼마나 더 나오나요?'
+      },
+      shin: {
+        key: 'shin',
+        name: '신유진 고객님',
+        rawName: '신유진',
+        avatar: '신',
+        creditGrade: 'KCB 1등급 (교직원)',
+        job: '꿈나무사립초등학교 (재직 6년차/정교사)',
+        phone: '010-4491-2287',
+        rawPhone: '010-4491-2287',
+        birth: '1994.06.30 (만 32세, 여)',
+        income: '4,600 만원',
+        creditScore: '960점 / 970점',
+        debtTotal: '총 1,200만원 (1금융 신용)',
+        interestSaved: '교직원 특례 최저금리 연 3.82%',
+        maxLimit: '최대 7,500 만원',
+        minRate: '연 3.82% ~',
+        tags: ['#초등학교_교사', '#최고_신용점수', '#공제회_연계'],
+        memo: '신용 960점 초우량. 방학 기간 생활안정자금 및 여유자금 3.82% 우대금리 안내.',
+        initialMsg: '교직원 우대 대출 금리 안내 문자 보고 연락드렸어요.'
+      },
+      oh: {
+        key: 'oh',
+        name: '오승환 고객님',
+        rawName: '오승환',
+        avatar: '오',
+        creditGrade: 'KCB 2등급 (물류)',
+        job: '(주)로지스익스프레스 (재직 4년차/물류운영 팀장)',
+        phone: '010-8193-4412',
+        rawPhone: '010-8193-4412',
+        birth: '1989.11.15 (만 36세, 남)',
+        income: '5,200 만원',
+        creditScore: '840점 / 855점',
+        debtTotal: '총 4,400만원 (1금융 2,800만 / 저축은행 1,600만)',
+        interestSaved: '저축은행 16% 대환 시 월 18.2만원 절감!',
+        maxLimit: '최대 6,000 만원',
+        minRate: '연 4.65% ~',
+        tags: ['#물류_정규직', '#저축은행_고금리대환', '#월지출절감'],
+        memo: '저축은행 16.5% 1,600만원 전액 대환 타깃. 월 불입금 18만원 절감 포인트 강조.',
+        initialMsg: '저축은행 이자가 너무 빡빡했는데 4%대로 낮출 수 있으면 지금 바로 하고 싶네요.'
+      },
+      bae: {
+        key: 'bae',
+        name: '배수현 고객님',
+        rawName: '배수현',
+        avatar: '배',
+        creditGrade: 'KCB 2등급 (법무직)',
+        job: '법무법인 정율 (재직 5년차/전문비서)',
+        phone: '010-3320-9981',
+        rawPhone: '010-3320-9981',
+        birth: '1995.03.12 (만 31세, 여)',
+        income: '4,300 만원',
+        creditScore: '880점 / 895점',
+        debtTotal: '총 2,700만원 (1금융 1,800만 / 카드론 900만)',
+        interestSaved: '카드론 대환 시 월 8.5만원 절감!',
+        maxLimit: '최대 5,500 만원',
+        minRate: '연 4.45% ~',
+        tags: ['#대형로펌_재직', '#카드론_소액대환', '#여성안심대출'],
+        memo: '카드론 900만원(14.2%) 보유. 전액 대환 및 1,000만원 추가 여유자금 동시 승인 가능.',
+        initialMsg: '카드론 남아있는 900만원 갈아타면서 조금 더 추가 대출도 가능한가요?'
+      },
+      kwon: {
+        key: 'kwon',
+        name: '권지호 고객님',
+        rawName: '권지호',
+        avatar: '권',
+        creditGrade: 'KCB 1등급 (IT엔지니어)',
+        job: '(주)대가전자시스템 (재직 7년차/책임엔지니어)',
+        phone: '010-9941-6672',
+        rawPhone: '010-9941-6672',
+        birth: '1990.07.22 (만 36세, 남)',
+        income: '6,800 만원',
+        creditScore: '925점 / 940점',
+        debtTotal: '총 5,000만원 (1금융 3,500만 / 캐피탈 1,500만)',
+        interestSaved: '캐피탈 대환 시 월 14.8만원 절감!',
+        maxLimit: '최대 9,500 만원',
+        minRate: '연 4.12% ~',
+        tags: ['#대가전자_책임', '#캐피탈_대환', '#우수신용자'],
+        memo: '자동차 할부 캐피탈(11.8%) 대환 및 신용대출 5,000만원 넉넉한 한도 배정.',
+        initialMsg: '캐피탈 금리 11% 넘게 내고 있는데 4.12%로 대환 처리 바로 되나요?'
+      },
+      hwang: {
+        key: 'hwang',
+        name: '황보람 고객님',
+        rawName: '황보람',
+        avatar: '황',
+        creditGrade: 'KCB 2등급 (핀테크)',
+        job: '(주)핀웨이브테크 (재직 4년차/데이터사이언티스트)',
+        phone: '010-7731-0029',
+        rawPhone: '010-7731-0029',
+        birth: '1993.12.05 (만 32세, 여)',
+        income: '6,500 만원',
+        creditScore: '895점 / 910점',
+        debtTotal: '총 4,100만원 (1금융 3,000만 / 카드론 1,100만)',
+        interestSaved: '고금리 대환 시 월 10.5만원 절감!',
+        maxLimit: '최대 8,000 만원',
+        minRate: '연 4.25% ~',
+        tags: ['#핀테크_혁신기업', '#스마트대환', '#모바일간편신청'],
+        memo: '핀테크 근무자로 금융 이해도 높음. DSR 규제 및 금리 절감 계산표 즉시 제시할 것.',
+        initialMsg: 'DSR 40% 한도 내에서 최대한도랑 최저금리 시뮬레이션 볼 수 있나요?'
+      },
+      ahn: {
+        key: 'ahn',
+        name: '안태준 고객님',
+        rawName: '안태준',
+        avatar: '안',
+        creditGrade: 'KCB 1등급 (전문직)',
+        job: '대명회계법인 (재직 5년차/공인회계사)',
+        phone: '010-1129-8834',
+        rawPhone: '010-1129-8834',
+        birth: '1991.02.18 (만 35세, 남)',
+        income: '8,200 만원',
+        creditScore: '945점 / 960점',
+        debtTotal: '총 4,500만원 (1금융 신용)',
+        interestSaved: '전문직 특별 우대금리 연 3.90%',
+        maxLimit: '최대 1억 3,000 만원',
+        minRate: '연 3.90% ~',
+        tags: ['#대명회계_회계사', '#전문직_특례', '#1억이상한도'],
+        memo: '전문직 자격증 보유자. 1억 3,000만원 3.90% 최고 우대조건 안내.',
+        initialMsg: '전문직 신용대출 한도가 1억 넘게 나온다고 들었는데 서류는 뭐가 필요한가요?'
+      },
+      ryu: {
+        key: 'ryu',
+        name: '류하은 고객님',
+        rawName: '류하은',
+        avatar: '류',
+        creditGrade: 'KCB 2등급 (항공직)',
+        job: '스카이윙스항공 (재직 6년차/선임승무원)',
+        phone: '010-6642-1175',
+        rawPhone: '010-6642-1175',
+        birth: '1994.04.09 (만 32세, 여)',
+        income: '4,900 만원',
+        creditScore: '870점 / 885점',
+        debtTotal: '총 3,500만원 (1금융 2,200만 / 카드론 1,300만)',
+        interestSaved: '카드론 대환 시 월 12.1만원 절감!',
+        maxLimit: '최대 6,200 만원',
+        minRate: '연 4.48% ~',
+        tags: ['#항공사_승무원', '#카드론_통합', '#신용상승효과'],
+        memo: '카드론 1,300만원(13.9%) 대환 처리 시 신용등급 상승 및 월 납입금 12만원 절감.',
+        initialMsg: '비행 스케줄 때문에 지점 방문이 어려운데 100% 모바일로 당일 입금 되나요?'
+      },
+      moon: {
+        key: 'moon',
+        name: '문성민 고객님',
+        rawName: '문성민',
+        avatar: '문',
+        creditGrade: 'KCB 1등급 (금융인)',
+        job: '(주)골든에셋자문 (재직 5년차/투자자문 팀장)',
+        phone: '010-5582-9901',
+        rawPhone: '010-5582-9901',
+        birth: '1988.08.31 (만 38세, 남)',
+        income: '7,400 만원',
+        creditScore: '910점 / 925점',
+        debtTotal: '총 6,200만원 (1금융 4,000만 / 2금융 2,200만)',
+        interestSaved: '2금융 고금리 대환 시 월 21.6만원 절감!',
+        maxLimit: '최대 1억 500 만원',
+        minRate: '연 4.20% ~',
+        tags: ['#금융투자_팀장', '#2금융_통합대환', '#여전자금활용'],
+        memo: '2금융 2,200만원(14.8%) 통합 대환 타깃. 4.20% 적용 시 월 21만원 이상 절감.',
+        initialMsg: '2금융 대출 2,200만원 쓰고 있는 거 깔끔하게 묶고 싶은데 심사 시간 얼마나 걸리나요?'
+      },
+      jang: {
+        key: 'jang',
+        name: '장예린 고객님',
+        rawName: '장예린',
+        avatar: '장',
+        creditGrade: 'KCB 2등급 (의료기사)',
+        job: '한빛종합병원 (재직 4년차/임상병리사)',
+        phone: '010-4418-7736',
+        rawPhone: '010-4418-7736',
+        birth: '1995.11.23 (만 30세, 여)',
+        income: '4,400 만원',
+        creditScore: '885점 / 900점',
+        debtTotal: '총 2,600만원 (1금융 1,600만 / 캐피탈 1,000만)',
+        interestSaved: '캐피탈 대환 시 월 9.8만원 절감!',
+        maxLimit: '최대 5,800 만원',
+        minRate: '연 4.38% ~',
+        tags: ['#한빛종합병원_의료', '#캐피탈_대환', '#원리금균등'],
+        memo: '캐피탈 1,000만원(13.5%) 대환 시 월 9.8만원 절감. 36개월 원리금균등 상환 추천.',
+        initialMsg: '캐피탈 대출 남은 거 4.38%로 갈아타면 한 달에 나가는 돈이 얼마나 줄어드나요?'
+      }
+    };
+
+    const customerKeys = Object.keys(customerDatabase);
+
+    // Initialize Timer
+    function startCallTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (!isHold && isCalling) {
+          secondsElapsed++;
+          const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+          const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+          const secs = String(secondsElapsed % 60).padStart(2, '0');
+          document.getElementById('call-timer').textContent = `${hrs}:${mins}:${secs}`;
+        }
+      }, 1000);
+    }
+
+    // Toggle Mute
+    function toggleMute() {
+      isMuted = !isMuted;
+      const btn = document.getElementById('btn-mute');
+      const icon = document.getElementById('icon-mute');
+      if (isMuted) {
+        btn.classList.add('bg-amber-600', 'text-white');
+        btn.classList.remove('bg-slate-800');
+        icon.className = 'fa-solid fa-microphone-slash text-base';
+        showToast('마이크 음소거', '상담원 마이크가 음소거되었습니다.', 'warning');
+      } else {
+        btn.classList.remove('bg-amber-600', 'text-white');
+        btn.classList.add('bg-slate-800');
+        icon.className = 'fa-solid fa-microphone text-base';
+        showToast('마이크 켬', '마이크가 다시 활성화되었습니다.', 'info');
+      }
+    }
+
+    // Toggle Hold
+    function toggleHold() {
+      isHold = !isHold;
+      const btn = document.getElementById('btn-hold');
+      const soundwave = document.getElementById('soundwave-container');
+      const timerEl = document.getElementById('call-timer');
+      if (isHold) {
+        btn.classList.add('bg-amber-600', 'text-white');
+        btn.classList.remove('bg-slate-800');
+        if (timerEl) timerEl.className = 'text-3xl lg:text-[34px] font-black font-mono tracking-wider text-amber-400 drop-shadow-[0_0_12px_rgba(251,191,36,0.35)] leading-none whitespace-nowrap';
+        soundwave.classList.add('opacity-30');
+        showToast('통화 보류', '고객에게 금융사 대기 음원이 송출됩니다.', 'warning');
+      } else {
+        btn.classList.remove('bg-amber-600', 'text-white');
+        btn.classList.add('bg-slate-800');
+        if (timerEl) timerEl.className = 'text-3xl lg:text-[34px] font-black font-mono tracking-wider text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.35)] leading-none whitespace-nowrap';
+        soundwave.classList.remove('opacity-30');
+        showToast('통화 재개', '고객과 정상 통화가 재개되었습니다.', 'info');
+      }
+    }
+
+    // End Call
+    function endCall() {
+      if (!isCalling) {
+        // Restart call
+        isCalling = true;
+        secondsElapsed = 0;
+        document.getElementById('btn-end-call').innerHTML = '<i class="fa-solid fa-phone-slash text-base"></i><span class="whitespace-nowrap tracking-wide">통화 종료</span>';
+        document.getElementById('btn-end-call').className = 'h-12 min-w-[130px] px-6 rounded-xl bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:from-rose-500 hover:to-red-500 text-white text-sm font-black flex items-center justify-center space-x-2 shadow-xl shadow-rose-600/40 border border-rose-400/30 active:scale-95 transition-all transform cursor-pointer whitespace-nowrap shrink-0';
+        const timerEl = document.getElementById('call-timer');
+        if (timerEl) timerEl.className = 'text-3xl lg:text-[34px] font-black font-mono tracking-wider text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.35)] leading-none whitespace-nowrap';
+        document.getElementById('agent-status-select').value = 'busy';
+        changeAgentStatus('busy');
+        startCallTimer();
+        showToast('통화 연결', '대출 TM 아웃바운드 통화가 연결되었습니다.', 'success');
+        return;
+      }
+
+      isCalling = false;
+      clearInterval(timerInterval);
+      const timerEl = document.getElementById('call-timer');
+      if (timerEl) timerEl.className = 'text-3xl lg:text-[34px] font-black font-mono tracking-wider text-rose-400 drop-shadow leading-none whitespace-nowrap';
+      
+      const btn = document.getElementById('btn-end-call');
+      btn.innerHTML = '<i class="fa-solid fa-phone text-base animate-pulse"></i><span class="whitespace-nowrap tracking-wide">통화 연결 (새 콜 시작)</span>';
+      btn.className = 'h-12 min-w-[175px] px-6 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-black flex items-center justify-center space-x-2 shadow-xl shadow-emerald-600/40 border border-emerald-400/30 active:scale-95 transition-all transform cursor-pointer whitespace-nowrap shrink-0';
+
+      // Switch to Wrapup
+      document.getElementById('agent-status-select').value = 'wrapup';
+      changeAgentStatus('wrapup');
+
+      showToast('상담 종료', '통화가 종료되었습니다. 가심사 결과 및 메모를 저장해 주세요.', 'info');
+    }
+
+    // Change Agent Status
+    function changeAgentStatus(val) {
+      const ind = document.getElementById('agent-status-indicator');
+      const ping = document.getElementById('agent-status-ping');
+      if (val === 'ready') {
+        ind.className = 'w-3 h-3 rounded-full bg-emerald-400';
+        ping.className = 'w-3 h-3 rounded-full bg-emerald-400 animate-ping absolute inset-0 opacity-75';
+      } else if (val === 'busy') {
+        ind.className = 'w-3 h-3 rounded-full bg-rose-500';
+        ping.className = 'w-3 h-3 rounded-full bg-rose-500 animate-ping absolute inset-0 opacity-75';
+      } else if (val === 'wrapup') {
+        ind.className = 'w-3 h-3 rounded-full bg-amber-400';
+        ping.className = 'w-3 h-3 rounded-full bg-amber-400 animate-ping absolute inset-0 opacity-75';
+      } else {
+        ind.className = 'w-3 h-3 rounded-full bg-slate-400';
+        ping.className = 'hidden';
+      }
+    }
+
+    // Toggle Masking
+    function toggleMasking() {
+      isMasked = !isMasked;
+      const cust = customerDatabase[currentCustomerKey];
+      const nameEl = document.getElementById('cust-name');
+      const phoneEl = document.getElementById('cust-phone');
+      const icon = document.getElementById('masking-icon');
+
+      if (isMasked) {
+        nameEl.textContent = cust.rawName[0] + '*' + cust.rawName.slice(2) + ' 고객님';
+        phoneEl.textContent = cust.phone.replace(/(\d{3})-\d{4}-(\d{4})/, '$1-****-$2');
+        icon.className = 'fa-solid fa-eye';
+        showToast('마스킹 적용', '금융 개인정보가 마스킹 처리되었습니다.', 'info');
+      } else {
+        nameEl.textContent = cust.rawName + ' 고객님';
+        phoneEl.textContent = cust.rawPhone;
+        icon.className = 'fa-solid fa-eye-slash text-blue-400';
+        showToast('마스킹 해제', '고객 개인정보 열람 감사 로그가 기록되었습니다.', 'warning');
+      }
+    }
+
+    // Switch Customer
+    function loadCustomerData(key) {
+      currentCustomerKey = key;
+      currentCustomerIndex = customerKeys.indexOf(key);
+      if (currentCustomerIndex === -1) currentCustomerIndex = 0;
+      const cust = customerDatabase[key];
+      if (!cust) return;
+
+      // Update select dropdown in header
+      const dbSelect = document.getElementById('customer-db-select');
+      if (dbSelect) dbSelect.value = key;
+
+      // Update customer DOM Profile
+      document.getElementById('cust-avatar').textContent = cust.avatar;
+      document.getElementById('cust-name').textContent = isMasked ? (cust.rawName[0] + '*' + cust.rawName.slice(2) + ' 고객님') : (cust.rawName + ' 고객님');
+      document.getElementById('cust-job').textContent = cust.job;
+      document.getElementById('cust-phone').textContent = isMasked ? cust.phone.replace(/(\d{3})-\d{4}-(\d{4})/, '$1-****-$2') : cust.rawPhone;
+      document.getElementById('cust-birth').textContent = cust.birth;
+      document.getElementById('cust-income').textContent = cust.income;
+      document.getElementById('cust-credit-score').textContent = cust.creditScore;
+      document.getElementById('cust-debt-total').textContent = cust.debtTotal;
+      document.getElementById('cust-interest-saved').textContent = cust.interestSaved;
+      document.getElementById('cust-max-limit').textContent = cust.maxLimit;
+      document.getElementById('cust-min-rate').textContent = cust.minRate;
+      document.getElementById('sticky-memo-text').value = cust.memo;
+
+      // Tags
+      const tagsContainer = document.getElementById('cust-tags');
+      tagsContainer.innerHTML = cust.tags.map(t => `<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 whitespace-nowrap">${t}</span>`).join('');
+
+      // Refresh Live Chat Stream with this customer's customized conversation
+      const chatContainer = document.getElementById('chat-messages-container');
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+      chatContainer.innerHTML = `
+        <div class="flex justify-center">
+          <span class="text-[10px] px-3 py-1 rounded-full bg-slate-800/90 text-slate-400 border border-slate-700/60 flex items-center space-x-1.5 shadow-sm whitespace-nowrap">
+            <i class="fa-solid fa-shield-halved text-[9px] text-emerald-400"></i>
+            <span>${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${timeStr} - 금융소비자보호법 준수 및 보안 녹취 세션이 시작되었습니다.</span>
+          </span>
+        </div>
+
+        <!-- Agent Opening Pitch -->
+        <div class="flex items-start justify-end space-x-2.5 max-w-[85%] ml-auto animate-fade-in">
+          <div class="text-right">
+            <div class="flex items-center justify-end space-x-1.5 mb-0.5">
+              <span class="text-[9px] text-slate-500 font-mono">${timeStr}</span>
+              <span class="text-[11px] font-bold text-blue-300">상담원 (김도현)</span>
+            </div>
+            <div class="p-3 rounded-2xl rounded-tr-none bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-xs leading-relaxed shadow-lg shadow-blue-600/20">
+              안녕하십니까 <strong>${cust.rawName} 고객님</strong>! FINEX 금융 우수직장인 전담센터 김도현 팀장입니다. 고객님 신용평점 및 4대보험 재직 기반으로 <strong>기존 고금리 대출을 ${cust.minRate} 저금리로 대환 가능한 특별 한도(${cust.maxLimit})</strong>가 배정되어 안내차 연락드렸습니다.
+            </div>
+          </div>
+          <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5 shadow">상</div>
+        </div>
+
+        <!-- Customer Message -->
+        <div class="flex items-start space-x-2.5 max-w-[85%] animate-fade-in">
+          <div class="w-7 h-7 rounded-full bg-amber-600 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5 shadow">${cust.avatar}</div>
+          <div>
+            <div class="flex items-center space-x-1.5 mb-0.5">
+              <span class="text-[11px] font-bold text-slate-300">고객 (${cust.rawName})</span>
+              <span class="text-[9px] text-slate-500 font-mono">${timeStr}</span>
+            </div>
+            <div class="p-3 rounded-2xl rounded-tl-none bg-slate-800 text-slate-100 text-xs leading-relaxed border border-slate-700/80 shadow-md">
+              ${cust.initialMsg}
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Whisper Assistant -->
+        <div class="flex justify-center my-1" id="ai-whisper-bubble">
+          <div class="bg-blue-950/70 border border-blue-500/40 rounded-xl px-3.5 py-1.5 flex items-center space-x-2 text-[11px] text-blue-200 shadow">
+            <i class="fa-solid fa-brain text-emerald-400 animate-pulse text-xs"></i>
+            <span><strong>AI 실시간 코파일럿 코칭:</strong> [${cust.interestSaved}] 핵심 혜택을 제시하며 가심사 동의를 유도하세요.</span>
+            <button onclick="applyTemplate('refinance_hook')" class="px-2 py-0.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-[10px] font-bold">스크립트 적용</button>
+          </div>
+        </div>
+      `;
+
+      // Update consultation record text
+      const textarea = document.getElementById('consultation-content');
+      if (textarea) {
+        textarea.value = `[상담 및 가심사 내역]
+1. 타깃 고객: ${cust.rawName} (${cust.job}), 연소득 ${cust.income}, 신용평점 ${cust.creditScore}.
+2. 기대출 현황: ${cust.debtTotal}
+3. 상담 목적: FINEX 우대 신용/대환대출 (${cust.minRate}, ${cust.maxLimit}) 특별한도 배정 안내.
+4. 고객 반응: ${cust.interestSaved} 포인트 확인 후 가심사 진행 동의.
+5. 후속 조치: 모바일 공인인증 가심사 URL(SMS) 발송 완료, 당일 전자약정 대기.`;
+        document.getElementById('char-count').textContent = textarea.value.length + '자';
+      }
+    }
+
+    // Search Customer
+    function searchCustomer(query) {
+      if (!query || !query.trim()) return;
+      const q = query.trim().toLowerCase();
+      const keys = Object.keys(customerDatabase);
+      const foundKey = keys.find(k => {
+        const c = customerDatabase[k];
+        return c.rawName.toLowerCase().includes(q) ||
+               c.phone.replace(/-/g, '').includes(q.replace(/-/g, '')) ||
+               c.job.toLowerCase().includes(q) ||
+               c.tags.some(t => t.toLowerCase().includes(q));
+      });
+      if (foundKey) {
+        loadCustomerData(foundKey);
+        showToast('고객 검색 성공', `[${customerDatabase[foundKey].rawName} 고객님 - ${customerDatabase[foundKey].job}] 정보를 불러왔습니다.`, 'success');
+      } else {
+        showToast('검색 결과 없음', `'${query}' 관련 고객 DB를 찾을 수 없습니다.`, 'warning');
+      }
+    }
+
+    // Loan Calculator Logic
+    function updateLoanCalculator() {
+      const amountWan = parseInt(document.getElementById('calc-amount-range').value);
+      document.getElementById('calc-amount-display').textContent = amountWan.toLocaleString() + ' 만원';
+      
+      const principal = amountWan * 10000;
+      const months = parseInt(document.getElementById('calc-period').value);
+      const annualRate = parseFloat(document.getElementById('calc-rate').value) / 100;
+      const monthlyRate = annualRate / 12;
+
+      // Amortization formula (원리금균등)
+      let monthlyPayment = 0;
+      if (monthlyRate > 0) {
+        monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+      } else {
+        monthlyPayment = principal / months;
+      }
+
+      const totalRepay = monthlyPayment * months;
+      const totalInterest = totalRepay - principal;
+
+      document.getElementById('calc-monthly-payment').textContent = Math.round(monthlyPayment).toLocaleString() + ' 원';
+      document.getElementById('calc-total-principal').textContent = principal.toLocaleString() + ' 원';
+      document.getElementById('calc-total-interest').textContent = Math.round(totalInterest).toLocaleString() + ' 원';
+    }
+
+    // Insert Calculator to Chat
+    function insertCalculatorResultToChat() {
+      const amount = document.getElementById('calc-amount-display').textContent;
+      const months = document.getElementById('calc-period').value;
+      const rate = document.getElementById('calc-rate').value;
+      const monthly = document.getElementById('calc-monthly-payment').textContent;
+
+      const scriptText = `고객님, 신청금액 ${amount} 기준 ${months}개월(연 ${rate}%) 선택 시 매월 예상 원리금은 약 ${monthly} 입니다.`;
+      const input = document.getElementById('chat-input');
+      input.value = scriptText;
+      input.focus();
+      showToast('계산결과 복사', '대출 시뮬레이션 결과가 대화 입력창에 삽입되었습니다.', 'success');
+    }
+
+    // Handle Sending Chat Message
+    function handleSendChatMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendChatMessage('agent', text);
+      input.value = '';
+
+      // Auto customer reply simulation after 1.3s
+      setTimeout(() => {
+        simulateCustomerLoanReply(text);
+      }, 1300);
+    }
+
+    function appendChatMessage(sender, text) {
+      const container = document.getElementById('chat-messages-container');
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+      
+      const msgDiv = document.createElement('div');
+      if (sender === 'agent') {
+        msgDiv.className = 'flex items-start justify-end space-x-2.5 max-w-[85%] ml-auto animate-fade-in';
+        msgDiv.innerHTML = `
+          <div class="text-right">
+            <div class="flex items-center justify-end space-x-1.5 mb-0.5">
+              <span class="text-[9px] text-slate-500 font-mono">${timeStr}</span>
+              <span class="text-[11px] font-bold text-blue-300">상담원 (김도현)</span>
+            </div>
+            <div class="p-3 rounded-2xl rounded-tr-none bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-xs leading-relaxed shadow-lg shadow-blue-600/20">
+              ${text}
+            </div>
+          </div>
+          <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5 shadow">상</div>
+        `;
+      } else {
+        const cust = customerDatabase[currentCustomerKey] || customerDatabase.kim;
+        msgDiv.className = 'flex items-start space-x-2.5 max-w-[85%] animate-fade-in';
+        msgDiv.innerHTML = `
+          <div class="w-7 h-7 rounded-full bg-amber-600 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5 shadow">${cust.avatar}</div>
+          <div>
+            <div class="flex items-center space-x-1.5 mb-0.5">
+              <span class="text-[11px] font-bold text-slate-300">고객 (${cust.rawName})</span>
+              <span class="text-[9px] text-slate-500 font-mono">${timeStr}</span>
+            </div>
+            <div class="p-3 rounded-2xl rounded-tl-none bg-slate-800 text-slate-100 text-xs leading-relaxed border border-slate-700/80 shadow-md">
+              ${text}
+            </div>
+          </div>
+        `;
+      }
+
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function simulateCustomerLoanReply(agentMsg) {
+      const cust = customerDatabase[currentCustomerKey] || customerDatabase.kim;
+      let reply = `아, 신용점수 하락이 전혀 없는 안심 가조회라면 한 번 ${cust.maxLimit} 한도랑 금리 조회 부탁드립니다!`;
+      if (agentMsg.includes('대환') || agentMsg.includes('이자') || agentMsg.includes('절감')) {
+        reply = `그럼 기존 대출 갈아타면 ${cust.interestSaved} 정말로 가능한가요? 자세히 설명해 주세요.`;
+      } else if (agentMsg.includes('문자') || agentMsg.includes('URL') || agentMsg.includes('링크')) {
+        reply = `네! 방금 제 번호(${cust.phone})로 문자 왔네요. 모바일 본인인증 진행하면 되나요?`;
+      } else if (agentMsg.includes('동의') || agentMsg.includes('약정')) {
+        reply = `네, ${cust.minRate} 금리 및 원리금균등 조건 확인했고 가심사 진행에 동의합니다.`;
+      }
+      appendChatMessage('customer', reply);
+    }
+
+    // Apply Quick Templates
+    const templateTexts = {
+      opening_vip: "안녕하십니까 고객님, FINEX 금융 우수 직장인 전담센터 김도현 팀장입니다. 이번에 우량 신용등급 및 재직 기반으로 연 4%대 특별 대환대출 한도가 배정되어 안내차 연락드렸습니다.",
+      objection_credit: "고객님, 단순 가심사 한도 조회는 금융감독원 규정에 따라 신용평점에 단 1점의 영향도 주지 않는 안심 가조회이니 안심하셔도 좋습니다.",
+      refinance_hook: "고객님께서 현재 이용 중이신 2금융 고금리 대출을 당사 우대금리로 전액 대환 시 매월 상당한 이자를 즉시 아끼실 수 있습니다.",
+      sms_guide: "고객님 스마트폰으로 안전한 금융결제원 공인인증 가심사 URL을 문자(SMS)로 발송해 드렸습니다. 본인인증 완료 시 즉시 최종 승인 결과가 안내됩니다.",
+      closing_done: "가심사 접수가 정상 승인되었습니다. 서류 확인 후 1시간 내로 원하시는 계좌로 당일 송금 처리 진행해 드리겠습니다. 좋은 하루 보내십시오!"
+    };
+
+    function applyTemplate(key) {
+      const text = templateTexts[key];
+      if (!text) return;
+      
+      const chatInput = document.getElementById('chat-input');
+      chatInput.value = text;
+      chatInput.focus();
+      showToast('템플릿 입력', '대출 TM 표준 스크립트가 삽입되었습니다.', 'info');
+    }
+
+    // Insert AI Objection Handling Script
+    function insertScript(num) {
+      const chatInput = document.getElementById('chat-input');
+      const cust = customerDatabase[currentCustomerKey] || customerDatabase.kim;
+      if (num === 1) {
+        chatInput.value = "고객님, 단순 가심사 한도 조회는 금융감독원 규정에 따라 신용평점에 단 1점의 영향도 주지 않는 안심 가조회이니 안심하셔도 좋습니다.";
+      } else {
+        chatInput.value = `고객님께서 현재 이용 중이신 고금리 대출을 ${cust.minRate}로 갈아타시면 ${cust.interestSaved} 효과를 즉시 누리실 수 있습니다.`;
+      }
+      chatInput.focus();
+      showToast('스크립트 복사', '추천 거절극복 스크립트가 대화창에 삽입되었습니다.', 'success');
+    }
+
+    // Insert AI Smart Reply
+    function insertAiSmartReply() {
+      const chatInput = document.getElementById('chat-input');
+      chatInput.value = "네 고객님! 직장인 우대 서류 간소화 대상이시라 서류 제출 없이 모바일 본인인증만으로 즉시 당일 대출 승인 및 송금이 가능하십니다.";
+      chatInput.focus();
+    }
+
+    // AI Summarize Consultation Record
+    function generateAiSummary() {
+      const btn = document.getElementById('btn-ai-summary');
+      const textarea = document.getElementById('consultation-content');
+      const cust = customerDatabase[currentCustomerKey] || customerDatabase.kim;
+      
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-amber-300"></i><span>AI 대출 심사 분석 및 요약 중...</span>';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        textarea.value = `[AI 자동 대출 심사 요약 - 2026.08.27]
+1. 타깃 분석: ${cust.rawName} (${cust.job}), 연소득 ${cust.income}, 신용평점 ${cust.creditScore}.
+2. 기대출 현황: ${cust.debtTotal}
+3. 대출 니즈: FINEX 우대 저금리(${cust.minRate}, ${cust.maxLimit}) 대환 신청.
+4. 심사 결과: 가심사 적격 판정 (${cust.interestSaved}), 36개월 원리금균등 상환 동의.
+5. 후속 조치: 고객 번호(${cust.phone})로 전자약정 URL SMS 발송 완료, 당일 송금 대기.`;
+        
+        btn.innerHTML = '<i class="fa-solid fa-sparkles text-amber-300"></i><span>AI 원클릭 대출상담 요약 생성</span>';
+        btn.disabled = false;
+        
+        document.getElementById('char-count').textContent = textarea.value.length + '자';
+        showToast('AI 요약 완료', `[${cust.rawName} 고객님] 상담 및 심사 요약문이 생성되었습니다.`, 'success');
+      }, 500);
+    }
+
+    // Save Consultation Record
+    function saveConsultationRecord() {
+      const content = document.getElementById('consultation-content').value;
+      if (!content.trim()) {
+        showToast('입력 오류', '상담 및 심사 내용을 입력해주세요.', 'error');
+        return;
+      }
+
+      // Confetti celebration for successful loan lead
+      confetti({
+        particleCount: 70,
+        spread: 70,
+        origin: { y: 0.8 }
+      });
+
+      // Increment stats
+      const countEl = document.getElementById('today-call-count');
+      const currentCalls = parseInt(countEl.textContent) || 64;
+      countEl.textContent = `${currentCalls + 1}건`;
+
+      // Change agent status to ready
+      document.getElementById('agent-status-select').value = 'ready';
+      changeAgentStatus('ready');
+
+      showToast('가심사 접수 완료', '대출 가심사 신청이 여신 전산에 안전하게 등록되었습니다! 🎉', 'success');
+    }
+
+    // Send Mobile SMS Link
+    function sendMobileSmsLink() {
+      const cust = customerDatabase[currentCustomerKey] || customerDatabase.kim;
+      showToast('SMS 발송 완료', `${cust.rawName} 고객님(${cust.phone}) 번호로 모바일 간편가심사 URL이 전송되었습니다.`, 'success');
+    }
+
+    // Reset Form
+    function resetRecordForm() {
+      document.getElementById('consultation-content').value = '';
+      document.getElementById('char-count').textContent = '0자';
+      showToast('초기화', '상담 입력 양식이 비워졌습니다.', 'info');
+    }
+
+    // Next Customer Call Simulator (Cycles dynamically through all 20 customers)
+    function simulateNextCustomerCall() {
+      currentCustomerIndex = (currentCustomerIndex + 1) % customerKeys.length;
+      const nextKey = customerKeys[currentCustomerIndex];
+      loadCustomerData(nextKey);
+      secondsElapsed = 0;
+      isCalling = true;
+      const timerEl = document.getElementById('call-timer');
+      if (timerEl) timerEl.className = 'text-3xl lg:text-[34px] font-black font-mono tracking-wider text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.35)] leading-none whitespace-nowrap';
+      document.getElementById('agent-status-select').value = 'busy';
+      changeAgentStatus('busy');
+      startCallTimer();
+      const cust = customerDatabase[nextKey];
+      showToast('다음 고객 자동 발신', `[${cust.rawName} 고객님 - ${cust.job}] 연결 (${currentCustomerIndex + 1}/${customerKeys.length})`, 'success');
+    }
+
+    // Keypad Logic
+    function openKeypadModal() {
+      document.getElementById('modal-keypad').classList.remove('hidden');
+    }
+    function pressKey(k) {
+      document.getElementById('keypad-display').value += k;
+    }
+    function clearKeypad() {
+      document.getElementById('keypad-display').value = '';
+    }
+    function dialKeypadNumber() {
+      const val = document.getElementById('keypad-display').value;
+      if (!val) return;
+      closeModal('modal-keypad');
+      showToast('아웃바운드 발신', `${val} 번호로 통화 발신을 시도합니다.`, 'info');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    // Toast Notification System
+    function showToast(title, message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      let borderCol = 'border-blue-500';
+      let icon = 'fa-circle-info text-blue-400';
+      if (type === 'success') {
+        borderCol = 'border-emerald-500';
+        icon = 'fa-circle-check text-emerald-400';
+      } else if (type === 'warning') {
+        borderCol = 'border-amber-500';
+        icon = 'fa-triangle-exclamation text-amber-400';
+      } else if (type === 'error') {
+        borderCol = 'border-rose-500';
+        icon = 'fa-circle-xmark text-rose-400';
+      }
+
+      toast.className = `bg-slate-900/95 text-slate-100 px-4 py-3 rounded-xl border-l-4 ${borderCol} shadow-2xl flex items-start space-x-3 w-80 backdrop-blur-md transform transition-all duration-300 ease-out translate-y-2 opacity-0`;
+      toast.innerHTML = `
+        <i class="fa-solid ${icon} mt-0.5 text-sm"></i>
+        <div class="flex-1">
+          <h5 class="text-xs font-bold text-white">${title}</h5>
+          <p class="text-[11px] text-slate-400 leading-snug mt-0.5">${message}</p>
+        </div>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 50);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-x-4');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Toggle Dark / Light Theme
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('theme-icon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        document.body.className = 'bg-slate-100 text-slate-800 font-sans h-screen flex flex-col overflow-hidden select-none transition-colors duration-300';
+        themeIcon.className = 'fa-solid fa-sun text-xs text-amber-500';
+        showToast('라이트 모드', '밝은 금융 콘솔 테마로 전환되었습니다.', 'info');
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        document.body.className = 'bg-[#090d16] text-slate-100 font-sans h-screen flex flex-col overflow-hidden select-none transition-colors duration-300';
+        themeIcon.className = 'fa-solid fa-moon text-xs text-slate-300';
+        showToast('다크 모드', '다크 금융 콘솔 테마로 전환되었습니다.', 'info');
+      }
+    }
+
+    // Helper functions
+    function saveStickyMemo() {
+      showToast('메모 저장', '고객 심사 특이사항 메모가 저장되었습니다.', 'success');
+    }
+    function clearChatLog() {
+      const container = document.getElementById('chat-messages-container');
+      container.innerHTML = `
+        <div class="flex justify-center">
+          <span class="text-[10px] px-3 py-1 rounded-full bg-slate-800/90 text-slate-400 border border-slate-700/60">
+            대출 상담 피드가 초기화되었습니다.
+          </span>
+        </div>
+      `;
+      showToast('초기화', '대화 피드가 초기화되었습니다.', 'info');
+    }
+    function triggerQuickEmoji() {
+      const input = document.getElementById('chat-input');
+      input.value += ' 신뢰와 정성을 다해 안내해 드리겠습니다.';
+      input.focus();
+    }
+    function enhanceToneWithAi() {
+      const input = document.getElementById('chat-input');
+      if (!input.value.trim()) return;
+      input.value = "고객님, 금융소비자보호법에 의거하여 정직하고 유리한 조건으로 안내해 드리겠습니다. " + input.value;
+      showToast('금융 톤 교정', '금융 전문 신뢰도 어조로 문장이 변환되었습니다.', 'success');
+    }
+    function searchKnowledgeBase(q) {
+      if (!q) return;
+      showToast('여신 규정 검색', `'${q}' 관련 DSR 심사 규정 4건이 조회되었습니다.`, 'info');
+    }
+    function filterTemplates(cat) {
+      showToast('스크립트 필터', `[${cat}] 카테고리 템플릿으로 전환되었습니다.`, 'info');
+    }
+
+    // Keyboard Shortcuts (F9 to save)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'F9') {
+        e.preventDefault();
+        saveConsultationRecord();
+      }
+    });
+
+    // Start timer on load & calculator init
+    window.onload = () => {
+      startCallTimer();
+      updateLoanCalculator();
+    };
+  </script>
+</body>
+</html>
