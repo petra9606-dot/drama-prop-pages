@@ -42,6 +42,14 @@ h1{margin:0;font-size:38px;letter-spacing:-.03em}
 .searchbox{display:flex;gap:9px;margin:0 0 24px}
 .searchbox input{flex:1;background:#0d121b;border:1px solid #28344b;border-radius:12px;color:#fff;padding:12px 13px;outline:none}
 .searchbox button{border:0;border-radius:12px;background:#7590ff;color:#fff;font-weight:800;padding:0 17px;cursor:pointer}
+.misc-title{margin:38px 0 4px;font-size:22px}
+.misc-sub{color:#78869f;font-size:12px;margin:0 0 16px}
+.app-btns{display:flex;gap:8px;margin-top:12px}
+.app-btns a{flex:1;text-align:center;font-size:13px;font-weight:800;text-decoration:none;border-radius:10px;padding:11px 0}
+.dl{background:#7590ff;color:#fff}
+.pv{background:#1c2743;color:#b7c5ff;border:1px solid #30436e}
+.soon{background:#141b29;color:#56627a;border:1px solid #202a3b;flex:1;text-align:center;font-size:12px;border-radius:10px;padding:11px 0}
+.qr{width:110px;height:110px;border-radius:8px;margin-top:12px;background:#fff}
 </style>
 </head>
 <body>
@@ -52,6 +60,41 @@ h1{margin:0;font-size:38px;letter-spacing:-.03em}
     <div class="count" id="totalCount">씬 자료 불러오는 중...</div>
   </div>
   <form class="searchbox" action="../search/" method="get"><input name="q" placeholder="피라밋 전체 검색"><button>검색</button></form><div class="grid" id="partGrid"></div>
+  <h2 class="misc-title">기타 · 촬영용 앱</h2>
+  <p class="misc-sub">APK 내려받기 · QR로 폰에 설치 · PC 미리보기</p>
+  <div class="grid">
+    <div class="card">
+      <div class="part-title"><strong>달림 라이더</strong><span class="num">v5 FINAL</span></div>
+      <div class="preview"><div class="scene-row"><span class="scene-badge">55.1MB</span><span class="scene-name">dallim-rider-v5-local-final.apk</span></div></div>
+      <div class="app-btns"><a class="dl" href="../apps/dallim-rider-v5-local-final.apk" download>내려받기</a><a class="pv" href="../apps/rider-preview.html">PC 미리보기</a></div>
+      <img class="qr" src="../apps/qr/dallim-rider-v5-local-final.png" alt="달림 라이더 QR">
+      <div class="footer"><span>촬영 최종본</span><span class="arrow">→</span></div>
+    </div>
+    <div class="card">
+      <div class="part-title"><strong>길봄 내비</strong><span class="num">v2</span></div>
+      <div class="preview"><div class="scene-row"><span class="scene-badge">79.5MB</span><span class="scene-name">gilbom-nav-v2.apk</span></div></div>
+      <div class="app-btns"><a class="dl" href="../apps/gilbom-nav-v2.apk" download>내려받기</a></div>
+      <div class="soon">PC 미리보기(Appetize) 준비 중</div>
+      <img class="qr" src="../apps/qr/gilbom-nav-v2.png" alt="길봄 내비 QR">
+      <div class="footer"><span>촬영 최종본</span><span class="arrow">→</span></div>
+    </div>
+    <div class="card">
+      <div class="part-title"><strong>편지 메일</strong><span class="num">v2</span></div>
+      <div class="preview"><div class="scene-row"><span class="scene-badge">79.5MB</span><span class="scene-name">letter-mail-v2.apk</span></div></div>
+      <div class="app-btns"><a class="dl" href="../apps/letter-mail-v2.apk" download>내려받기</a></div>
+      <div class="soon">PC 미리보기(Appetize) 준비 중</div>
+      <img class="qr" src="../apps/qr/letter-mail-v2.png" alt="편지 메일 QR">
+      <div class="footer"><span>촬영 최종본</span><span class="arrow">→</span></div>
+    </div>
+    <div class="card">
+      <div class="part-title"><strong>모아챗</strong><span class="num">v3 PHONE</span></div>
+      <div class="preview"><div class="scene-row"><span class="scene-badge">86MB</span><span class="scene-name">moa-chat-v3-phone.apk</span></div></div>
+      <div class="app-btns"><a class="dl" href="../apps/moa-chat-v3-phone.apk" download>내려받기</a></div>
+      <div class="soon">PC 미리보기(Appetize) 준비 중</div>
+      <img class="qr" src="../apps/qr/moa-chat-v3-phone.png" alt="모아챗 QR">
+      <div class="footer"><span>촬영 최종본</span><span class="arrow">→</span></div>
+    </div>
+  </div>
 </main>
 
 <script>
