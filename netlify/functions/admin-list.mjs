@@ -1,9 +1,9 @@
 
 import { getStore } from "@netlify/blobs";
-import { isAdmin } from "./_auth.mjs";
+import { isAdmin } from "../lib/auth.mjs";
 
 export default async (req) => {
-  if (!isAdmin(req)) return Response.json({ ok:false, error:"로그인이 필요합니다." }, { status:401 });
+  if (!isAdmin(req)) return Response.json({ ok:false, error:"로그?�이 ?�요?�니??" }, { status:401 });
   const store = getStore("disolveworks-uploads");
   const { blobs } = await store.list();
   const items = [];
