@@ -5,13 +5,138 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>오늘의 타로 | DisolveWorks</title>
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 72% 5%,#17354a 0,transparent 28%),#071521;color:#f7f0e4;font-family:'Segoe UI','Malgun Gothic',sans-serif}.wrap{max-width:980px;margin:auto;padding:32px 22px 60px}.back{color:#d7bc86;text-decoration:none;font-size:13px}.hero{display:grid;grid-template-columns:1fr 360px;gap:54px;align-items:center;margin-top:46px}.eyebrow{color:#b89861;font-size:11px;letter-spacing:.2em}.copy h1{font-size:48px;margin:12px 0 12px}.copy p{color:#aebbc4;line-height:1.8;margin:0 0 24px}.features{list-style:none;padding:0;margin:0 0 28px;color:#d7dee3;line-height:2}.features li:before{content:'✦';color:#b89861;margin-right:10px}.buttons{display:flex;gap:10px;flex-wrap:wrap}.buttons a{padding:13px 18px;border-radius:24px;text-decoration:none;font-weight:800;font-size:13px}.download{background:#b89861;color:#071521}.qr-link{border:1px solid #947d52;color:#e9d4ab}.phone{width:310px;height:620px;margin:auto;border:8px solid #17232e;border-radius:42px;background:#071521;box-shadow:0 28px 65px #0009;overflow:hidden;position:relative;padding:40px 14px 20px;text-align:center}.phone h2{margin:0;font-size:25px}.phone .sub{color:#9eacb5;font-size:11px;margin-top:7px}.deck{position:relative;height:285px;margin-top:26px}.card{position:absolute;width:68px;height:102px;left:50%;top:42px;margin-left:-34px;border-radius:5px;border:1px solid #b8986199;background:repeating-linear-gradient(45deg,#18354b 0 6px,#0d2232 6px 12px);box-shadow:0 7px 14px #0008;transition:.55s cubic-bezier(.4,0,.2,1);cursor:pointer}.card:after{content:'✦';display:grid;place-items:center;height:100%;color:#d7bc86;font-size:20px}.deck.ready .card{transform:translate(calc((var(--i) - 9.5)*14px),calc(var(--lift)*1px)) rotate(calc(var(--angle)*1deg))}.deck:not(.chosen) .card:hover{z-index:60;filter:brightness(1.14);transform:translate(calc((var(--i) - 9.5)*14px),calc(var(--lift)*1px - 12px)) rotate(calc(var(--angle)*1deg)) scale(1.07)}.deck.chosen .card{opacity:0;transform:translate(calc((var(--i) - 9.5)*18px),190px)}.deck.chosen .card.active{opacity:1;z-index:50;transform:translate(0,34px) scale(2.35);transition:.65s cubic-bezier(.4,0,.2,1)}.card.active.flip{transform:translate(0,34px) scale(2.35) rotateY(180deg)}.result{opacity:0;transform:translateY(12px);transition:.4s;color:#fff9ef;font-size:14px;line-height:1.5}.result.show{opacity:1;transform:none}.result b{display:block;color:#d7bc86;letter-spacing:.18em;font-size:11px;margin-bottom:5px}.reset{margin-top:10px;background:transparent;border:1px solid #947d52;color:#e9d4ab;border-radius:18px;padding:8px 14px;cursor:pointer}.qrbox{margin-top:34px;padding:20px;border:1px solid #233849;border-radius:18px;display:flex;align-items:center;gap:18px;background:#0b1a27}.qrbox img{width:112px;height:112px;background:white;border-radius:8px}.qrbox strong{display:block;font-size:18px;margin-bottom:7px}.qrbox span{color:#91a0aa;font-size:13px}@media(max-width:760px){.hero{grid-template-columns:1fr;gap:38px}.copy h1{font-size:38px}.phone{width:300px}.qrbox{align-items:flex-start}.qrbox img{width:96px;height:96px}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 72% 5%,#17354a 0,transparent 28%),#071521;color:#f7f0e4;font-family:'Segoe UI','Malgun Gothic',sans-serif}.wrap{max-width:980px;margin:auto;padding:32px 22px 60px}.back{color:#d7bc86;text-decoration:none;font-size:13px}.hero{display:grid;grid-template-columns:1fr 360px;gap:54px;align-items:start;margin-top:46px}.eyebrow{color:#b89861;font-size:11px;letter-spacing:.2em}.copy h1{font-size:48px;margin:12px 0 12px}.copy h1 small{font-size:14px;color:#b89861;letter-spacing:.12em;margin-left:10px;vertical-align:middle}.copy p{color:#aebbc4;line-height:1.8;margin:0 0 24px}.features{list-style:none;padding:0;margin:0 0 28px;color:#d7dee3;line-height:2}.features li:before{content:'✦';color:#b89861;margin-right:10px}.buttons{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.buttons a{padding:13px 18px;border-radius:24px;text-decoration:none;font-weight:800;font-size:13px}.download{background:#b89861;color:#071521}.qr-link{border:1px solid #947d52;color:#e9d4ab}.buttons a.old{padding:13px 4px;color:#7f8f9a;font-weight:600;font-size:12px}.qrbox{margin-top:34px;padding:20px;border:1px solid #233849;border-radius:18px;display:flex;align-items:center;gap:18px;background:#0b1a27}.qrbox img{width:112px;height:112px;background:white;border-radius:8px}.qrbox strong{display:block;font-size:18px;margin-bottom:7px}.qrbox span{color:#91a0aa;font-size:13px;line-height:1.6}
+.timeline{margin-top:22px;border:1px solid #233849;border-radius:18px;padding:18px 20px;background:#0b1a27}.timeline h3{margin:0 0 12px;font-size:14px;color:#e9d4ab;letter-spacing:.08em}.bar{display:flex;height:10px;border-radius:6px;overflow:hidden;background:#12283a}.bar i{display:block;height:100%}.legend{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin-top:12px;font-size:12px;color:#aebbc4}.legend b{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:middle}
+.phone{width:310px;height:620px;margin:auto;border:8px solid #17232e;border-radius:42px;background:#071521;box-shadow:0 28px 65px #0009;overflow:hidden;position:relative;padding:40px 14px 20px;text-align:center;user-select:none;-webkit-user-select:none}.phone h2{margin:0;font-size:25px;cursor:pointer}.phone .sub{color:#9eacb5;font-size:11px;margin-top:7px;min-height:14px}
+.deck{position:relative;height:300px;margin-top:22px;touch-action:none;cursor:pointer}.card,.halo{position:absolute;left:50%;top:42px;will-change:transform,opacity}.card{width:68px;height:102px;margin-left:-34px;perspective:700px}.halo{width:340px;height:340px;margin-left:-170px;margin-top:-119px;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(circle,rgba(236,208,150,.42) 0,rgba(236,208,150,.18) 30%,rgba(236,208,150,.05) 55%,transparent 70%)}
+.flipper{position:absolute;inset:0;transform-style:preserve-3d}.face{position:absolute;inset:0;border-radius:5px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}.cback{border:1px solid #b8986199;background:repeating-linear-gradient(45deg,#18354b 0 6px,#0d2232 6px 12px);box-shadow:0 7px 14px #0008}.cback:after{content:'✦';display:grid;place-items:center;height:100%;color:#d7bc86;font-size:20px}.front{transform:rotateY(180deg);border:1px solid #d7bc8699;background:radial-gradient(circle at 50% 38%,#3b3526 0,#1a1812 60%,#0d0c09 100%);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6px 3px;color:#e9d4ab;font-size:7px;letter-spacing:.14em}.front .sym{font-size:26px;line-height:1}.veil{position:absolute;inset:0;background:#071521;opacity:0}.shine{position:absolute;inset:0;border-radius:5px;border:1.5px solid rgba(238,209,151,.9);background:rgba(255,238,196,.1);opacity:0}.aura{position:absolute;inset:-5px;border-radius:9px;border:1px solid rgba(238,209,151,.5);background:rgba(227,201,143,.14);box-shadow:0 0 14px rgba(227,201,143,.35);opacity:0}
+.result{opacity:0;transform:translateY(12px);transition:.45s;color:#fff9ef;font-size:14px;line-height:1.5;position:relative;margin-top:14px}.result.show{opacity:1;transform:none}.result b{display:block;color:#d7bc86;letter-spacing:.18em;font-size:11px;margin-bottom:5px}.reset{margin-top:10px;background:transparent;border:1px solid #947d52;color:#e9d4ab;border-radius:18px;padding:8px 14px;cursor:pointer}.hint{position:absolute;left:0;right:0;bottom:28px;color:#82939f;font-size:11px}
+.controls{width:310px;margin:18px auto 0;border:1px solid #233849;border-radius:16px;padding:14px 14px 10px;background:#0b1a27}.controls h4{margin:0 0 6px;font-size:12px;letter-spacing:.14em;color:#e9d4ab;text-align:center}.controls label{display:block;color:#b89861;font-size:10px;font-weight:700;letter-spacing:.12em;margin:10px 0 6px}.seg{display:flex;flex-wrap:wrap;gap:5px}.seg button{border:1px solid #3a4e5e;background:#0a1824;color:#9fb0bb;border-radius:14px;padding:6px 9px;font-size:11px;font-weight:600;cursor:pointer}.seg button.on{border-color:#d7bc86;background:#3a3122;color:#fff3dc}.controls p{color:#6f808c;font-size:10px;text-align:center;margin:12px 0 0}
+@media(max-width:760px){.hero{grid-template-columns:1fr;gap:38px}.copy h1{font-size:38px}.phone,.controls{width:300px}.qrbox{align-items:flex-start}.qrbox img{width:96px;height:96px}}
 </style>
 </head>
-<body><main class="wrap"><a class="back" href="../pyramid/">← 피라밋 촬영용 앱</a><section class="hero"><div class="copy"><div class="eyebrow">DIGITAL PROP · FILM APP</div><h1>오늘의 타로</h1><p>여러 장의 카드 중 한 장을 직접 고르고, 차분한 3D Flip으로 오늘의 운세를 공개하는 촬영용 소품 앱입니다.</p><ul class="features"><li>스무 장의 타로 카드 선택</li><li>중앙 이동과 자연스러운 카드 Flip</li><li>기존 촬영용 결과 2종 유지</li><li>버튼 또는 제목 5회 터치로 Reset</li></ul><div class="buttons"><a class="download" href="./today-tarot-v1.apk" download>APK 다운로드</a><a class="qr-link" href="./qr/today-tarot-v1.png">QR 코드 보기</a></div><div class="qrbox"><img src="./qr/today-tarot-v1.png" alt="오늘의 타로 다운로드 QR"><div><strong>휴대폰으로 바로 열기</strong><span>QR을 촬영하면 APK 다운로드 주소로 이동합니다.</span></div></div></div><div class="phone"><h2>오늘의 운세</h2><div class="sub">마음이 끌리는 카드를 터치하세요</div><div class="deck" id="deck"></div><div class="result" id="result"><b>DEATH</b>무엇을 바라든 이루어지지 않을 것이다<br><button class="reset" id="reset">↻ 다시 선택하기</button></div></div></section></main><script>
-const deck=document.getElementById('deck'),result=document.getElementById('result');
-for(let i=0;i<20;i++){const c=document.createElement('button');c.className='card';c.style.setProperty('--i',i);c.style.setProperty('--lift',Math.pow(Math.abs(i-9.5)/9.5,2)*34);c.style.setProperty('--angle',(i-9.5)*1.1);c.setAttribute('aria-label',`${i+1}번 타로 카드`);c.onclick=()=>choose(c);deck.appendChild(c)}
-requestAnimationFrame(()=>deck.classList.add('ready'));
-function choose(c){if(deck.classList.contains('chosen'))return;c.classList.add('active');deck.classList.add('chosen');setTimeout(()=>c.classList.add('flip'),850);setTimeout(()=>result.classList.add('show'),1500)}
-document.getElementById('reset').onclick=()=>{result.classList.remove('show');deck.classList.remove('chosen');deck.querySelectorAll('.card').forEach(c=>c.classList.remove('active','flip'))};
+<body><main class="wrap"><a class="back" href="../pyramid/">← 피라밋 촬영용 앱</a><section class="hero"><div class="copy"><div class="eyebrow">DIGITAL PROP · FILM APP</div><h1>오늘의 타로<small>v2</small></h1><p>카드를 누르면 바로 열리지 않고 들어올림 · 흔들림 · 셔플 · 중앙 이동을 거쳐, 대사 타이밍에 맞춰 공개되는 촬영용 소품 앱입니다.</p><ul class="features"><li>누르는 동안 부드럽게 들어 올리는 터치 피드백</li><li>공개까지 2.5 / 3.0 / 3.5 / 4.0 / 5.0초 (기본 3.5초)</li><li>셔플 OFF · LIGHT · NORMAL / 공개 FLIP · FADE · FLIP+GLOW</li><li>탭 · 셔플 · 공개 효과음 (ON/OFF)</li><li>제목 1.2초 길게 누르기 = TEST MODE · 5번 탭 = Reset</li><li>기존 촬영용 결과 2종 유지 (DEATH → KING 번갈아)</li></ul><div class="buttons"><a class="download" href="./today-tarot-v2.apk" download>APK 다운로드 (v2)</a><a class="qr-link" href="./qr/today-tarot-v2.png">QR 코드 보기</a><a class="old" href="./today-tarot-v1.apk" download>이전 v1 받기</a></div><div class="qrbox"><img src="./qr/today-tarot-v2.png" alt="오늘의 타로 v2 다운로드 QR"><div><strong>휴대폰으로 바로 열기</strong><span>QR을 촬영하면 v2 APK를 내려받습니다.<br>v1이 설치된 폰에도 업데이트로 설치됩니다.</span></div></div>
+<div class="timeline"><h3>공개 타이밍 (3.5초 기준)</h3><div class="bar" id="bar"></div><div class="legend" id="legend"></div></div></div>
+<div><div class="phone"><h2 id="title">오늘의 운세</h2><div class="sub" id="sub">마음이 끌리는 카드를 터치하세요</div><div class="deck" id="deck"></div><div class="result" id="result"><b id="rname">DEATH</b><span id="rtext">무엇을 바라든 이루어지지 않을 것이다</span><br><button class="reset" id="reset">↻ 다시 선택하기</button></div><div class="hint" id="hint">스무 장의 카드 중 한 장을 선택하세요</div></div>
+<div class="controls" id="controls"><h4>TEST MODE 미리보기</h4><label>CARD REVEAL SPEED</label><div class="seg" data-key="delay"></div><label>SHUFFLE EFFECT</label><div class="seg" data-key="shuffle"></div><label>REVEAL EFFECT</label><div class="seg" data-key="reveal"></div><label>SOUND</label><div class="seg" data-key="sound"></div><p>앱과 같은 연출을 PC에서 확인하는 미리보기입니다.</p></div></div></section></main>
+<script>
+const N=20,STEP=14,CW=68,CENTER_Y=34,BIG=2.35;
+const CARDS=[{name:'DEATH',sym:'☠',num:'XIII',text:'무엇을 바라든 이루어지지 않을 것이다'},{name:'KING',sym:'♛',num:'IV',text:'화려한 조명을 받는 오늘, 당신이 세상의 주인공'}];
+const OPTIONS={delay:[[2500,'2.5초'],[3000,'3.0초'],[3500,'3.5초'],[4000,'4.0초'],[5000,'5.0초']],shuffle:[['off','OFF'],['light','LIGHT'],['normal','NORMAL']],reveal:[['flip','FLIP'],['fade','FADE'],['flipGlow','FLIP + GLOW']],sound:[[true,'ON'],[false,'OFF']]};
+const settings={delay:3500,shuffle:'normal',reveal:'flipGlow',sound:true};
+const FLIP=900,PAUSE=140;
+const $=id=>document.getElementById(id),deck=$('deck'),result=$('result'),sub=$('sub'),hint=$('hint');
+const sounds={};['tap','shuffle','reveal'].forEach(k=>{try{sounds[k]=new Audio(`./tarot-sounds/card_${k}.wav`);sounds[k].preload='auto'}catch(e){}});
+const VOL={tap:.55,shuffle:.4,reveal:.7};
+function play(k){if(!settings.sound||!sounds[k])return;try{const a=sounds[k];a.volume=VOL[k];a.currentTime=0;a.play().catch(()=>{})}catch(e){}}
+
+// build deck
+const halo=document.createElement('div');halo.className='halo';deck.appendChild(halo);
+const cards=[];
+for(let i=0;i<N;i++){
+  const el=document.createElement('div');el.className='card';
+  el.innerHTML='<div class="aura"></div><div class="flipper"><div class="face cback"><div class="shine"></div></div><div class="face front"><span class="num"></span><span class="sym"></span><span class="nm"></span><div class="veil"></div></div></div>';
+  deck.appendChild(el);
+  const d=Math.abs(i-9.5)/9.5;
+  cards.push({el,flipper:el.querySelector('.flipper'),back:el.querySelector(".cback"),front:el.querySelector('.front'),veil:el.querySelector('.veil'),shine:el.querySelector('.shine'),aura:el.querySelector('.aura'),
+    x:(i-9.5)*STEP,y:d*d*34,r:(i-9.5)*1.1,press:0,enter:0,j:{x:0,y:0,r:0}});
+}
+let phase='choose',hovered=null,selected=null,draw=0,start=0,plan=null,cues=[];
+const V={lift:0,focus:0,shake:0,shuffle:0,hover:0,aura:0,halo:0,emph:0,move:0,exit:0,flip:0,fade:0,veil:1};
+const ease={lin:t=>t,sin:t=>-(Math.cos(Math.PI*t)-1)/2,out3:t=>1-Math.pow(1-t,3),io3:t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,outq:t=>1-(1-t)*(1-t)};
+// track: [[time,value,easing?],...] value held before first / after last
+function track(t,k){if(t<=k[0][0])return k[0][1];for(let n=1;n<k.length;n++){const[a,va]=k[n-1],[b,vb,e]=k[n];if(t<=b){const p=b>a?(t-a)/(b-a):1;return va+(vb-va)*ease[e||'sin'](p)}}return k[k.length-1][1]}
+
+function buildPlan(s){
+  const T=s.delay,lift=T*.12,move=T*.29,rest=Math.max(0,T-lift-move-PAUSE),react=rest*.53,shuf=rest-react,ss=lift+react,ms=ss+shuf,L=s.shuffle;
+  const p={T,ss,ms,move,level:L,reveal:s.reveal,tracks:{}},tr=p.tracks,LS=0.35;
+  tr.lift=[[0,LS],[lift,1,'out3'],[ms,1],[ms+move*.7,0]];
+  tr.focus=[[lift*.4,0],[lift*.4+react*.7,1,'outq']];
+  tr.aura=[[lift*.3,0],[lift*.3+react*.6,.55],[ss,.55],[ss+shuf*.5,1],[ms,.7]];
+  tr.move=[[ms,0],[ms+move,1,'io3']];tr.exit=tr.move;
+  tr.emph=[[ms+move*.58,0],[ms+move,1,'out3']];
+  if(L!=='off'){
+    const cnt=L==='normal'?3:2,amp=L==='normal'?1:.6,st=react*.75/(cnt*2+1),k=[[lift,0]];let t=lift;
+    for(let i=0;i<cnt;i++){const d=1-i*.22;t+=st;k.push([t,amp*d]);t+=st;k.push([t,-amp*d])}t+=st;k.push([t,0]);tr.shake=k;
+    tr.shuffle=[[ss,0],[ss+shuf/3,1],[ss+shuf*2/3,2],[ms,3]];
+    tr.hover=[[ss,0],[ss+shuf/2,1],[ms,0]];
+    p.amount=L==='normal'?{g:.34,x:10,y:7,r:5}:{g:0,x:5,y:3.5,r:2.5};
+  }else{tr.shake=[[0,0]];tr.shuffle=[[0,0]];tr.hover=[[0,0]];p.amount={g:0,x:0,y:0,r:0}}
+  tr.halo=s.reveal==='flipGlow'?[[ss,0],[ms+move*.5,.35],[T+FLIP*.35,.35],[T+FLIP*.35+380,1,'outq'],[T+FLIP*.35+1380,.45]]:[[0,0]];
+  const F=T;
+  if(s.reveal==='fade'){tr.fade=[[F,0],[F+FLIP,1]];tr.flip=[[0,0]]}else{tr.flip=[[F,0],[F+FLIP,1,'io3']];tr.fade=[[0,0]]}
+  tr.veil=[[F+FLIP*.45,1],[F+FLIP*.45+650,0,'outq']];
+  tr.emph.push([F+FLIP,1],[F+FLIP+460,0,'out3']);
+  tr.aura.push([F,.7],[F+FLIP,s.reveal==='flipGlow'?.6:0]);
+  return p;
+}
+function cardAt(ev){const r=deck.getBoundingClientRect(),x=ev.clientX-r.left-r.width/2,y=ev.clientY-r.top;if(phase!=='choose'||y<10||y>190)return null;return Math.max(0,Math.min(N-1,Math.round(x/STEP+9.5)))}
+deck.addEventListener('pointerdown',e=>{if(phase!=='choose')return;deck.setPointerCapture(e.pointerId);hovered=cardAt(e)});
+deck.addEventListener('pointermove',e=>{if(phase==='choose'&&e.buttons)hovered=cardAt(e)});
+deck.addEventListener('pointerup',e=>{const i=cardAt(e);hovered=null;if(i!==null)choose(i)});
+deck.addEventListener('pointercancel',()=>{hovered=null});
+function choose(i){
+  if(phase!=='choose')return;
+  phase='selecting';selected=i;const c=CARDS[draw%2];draw++;
+  const f=cards[i].front;f.querySelector('.num').textContent=c.num;f.querySelector('.sym').textContent=c.sym;f.querySelector('.nm').textContent=c.name;
+  $('rname').textContent=c.name;$('rtext').textContent=c.text;
+  cards.forEach(k=>k.j={x:Math.random()*2-1,y:Math.random()*2-1,r:Math.random()*2-1});
+  plan=buildPlan(settings);start=performance.now();
+  sub.textContent='운명의 카드가 선택되고 있습니다';hint.textContent='잠시만 기다려 주세요';
+  play('tap');
+  if(plan.level!=='off')cues.push(setTimeout(()=>play('shuffle'),plan.ss));
+  cues.push(setTimeout(()=>{phase='flipping';play('reveal')},plan.T));
+  cues.push(setTimeout(()=>{phase='result';sub.textContent='오늘 당신을 위한 한 장';hint.textContent='';result.classList.add('show')},plan.T+FLIP));
+}
+function reset(){cues.forEach(clearTimeout);cues=[];phase='choose';selected=null;plan=null;Object.assign(V,{lift:0,focus:0,shake:0,shuffle:0,hover:0,aura:0,halo:0,emph:0,move:0,exit:0,flip:0,fade:0,veil:1});result.classList.remove('show');sub.textContent='마음이 끌리는 카드를 터치하세요';hint.textContent='스무 장의 카드 중 한 장을 선택하세요';cards.forEach(c=>{c.enter=0;c.press=0});enterStart=performance.now()}
+$('reset').onclick=reset;
+let taps=0,tapTimer=null,lp=null;const title=$('title');
+title.addEventListener('pointerdown',()=>{lp=setTimeout(()=>{lp=null;taps=0;$('controls').scrollIntoView({behavior:'smooth',block:'center'});$('controls').animate([{boxShadow:'0 0 0 2px #d7bc86'},{boxShadow:'0 0 0 0 transparent'}],{duration:1200})},1200)});
+title.addEventListener('pointerup',()=>{if(!lp)return;clearTimeout(lp);lp=null;taps++;clearTimeout(tapTimer);if(taps>=5){taps=0;reset()}else tapTimer=setTimeout(()=>taps=0,1600)});
+
+let enterStart=performance.now(),last=performance.now();
+function frame(now){
+  const dt=Math.min(50,now-last);last=now;
+  if(plan){const t=now-start;for(const k in plan.tracks)V[k]=track(t,plan.tracks[k])}
+  const a=plan?plan.amount:{g:0,x:0,y:0,r:0};
+  halo.style.opacity=V.halo;
+  cards.forEach((c,i)=>{
+    c.enter=Math.min(1,(now-enterStart-i*28)/520);const en=c.enter<0?0:ease.out3(c.enter);
+    const target=hovered===i?1:0;c.press+=(target-c.press)*(1-Math.exp(-dt/(target?55:65)));
+    const sel=selected===i;
+    if(sel){
+      const m=V.move,x=c.x*(1-m),y=c.y*(1-m)+CENTER_Y*m+V.lift*-12+V.hover*-5,r=c.r*(1-m)+V.shake*2.4;
+      const s=(1+(BIG-1)*m)*(1+.1*V.lift)*(1+.08*V.emph);
+      c.el.style.transform=`translate(${x}px,${y}px) rotate(${r}deg) scale(${s})`;c.el.style.zIndex=100;c.el.style.opacity=1;
+      halo.style.transform=`translate(${x}px,${y}px) scale(${.82+.22*V.halo})`;
+      c.flipper.style.transform=plan&&plan.reveal==='fade'?'none':`rotateY(${V.flip*180}deg)`;
+      if(plan&&plan.reveal==='fade'){c.back.style.opacity=1-V.fade;c.front.style.opacity=V.fade;c.front.style.transform='none'}else{c.back.style.opacity=1;c.front.style.opacity=1;c.front.style.transform='rotateY(180deg)'}
+      c.veil.style.opacity=V.veil*.62;c.aura.style.opacity=V.aura;c.shine.style.opacity=V.aura*.85;
+    }else{
+      const d=selected===null?0:i-selected,rip=d&&Math.abs(d)<=3?Math.sign(d)*(4-Math.abs(d))*2.5:0;
+      const gx=(9.5-i)*STEP*a.g,q=V.shuffle;
+      const kx=[0,gx+c.j.x*a.x,-gx*.25-c.j.x*a.x*.6,0],ky=[0,c.j.y*a.y,-c.j.y*a.y*.5,0],kr=[0,c.j.r*a.r,-c.j.r*a.r*.5,0];
+      const seg=Math.min(2,Math.floor(q)),p=q-seg,lerp=k=>k[seg]+(k[seg+1]-k[seg])*p;
+      const x=c.x+(1-en)*-c.x+V.exit*(i<10?-34:34)+V.focus*rip+lerp(kx);
+      const y=c.y+(1-en)*60+V.exit*30+c.press*-4+lerp(ky);
+      const s=(.72+.28*en)*(1+.035*c.press)*(1-.04*V.focus);
+      c.el.style.transform=`translate(${x}px,${y}px) rotate(${c.r+lerp(kr)}deg) scale(${s})`;
+      c.el.style.zIndex=hovered===i?100:(c.press>.02?99:i);
+      c.el.style.opacity=en*(1-.4*V.focus)*(1-.55*V.exit);
+      c.flipper.style.transform='none';c.back.style.opacity=1;c.aura.style.opacity=c.press;c.shine.style.opacity=c.press;
+    }
+  });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// controls
+document.querySelectorAll('.seg').forEach(seg=>{const key=seg.dataset.key;OPTIONS[key].forEach(([v,l])=>{const b=document.createElement('button');b.textContent=l;b.onclick=()=>{settings[key]=v;render();if(key==='delay')drawBar()};b.dataset.v=String(v);seg.appendChild(b)})});
+function render(){document.querySelectorAll('.seg').forEach(seg=>seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===String(settings[seg.dataset.key]))))}
+function drawBar(){const T=settings.delay,lift=T*.12,move=T*.29,rest=T-lift-move-PAUSE,react=rest*.53,shuf=rest-react,tot=T+FLIP;
+  const parts=[['들어올림',lift,'#e9d4ab'],['흔들림 · 주변 반응',react,'#b89861'],['셔플 · 빛',shuf,'#7d6a45'],['중앙 이동 · 확대',move+PAUSE,'#3f6f8f'],['뒤집기',FLIP,'#d7e3ea']];
+  document.querySelector('.timeline h3').textContent=`공개 타이밍 (${(T/1000).toFixed(1)}초 후 뒤집기 시작)`;
+  $('bar').innerHTML=parts.map(p=>`<i style="width:${p[1]/tot*100}%;background:${p[2]}"></i>`).join('');
+  let t=0;$('legend').innerHTML=parts.map(p=>{const s=t;t+=p[1];return `<span><b style="background:${p[2]}"></b>${p[0]} ${(s/1000).toFixed(1)}–${(t/1000).toFixed(1)}초</span>`}).join('');}
+render();drawBar();
 </script></body></html>
