@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>사내 게임 | DisolveWorks</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 14% 0,rgba(70,224,208,.10),transparent 30%),radial-gradient(circle at 88% 6%,rgba(157,123,255,.10),transparent 28%),#0b0f19;
+  color:#eef2ff;font-family:'Segoe UI','Malgun Gothic',sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:44px 22px 70px}
+.back{display:inline-block;margin-bottom:26px;color:#8fa8ff;text-decoration:none;font-size:13px}
+h1{margin:0;font-size:38px;letter-spacing:-.03em}
+.sub{color:#78869f;font-size:12px;letter-spacing:.12em;margin-top:8px}
+.lead{color:#9aa7bd;font-size:14px;line-height:1.8;margin:18px 0 30px;max-width:640px}
+.game{display:grid;grid-template-columns:1fr 200px;gap:26px;align-items:start;
+  background:linear-gradient(145deg,rgba(255,255,255,.03),rgba(255,255,255,0)),#111827;
+  border:1px solid #263244;border-radius:20px;padding:26px}
+.badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.12em;color:#46e0d0;
+  border:1px solid rgba(70,224,208,.4);background:rgba(70,224,208,.08);border-radius:999px;padding:5px 10px}
+.game h2{margin:12px 0 8px;font-size:30px;letter-spacing:-.02em}
+.game p{color:#9fadc2;line-height:1.75;margin:0 0 18px}
+.btns{display:flex;gap:9px;flex-wrap:wrap}
+.btns a{text-decoration:none;font-weight:800;font-size:14px;border-radius:12px;padding:13px 18px}
+.play{background:#46e0d0;color:#06201d}
+.ghost{background:#1c2743;color:#b7c5ff;border:1px solid #30436e}
+.qr{width:200px;height:200px;background:#fff;border-radius:14px}
+.qrnote{color:#74819a;font-size:11px;margin-top:8px;text-align:center;line-height:1.6}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:34px}
+.spec{background:#101728;border:1px solid #223049;border-radius:16px;padding:16px}
+.spec h3{margin:0 0 8px;font-size:15px;color:#e7edff}
+.spec p{margin:0;color:#8d9cb4;font-size:13px;line-height:1.7}
+.spec b{color:#c9f24d;font-weight:700}
+.rules{margin-top:34px;background:#101728;border:1px solid #223049;border-radius:18px;padding:22px}
+.rules h3{margin:0 0 14px;font-size:17px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid #1d2941;color:#a9b6cb;vertical-align:top}
+th{color:#6f7f99;font-size:11px;letter-spacing:.08em;font-weight:700}
+td b{color:#eef2ff}
+.foot{margin-top:40px;padding-top:18px;border-top:1px solid #1a2233;color:#5d6b84;font-size:11px;display:flex;justify-content:space-between}
+@media(max-width:720px){.game{grid-template-columns:1fr}.qr{width:150px;height:150px}h1{font-size:30px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="../index.html">← DisolveWorks</a>
+  <h1>사내 게임</h1>
+  <div class="sub">TEAM GAMES · 내기 · 회식</div>
+  <p class="lead">촬영 소품과는 별개로, 사무실에서 내기할 때 쓰는 게임을 모아 둡니다. 설치 없이 각자 휴대폰 브라우저로 접속해 방 코드만 입력하면 됩니다.</p>
+
+  <section class="game">
+    <div>
+      <span class="badge">GAME 001 · 2~14명</span>
+      <h2>청소내기 배틀</h2>
+      <p>미니게임 8종과 카트 레이스로 30분간 점수를 쌓고, 중간중간 터지는 운빨 이벤트로 순위가 뒤집힙니다.
+         개인전은 최하위 몇 명, 팀전은 진 팀 전원이 청소 당첨. 팀 인원이 4대3처럼 안 맞아도 팀 평균 점수로 겨루니 공평합니다.</p>
+      <div class="btns">
+        <a class="play" href="./cleaning-battle.html">게임 열기</a>
+        <a class="ghost" href="./qr/cleaning-battle.png">QR 코드</a>
+      </div>
+    </div>
+    <div>
+      <img class="qr" src="./qr/cleaning-battle.png" alt="청소내기 배틀 QR 코드">
+      <div class="qrnote">QR을 찍으면 이 페이지가 열립니다<br>한 명이 방을 만들고 코드를 공유하세요</div>
+    </div>
+  </section>
+
+  <div class="specs">
+    <div class="spec"><h3>진행 시간</h3><p><b>20 · 30 · 40분</b> 중 선택. 라운드 수가 자동으로 맞춰집니다.</p></div>
+    <div class="spec"><h3>인원</h3><p><b>2~14명</b>. 7명이면 딱 좋고, 늦게 들어와도 중간 합류됩니다.</p></div>
+    <div class="spec"><h3>필요한 것</h3><p>각자 휴대폰과 <b>인터넷</b>. 앱 설치·블루투스 없이 브라우저만 있으면 됩니다.</p></div>
+    <div class="spec"><h3>벌칙</h3><p>개인전 <b>최하위 1~3명</b> / 팀전 <b>진 팀 전원</b>. 면제권 이벤트에 걸리면 빠집니다.</p></div>
+  </div>
+
+  <section class="rules">
+    <h3>미니게임 8종 + 카트 레이스</h3>
+    <table>
+      <tr><th style="width:120px">종목</th><th>내용</th><th style="width:110px">기록</th></tr>
+      <tr><td><b>카트 레이스</b></td><td>3차선 트랙을 달리며 장애물 피하기. 좌우 탭으로 차선 변경, 길게 눌렀다 떼면 드리프트 부스트. 첫 판·중반·마지막(점수 2배)에 등장하고, 화면 옆에 모두의 실시간 순위가 표시됩니다.</td><td>완주 시간</td></tr>
+      <tr><td>반응 속도</td><td>초록으로 바뀌는 순간 탭, 4번 평균</td><td>빠를수록</td></tr>
+      <tr><td>10초 연타</td><td>10초 동안 탭한 횟수</td><td>많을수록</td></tr>
+      <tr><td>1→16 순서</td><td>흩어진 숫자를 순서대로 터치</td><td>빠를수록</td></tr>
+      <tr><td>기억력</td><td>불이 들어온 순서 따라 누르기</td><td>단계 높을수록</td></tr>
+      <tr><td>정밀 정지</td><td>움직이는 막대를 한가운데에 5번</td><td>오차 적을수록</td></tr>
+      <tr><td>다른 색 찾기</td><td>색이 살짝 다른 칸 찾기</td><td>단계 높을수록</td></tr>
+      <tr><td>5초 맞추기</td><td>숫자를 가린 채 5.00초에 정지, 3번</td><td>오차 적을수록</td></tr>
+      <tr><td>암산 배틀</td><td>제한 시간 안에 계산 문제 풀기</td><td>많을수록</td></tr>
+    </table>
+    <h3 style="margin-top:22px">운빨 이벤트 5종</h3>
+    <table>
+      <tr><td><b>행운의 카드</b></td><td>각자 카드 한 장. +10부터 −10까지, 먼저 고른 사람이 임자</td></tr>
+      <tr><td><b>폭탄 상자</b></td><td>상자 중 딱 하나가 폭탄(−14점)</td></tr>
+      <tr><td><b>자비의 여신</b></td><td>그 시점 하위 두 명에게 +9, +5점</td></tr>
+      <tr><td><b>운명 교환</b></td><td>무작위 두 사람의 점수를 통째로 교환</td></tr>
+      <tr><td><b>면제권 추첨</b></td><td>한 명이 청소 면제권 획득</td></tr>
+    </table>
+  </section>
+
+  <section class="rules">
+    <h3>진행 방법</h3>
+    <table>
+      <tr><td style="width:34px"><b>1</b></td><td>한 명이 <b>방 만들기</b> → 4자리 코드가 나옵니다. 단톡방에 코드나 링크를 공유하세요.</td></tr>
+      <tr><td><b>2</b></td><td>나머지는 같은 주소에서 이름과 코드를 넣고 참가합니다.</td></tr>
+      <tr><td><b>3</b></td><td>호스트가 시간·개인전/팀전·청소 인원을 정하고 시작합니다. 팀전이면 자동 배분 후 ↔ 버튼으로 옮길 수 있습니다.</td></tr>
+      <tr><td><b>4</b></td><td>라운드는 자동으로 넘어가고, 호스트는 결과 화면에서 <b>바로 다음으로</b>를 눌러 진행을 당길 수 있습니다.</td></tr>
+      <tr><td><b>5</b></td><td>마지막에 청소 당첨자가 발표됩니다. 호스트의 <b>한 판 더</b>로 같은 멤버 그대로 다시 시작할 수 있습니다.</td></tr>
+    </table>
+  </section>
+
+  <div class="foot"><span>DISOLVEWORKS</span><span>TEAM GAMES</span></div>
+</main>
+</body>
+</html>
