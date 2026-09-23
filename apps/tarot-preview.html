@@ -15,14 +15,14 @@
 @media(max-width:760px){.hero{grid-template-columns:1fr;gap:38px}.copy h1{font-size:38px}.phone,.controls{width:300px}.qrbox{align-items:flex-start}.qrbox img{width:96px;height:96px}}
 </style>
 </head>
-<body><main class="wrap"><a class="back" href="../pyramid/">← 피라밋 촬영용 앱</a><section class="hero"><div class="copy"><div class="eyebrow">DIGITAL PROP · FILM APP</div><h1>오늘의 타로<small>v2</small></h1><p>카드를 누르면 바로 열리지 않고 들어올림 · 흔들림 · 셔플 · 중앙 이동을 거쳐, 대사 타이밍에 맞춰 공개되는 촬영용 소품 앱입니다.</p><ul class="features"><li>누르는 동안 부드럽게 들어 올리는 터치 피드백</li><li>공개까지 2.5 / 3.0 / 3.5 / 4.0 / 5.0초 (기본 3.5초)</li><li>셔플 OFF · LIGHT · NORMAL / 공개 FLIP · FADE · FLIP+GLOW</li><li>탭 · 셔플 · 공개 효과음 (ON/OFF)</li><li>제목 1.2초 길게 누르기 = TEST MODE · 5번 탭 = Reset</li><li>기존 촬영용 결과 2종 유지 (DEATH → KING 번갈아)</li></ul><div class="buttons"><a class="download" href="./today-tarot-v2.apk" download>APK 다운로드 (v2)</a><a class="qr-link" href="./qr/today-tarot-v2.png">QR 코드 보기</a><a class="old" href="./today-tarot-v1.apk" download>이전 v1 받기</a></div><div class="qrbox"><img src="./qr/today-tarot-v2.png" alt="오늘의 타로 v2 다운로드 QR"><div><strong>휴대폰으로 바로 열기</strong><span>QR을 촬영하면 v2 APK를 내려받습니다.<br>v1이 설치된 폰에도 업데이트로 설치됩니다.</span></div></div>
-<div class="timeline"><h3>공개 타이밍 (3.5초 기준)</h3><div class="bar" id="bar"></div><div class="legend" id="legend"></div></div></div>
+<body><main class="wrap"><a class="back" href="../pyramid/">← 피라밋 촬영용 앱</a><section class="hero"><div class="copy"><div class="eyebrow">DIGITAL PROP · FILM APP</div><h1>오늘의 타로<small>v2</small></h1><p>카드를 누르면 바로 열리지 않고 들어올림 · 셔플 · 중앙 이동을 거쳐, 대사 타이밍에 맞춰 공개되는 촬영용 소품 앱입니다.</p><ul class="features"><li>누르는 동안 부드럽게 들어 올리는 터치 피드백</li><li>실제 셔플 3.0 / 3.5 / 4.0초 (기본 3.5초)</li><li>셔플 OFF · LIGHT · NORMAL / 공개 FLIP · FADE · FLIP+GLOW</li><li>탭 · 셔플 · 공개 효과음 (ON/OFF)</li><li>제목 1.2초 길게 누르기 = TEST MODE · 5번 탭 = Reset</li><li>기존 촬영용 결과 2종 유지 (DEATH → KING 번갈아)</li></ul><div class="buttons"><a class="download" href="./today-tarot-v2.apk" download>APK 다운로드 (v2)</a><a class="qr-link" href="./qr/today-tarot-v2.png">QR 코드 보기</a><a class="old" href="./today-tarot-v1.apk" download>이전 v1 받기</a></div><div class="qrbox"><img src="./qr/today-tarot-v2.png" alt="오늘의 타로 v2 다운로드 QR"><div><strong>휴대폰으로 바로 열기</strong><span>QR을 촬영하면 v2 APK를 내려받습니다.<br>v1이 설치된 폰에도 업데이트로 설치됩니다.</span></div></div>
+<div class="timeline"><h3>셔플 타이밍 (3.5초 기준)</h3><div class="bar" id="bar"></div><div class="legend" id="legend"></div></div></div>
 <div><div class="phone"><h2 id="title">오늘의 운세</h2><div class="sub" id="sub">마음이 끌리는 카드를 터치하세요</div><div class="deck" id="deck"></div><div class="result" id="result"><b id="rname">DEATH</b><span id="rtext">무엇을 바라든 이루어지지 않을 것이다</span><br><button class="reset" id="reset">↻ 다시 선택하기</button></div><div class="hint" id="hint">스무 장의 카드 중 한 장을 선택하세요</div></div>
-<div class="controls" id="controls"><h4>TEST MODE 미리보기</h4><label>CARD REVEAL SPEED</label><div class="seg" data-key="delay"></div><label>SHUFFLE EFFECT</label><div class="seg" data-key="shuffle"></div><label>REVEAL EFFECT</label><div class="seg" data-key="reveal"></div><label>SOUND</label><div class="seg" data-key="sound"></div><p>앱과 같은 연출을 PC에서 확인하는 미리보기입니다.</p></div></div></section></main>
+<div class="controls" id="controls"><h4>TEST MODE 미리보기</h4><label>SHUFFLE DURATION</label><div class="seg" data-key="delay"></div><label>SHUFFLE EFFECT</label><div class="seg" data-key="shuffle"></div><label>REVEAL EFFECT</label><div class="seg" data-key="reveal"></div><label>SOUND</label><div class="seg" data-key="sound"></div><p>앱과 같은 연출을 PC에서 확인하는 미리보기입니다.</p></div></div></section></main>
 <script>
 const N=20,STEP=14,CW=68,CENTER_Y=34,BIG=2.35;
 const CARDS=[{name:'DEATH',sym:'☠',num:'XIII',text:'무엇을 바라든 이루어지지 않을 것이다'},{name:'KING',sym:'♛',num:'IV',text:'화려한 조명을 받는 오늘, 당신이 세상의 주인공'}];
-const OPTIONS={delay:[[2500,'2.5초'],[3000,'3.0초'],[3500,'3.5초'],[4000,'4.0초'],[5000,'5.0초']],shuffle:[['off','OFF'],['light','LIGHT'],['normal','NORMAL']],reveal:[['flip','FLIP'],['fade','FADE'],['flipGlow','FLIP + GLOW']],sound:[[true,'ON'],[false,'OFF']]};
+const OPTIONS={delay:[[3000,'3.0초'],[3500,'3.5초'],[4000,'4.0초']],shuffle:[['off','OFF'],['light','LIGHT'],['normal','NORMAL']],reveal:[['flip','FLIP'],['fade','FADE'],['flipGlow','FLIP + GLOW']],sound:[[true,'ON'],[false,'OFF']]};
 const settings={delay:3500,shuffle:'normal',reveal:'flipGlow',sound:true};
 const FLIP=900,PAUSE=140;
 const $=id=>document.getElementById(id),deck=$('deck'),result=$('result'),sub=$('sub'),hint=$('hint');
@@ -48,7 +48,7 @@ const ease={lin:t=>t,sin:t=>-(Math.cos(Math.PI*t)-1)/2,out3:t=>1-Math.pow(1-t,3)
 function track(t,k){if(t<=k[0][0])return k[0][1];for(let n=1;n<k.length;n++){const[a,va]=k[n-1],[b,vb,e]=k[n];if(t<=b){const p=b>a?(t-a)/(b-a):1;return va+(vb-va)*ease[e||'sin'](p)}}return k[k.length-1][1]}
 
 function buildPlan(s){
-  const T=s.delay,lift=T*.12,move=T*.29,rest=Math.max(0,T-lift-move-PAUSE),react=rest*.53,shuf=rest-react,ss=lift+react,ms=ss+shuf,L=s.shuffle;
+  const shuf=s.delay,lift=300,react=260,move=620,ss=lift,ms=ss+shuf,T=ms+move+PAUSE,L=s.shuffle;
   const p={T,ss,ms,move,level:L,reveal:s.reveal,tracks:{}},tr=p.tracks,LS=0.35;
   tr.lift=[[0,LS],[lift,1,'out3'],[ms,1],[ms+move*.7,0]];
   tr.focus=[[lift*.4,0],[lift*.4+react*.7,1,'outq']];
@@ -58,7 +58,7 @@ function buildPlan(s){
   if(L!=='off'){
     const cnt=L==='normal'?3:2,amp=L==='normal'?1:.6,st=react*.75/(cnt*2+1),k=[[lift,0]];let t=lift;
     for(let i=0;i<cnt;i++){const d=1-i*.22;t+=st;k.push([t,amp*d]);t+=st;k.push([t,-amp*d])}t+=st;k.push([t,0]);tr.shake=k;
-    tr.shuffle=[[ss,0],[ss+shuf/3,1],[ss+shuf*2/3,2],[ms,3]];
+    tr.shuffle=[[ss,0],[ms,1,'lin']];
     tr.hover=[[ss,0],[ss+shuf/2,1],[ms,0]];
     p.amount=L==='normal'?{g:.34,x:10,y:7,r:5}:{g:0,x:5,y:3.5,r:2.5};
   }else{tr.shake=[[0,0]];tr.shuffle=[[0,0]];tr.hover=[[0,0]];p.amount={g:0,x:0,y:0,r:0}}
@@ -82,7 +82,7 @@ function choose(i){
   $('rname').textContent=c.name;$('rtext').textContent=c.text;
   cards.forEach(k=>k.j={x:Math.random()*2-1,y:Math.random()*2-1,r:Math.random()*2-1});
   plan=buildPlan(settings);start=performance.now();
-  sub.textContent='운명의 카드가 선택되고 있습니다';hint.textContent='잠시만 기다려 주세요';
+  sub.textContent='운명의 카드를 섞고 있습니다';hint.textContent='잠시만 기다려 주세요';
   play('tap');
   if(plan.level!=='off')cues.push(setTimeout(()=>play('shuffle'),plan.ss));
   cues.push(setTimeout(()=>{phase='flipping';play('reveal')},plan.T));
@@ -114,13 +114,15 @@ function frame(now){
       c.veil.style.opacity=V.veil*.62;c.aura.style.opacity=V.aura;c.shine.style.opacity=V.aura*.85;
     }else{
       const d=selected===null?0:i-selected,rip=d&&Math.abs(d)<=3?Math.sign(d)*(4-Math.abs(d))*2.5:0;
-      const gx=(9.5-i)*STEP*a.g,q=V.shuffle;
-      const kx=[0,gx+c.j.x*a.x,-gx*.25-c.j.x*a.x*.6,0],ky=[0,c.j.y*a.y,-c.j.y*a.y*.5,0],kr=[0,c.j.r*a.r,-c.j.r*a.r*.5,0];
-      const seg=Math.min(2,Math.floor(q)),p=q-seg,lerp=k=>k[seg]+(k[seg+1]-k[seg])*p;
-      const x=c.x+(1-en)*-c.x+V.exit*(i<10?-34:34)+V.focus*rip+lerp(kx);
-      const y=c.y+(1-en)*60+V.exit*30+c.press*-4+lerp(ky);
+      const q=V.shuffle,packet=i%2===0?-1:1,rank=Math.floor(i/2),ds=.3+rank*.045,de=ds+.075;
+      const gx=-c.x,gy=CENTER_Y-c.y,pw=a.x*6,pl=(rank-4.5)*3.2;
+      const sx=track(q,[[0,0],[.16,gx],[.28,gx+packet*pw],[ds,gx+packet*pw],[de,gx+packet*2.5],[.84,gx+c.j.x*2.2],[1,gx]]);
+      const sy=track(q,[[0,0],[.16,gy],[.28,gy+pl],[ds,gy+pl],[de,gy-10+rank],[.84,gy+c.j.y*2],[1,gy]]);
+      const sr=track(q,[[0,0],[.16,-c.r],[.28,-c.r+packet*a.r],[ds,-c.r+packet*a.r],[de,-c.r+packet*.5],[.84,-c.r+c.j.r*.5],[1,-c.r]]);
+      const x=c.x+(1-en)*-c.x+V.exit*(i<10?-34:34)+V.focus*rip+sx;
+      const y=c.y+(1-en)*60+V.exit*30+c.press*-4+sy;
       const s=(.72+.28*en)*(1+.035*c.press)*(1-.04*V.focus);
-      c.el.style.transform=`translate(${x}px,${y}px) rotate(${c.r+lerp(kr)}deg) scale(${s})`;
+      c.el.style.transform=`translate(${x}px,${y}px) rotate(${c.r+sr}deg) scale(${s})`;
       c.el.style.zIndex=hovered===i?100:(c.press>.02?99:i);
       c.el.style.opacity=en*(1-.4*V.focus)*(1-.55*V.exit);
       c.flipper.style.transform='none';c.back.style.opacity=1;c.aura.style.opacity=c.press;c.shine.style.opacity=c.press;
@@ -133,9 +135,9 @@ requestAnimationFrame(frame);
 // controls
 document.querySelectorAll('.seg').forEach(seg=>{const key=seg.dataset.key;OPTIONS[key].forEach(([v,l])=>{const b=document.createElement('button');b.textContent=l;b.onclick=()=>{settings[key]=v;render();if(key==='delay')drawBar()};b.dataset.v=String(v);seg.appendChild(b)})});
 function render(){document.querySelectorAll('.seg').forEach(seg=>seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===String(settings[seg.dataset.key]))))}
-function drawBar(){const T=settings.delay,lift=T*.12,move=T*.29,rest=T-lift-move-PAUSE,react=rest*.53,shuf=rest-react,tot=T+FLIP;
-  const parts=[['들어올림',lift,'#e9d4ab'],['흔들림 · 주변 반응',react,'#b89861'],['셔플 · 빛',shuf,'#7d6a45'],['중앙 이동 · 확대',move+PAUSE,'#3f6f8f'],['뒤집기',FLIP,'#d7e3ea']];
-  document.querySelector('.timeline h3').textContent=`공개 타이밍 (${(T/1000).toFixed(1)}초 후 뒤집기 시작)`;
+function drawBar(){const shuf=settings.delay,lift=300,move=620,tot=lift+shuf+move+PAUSE+FLIP;
+  const parts=[['들어올림',lift,'#e9d4ab'],['셔플 · 대사 호흡',shuf,'#7d6a45'],['중앙 이동 · 확대',move+PAUSE,'#3f6f8f'],['뒤집기',FLIP,'#d7e3ea']];
+  document.querySelector('.timeline h3').textContent=`셔플 ${(shuf/1000).toFixed(1)}초 후 카드 공개`;
   $('bar').innerHTML=parts.map(p=>`<i style="width:${p[1]/tot*100}%;background:${p[2]}"></i>`).join('');
   let t=0;$('legend').innerHTML=parts.map(p=>{const s=t;t+=p[1];return `<span><b style="background:${p[2]}"></b>${p[0]} ${(s/1000).toFixed(1)}–${(t/1000).toFixed(1)}초</span>`}).join('');}
 render();drawBar();
