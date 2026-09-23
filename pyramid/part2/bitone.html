@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aver (에이버) - 비트원 거래소 시뮬레이션</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Pretendard:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Pretendard', 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      user-select: none;
+    }
+
+    .font-google {
+      font-family: 'Product Sans', 'Roboto', sans-serif;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Upbit custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f3f5;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    /* Real-time price flashing effects */
+    @keyframes flashRed {
+      0% { background-color: rgba(200, 74, 49, 0.3); }
+      100% { background-color: transparent; }
+    }
+    @keyframes flashBlue {
+      0% { background-color: rgba(18, 97, 196, 0.3); }
+      100% { background-color: transparent; }
+    }
+    .flash-red {
+      animation: flashRed 0.7s ease-out;
+    }
+    .flash-blue {
+      animation: flashBlue 0.7s ease-out;
+    }
+
+    /* Pulsing glow for cinematic drama */
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(18, 97, 196, 0.5); }
+      50% { box-shadow: 0 0 30px rgba(18, 97, 196, 0.9); }
+    }
+    .pulse-blue {
+      animation: pulseGlow 1.5s infinite;
+    }
+
+    /* Sell tab entry animation */
+    @keyframes sellEnter {
+      0% { opacity: 0; transform: translateY(10px) scale(0.985); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .animate-sell-enter {
+      animation: sellEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* VIP Asset card breathing glow */
+    @keyframes vipAssetGlow {
+      0%, 100% { box-shadow: 0 4px 20px -2px rgba(18, 97, 196, 0.45); }
+      50% { box-shadow: 0 4px 32px 3px rgba(18, 97, 196, 0.75), 0 0 20px rgba(250, 204, 21, 0.35); }
+    }
+    .vip-card-glow {
+      animation: vipAssetGlow 3s infinite ease-in-out;
+    }
+
+    /* Gold shimmer across the 379억 numbers */
+    @keyframes shimmerWon {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .shimmer-text {
+      background: linear-gradient(90deg, #ffffff 0%, #fef08a 40%, #ffffff 80%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmerWon 3s infinite linear;
+    }
+
+    /* Chart live beacon ping */
+    @keyframes beaconPulse {
+      0% { r: 3; opacity: 1; }
+      100% { r: 16; opacity: 0; }
+    }
+    .beacon-pulse {
+      animation: beaconPulse 1.2s infinite ease-out;
+    }
+
+    /* Live trade row arrival flash */
+    @keyframes tradeFlashAnim {
+      0% { background-color: rgba(200, 74, 49, 0.25); }
+      100% { background-color: transparent; }
+    }
+    .trade-row-flash {
+      animation: tradeFlashAnim 0.8s ease-out;
+    }
+
+    /* Screen transition effect */
+    .view-transition {
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .hidden-view {
+      display: none !important;
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="bg-[#f8f9fa] text-[#202124] min-h-screen overflow-x-hidden">
+
+  <!-- ========================================================
+       STAGE 1-A: 에이버 (Aver) 홈 검색 화면
+       (구글 스타일의 깔끔한 파란색 로고 + Aver/에이버 표기)
+       ======================================================== -->
+  <div id="stage-google-home" class="view-transition min-h-screen flex flex-col justify-between bg-white">
+    <!-- 상단 헤더 -->
+    <header class="p-4 flex items-center justify-end space-x-4 text-sm text-[#5f6368]">
+      <span class="hover:underline cursor-pointer">Aver 메일</span>
+      <span class="hover:underline cursor-pointer">이미지</span>
+      <button class="p-2 hover:bg-gray-100 rounded-full">
+        <svg class="w-5 h-5 fill-current text-[#5f6368]" viewBox="0 0 24 24">
+          <path d="M6,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM16,6c0,1.1 0.9,2 2,2s2,-0.9 2,-2 -0.9,-2 -2,-2 -2,0.9 -2,2zM12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2z"/>
+        </svg>
+      </button>
+      <button class="bg-[#1a73e8] hover:bg-[#1557b0] text-white px-5 py-2 rounded-md font-medium text-sm shadow-sm transition">
+        로그인
+      </button>
+    </header>
+
+    <!-- 중앙 검색 영역 (에이버 Aver 로고) -->
+    <main class="flex flex-col items-center justify-center -mt-20 px-4">
+      <div class="mb-7 select-none text-center">
+        <!-- 클릭 시 Aver ↔ 에이버 토글 지원 (촬영 현장 맞춤) -->
+        <h1 id="main-portal-logo" 
+            onclick="togglePortalLogoText()"
+            title="클릭하면 Aver / 에이버 글자가 전환됩니다"
+            class="text-5xl font-bold tracking-tight text-[#1a73e8] font-google cursor-pointer hover:opacity-95 transition">
+          Aver
+        </h1>
+      </div>
+
+      <div class="w-full max-w-[584px]">
+        <div class="flex items-center border border-[#dfe1e5] hover:border-transparent hover:shadow-[0_1px_6px_rgba(32,33,36,0.28)] focus-within:shadow-[0_1px_6px_rgba(32,33,36,0.28)] focus-within:border-transparent rounded-full px-4 py-3 bg-white transition duration-200">
+          <svg class="w-5 h-5 text-[#9aa0a6] mr-3 shrink-0 fill-current" viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+          
+          <input type="text" id="google-home-input"
+                 class="w-full text-base outline-none bg-transparent text-[#202124]"
+                 autocomplete="off"
+                 autofocus
+                 onkeydown="handleGoogleHomeKey(event)">
+
+          <div class="flex items-center space-x-3 shrink-0 ml-2">
+            <svg class="w-5 h-5 cursor-pointer fill-current text-[#4285f4]" viewBox="0 0 24 24">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+            <svg class="w-5 h-5 cursor-pointer fill-current text-[#4285f4]" viewBox="0 0 24 24">
+              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+              <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center space-x-3 mt-7">
+          <button onclick="executeGoogleSearch()" id="btn-portal-search" class="bg-[#f8f9fa] hover:bg-[#f1f3f4] text-[#3c4043] border border-transparent hover:border-[#dadce0] px-4 py-2 rounded text-sm font-medium transition">
+            Aver 검색
+          </button>
+          <button onclick="executeGoogleSearch()" class="bg-[#f8f9fa] hover:bg-[#f1f3f4] text-[#3c4043] border border-transparent hover:border-[#dadce0] px-4 py-2 rounded text-sm font-medium transition">
+            I'm Feeling Lucky
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- 에이버 하단 푸터 -->
+    <footer class="bg-[#f2f2f2] text-[#70757a] text-sm">
+      <div class="px-7 py-3 border-b border-[#dadce0]">대한민국</div>
+      <div class="px-7 py-3 flex flex-wrap justify-between">
+        <div class="flex space-x-6">
+          <span class="hover:underline cursor-pointer">Aver 정보</span>
+          <span class="hover:underline cursor-pointer">광고</span>
+          <span class="hover:underline cursor-pointer">비즈니스</span>
+          <span class="hover:underline cursor-pointer">검색의 원리</span>
+        </div>
+        <div class="flex space-x-6">
+          <span class="hover:underline cursor-pointer">개인정보처리방침</span>
+          <span class="hover:underline cursor-pointer">약관</span>
+          <span class="hover:underline cursor-pointer">설정</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+
+  <!-- ========================================================
+       STAGE 1-B: 에이버 (Aver) '비트원' 검색 결과 화면
+       ======================================================== -->
+  <div id="stage-google-results" class="view-transition min-h-screen flex flex-col bg-white hidden-view">
+    <header class="border-b border-[#ebebeb] px-6 py-4 flex items-center justify-between sticky top-0 bg-white z-20">
+      <div class="flex items-center space-x-8 flex-1 max-w-[800px]">
+        <span onclick="goToStage('google-home')" id="results-portal-logo" class="text-3xl font-bold tracking-tight text-[#1a73e8] font-google cursor-pointer">
+          Aver
+        </span>
+        
+        <div class="flex-1 max-w-[650px] relative">
+          <div class="flex items-center border border-[#dfe1e5] rounded-full px-4 py-2.5 bg-white shadow-sm hover:shadow-md focus-within:shadow-md transition">
+            <input type="text" id="google-results-input"
+                   value="비트원"
+                   class="w-full text-base outline-none bg-transparent text-[#202124] font-medium"
+                   onkeydown="handleGoogleResultsKey(event)">
+            <button onclick="executeGoogleSearchFromInput()" class="text-[#4285f4] p-1">
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3 text-[#5f6368]">
+        <button class="p-2 hover:bg-gray-100 rounded-full">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+          </svg>
+        </button>
+        <button class="bg-[#1a73e8] text-white px-4 py-1.5 rounded-md font-medium text-sm">로그인</button>
+      </div>
+    </header>
+
+    <!-- 검색 결과 서브탭 -->
+    <div class="border-b border-[#ebebeb] px-6 lg:pl-44 text-sm text-[#5f6368] flex space-x-6 h-11 items-center">
+      <span class="text-[#1a73e8] border-b-2 border-[#1a73e8] h-full flex items-center font-semibold">전체</span>
+      <span class="hover:text-black cursor-pointer">뉴스</span>
+      <span class="hover:text-black cursor-pointer">이미지</span>
+      <span class="hover:text-black cursor-pointer">동영상</span>
+      <span class="hover:text-black cursor-pointer">지도</span>
+      <span class="hover:text-black cursor-pointer">도구</span>
+    </div>
+
+    <!-- 검색 결과 바디 (총 6개 사이트) -->
+    <main class="px-6 lg:pl-44 py-4 flex-1 max-w-[850px] space-y-7">
+      <div class="text-xs text-[#70757a]">검색결과 약 1,480,000개 (0.28초)</div>
+
+      <!-- [사이트 1 - 메인] 비트원 공식 거래소 (클릭 시 로그인창 진입!) -->
+      <div class="space-y-1">
+        <div class="flex items-center space-x-2 text-xs text-[#202124]">
+          <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-xs">B</div>
+          <div>
+            <div class="text-[#202124] font-medium leading-none">비트원 (BitOne)</div>
+            <div class="text-[#4d5156] text-[11px]">https://www.bitone.co.kr</div>
+          </div>
+        </div>
+        <h2 class="text-xl text-[#1a0dab] hover:underline cursor-pointer font-medium leading-snug pt-0.5" onclick="goToStage('login')">
+          비트원 (BitOne) - 가장 신뢰받는 대한민국 1등 글로벌 가상자산 거래소
+        </h2>
+        <p class="text-sm text-[#4d5156] leading-relaxed">
+          대한민국 디지털 자산의 새로운 표준, 비트원(BitOne). 비트코인, 이더리움, KKE 코인 등 실시간 시세 조회 및 원화(KRW) 마켓 거래 지원. 최고 등급 정보보안 ISMS-P 인증 획득...
+        </p>
+
+        <div class="grid grid-cols-2 gap-x-6 gap-y-2 pt-2 text-sm">
+          <div>
+            <h3 class="text-[#1a0dab] hover:underline cursor-pointer font-medium" onclick="goToStage('login')">KKE / KRW 거래소</h3>
+            <p class="text-xs text-[#4d5156]">KKE 코인 실시간 차트 및 호가 주문창</p>
+          </div>
+          <div>
+            <h3 class="text-[#1a0dab] hover:underline cursor-pointer font-medium" onclick="goToStage('login')">회원 로그인</h3>
+            <p class="text-xs text-[#4d5156]">보안 2차 인증 및 VIP 프라임 접속</p>
+          </div>
+          <div>
+            <h3 class="text-[#1a0dab] hover:underline cursor-pointer font-medium" onclick="goToStage('login')">입출금 센터</h3>
+            <p class="text-xs text-[#4d5156]">원화 즉시 출금 및 고액 자산 정산</p>
+          </div>
+          <div>
+            <h3 class="text-[#1a0dab] hover:underline cursor-pointer font-medium" onclick="goToStage('login')">공지사항 및 뉴스</h3>
+            <p class="text-xs text-[#4d5156]">최신 마켓 상장 및 점검 현황 안내</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- [사이트 2] 비트원 고객지원센터 -->
+      <div class="space-y-1">
+        <div class="flex items-center space-x-2 text-xs text-[#202124]">
+          <div class="w-6 h-6 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-bold text-xs">CS</div>
+          <div>
+            <div class="text-[#202124] font-medium leading-none">비트원 고객지원센터</div>
+            <div class="text-[#4d5156] text-[11px]">https://support.bitone.co.kr › help</div>
+          </div>
+        </div>
+        <h2 class="text-xl text-[#1a0dab] hover:underline cursor-pointer font-medium leading-snug pt-0.5">
+          비트원 고객센터 - 계정 보안 및 출금 한도 상향 안내
+        </h2>
+        <p class="text-sm text-[#4d5156] leading-relaxed">
+          고액 자산가 및 VIP 회원을 위한 특별 출금 한도 정책, 하드웨어 보안키(USB) 연동 방법, OTP 재설정 및 이상 거래 감지 시스템(FDS) 운영 정책을 확인하세요.
+        </p>
+      </div>
+
+      <!-- [사이트 3] 위키디아 -->
+      <div class="space-y-1">
+        <div class="flex items-center space-x-2 text-xs text-[#202124]">
+          <div class="w-6 h-6 rounded-full bg-gray-100 text-gray-800 flex items-center justify-center font-serif font-bold text-xs">W</div>
+          <div>
+            <div class="text-[#202124] font-medium leading-none">위키디아, 모두의 백과사전</div>
+            <div class="text-[#4d5156] text-[11px]">https://ko.wikidia.org › wiki › 비트원</div>
+          </div>
+        </div>
+        <h2 class="text-xl text-[#1a0dab] hover:underline cursor-pointer font-medium leading-snug pt-0.5">
+          비트원 (가상화폐 거래소) - 위키디아
+        </h2>
+        <p class="text-sm text-[#4d5156] leading-relaxed">
+          비트원(BitOne)은 대한민국의 암호화폐 거래소이다. 2019년 설립 이후 일일 거래대금 기준 국내 최대 규모로 성장하였으며, 특히 KKE 네트워크 코인의 독점 마켓 형성으로 큰 주목을 받았다...
+        </p>
+      </div>
+
+      <!-- [사이트 4] 경제 뉴스 -->
+      <div class="space-y-1">
+        <div class="flex items-center space-x-2 text-xs text-[#202124]">
+          <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">N</div>
+          <div>
+            <div class="text-[#202124] font-medium leading-none">블록타임즈 디지털자산 뉴스</div>
+            <div class="text-[#4d5156] text-[11px]">https://www.blocktimes.co.kr › news › article › 84920</div>
+          </div>
+        </div>
+        <h2 class="text-xl text-[#1a0dab] hover:underline cursor-pointer font-medium leading-snug pt-0.5">
+          [단독] 비트원 거래소, KKE 코인 거래대금 폭증 속 1초당 5만건 체결 신기록 달성
+        </h2>
+        <p class="text-sm text-[#4d5156] leading-relaxed">
+          어제 자정 기준 비트원 원화마켓의 KKE 코인은 전일 대비 급등세를 보이며 기관 및 고액 자산가들의 매수세가 집중되었다. 비트원 기술팀은 초고속 체결 엔진을 전면 가동 중이라고 밝혔다.
+        </p>
+      </div>
+
+      <!-- [사이트 5] API 센터 -->
+      <div class="space-y-1">
+        <div class="flex items-center space-x-2 text-xs text-[#202124]">
+          <div class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center font-mono text-xs">&lt;/&gt;</div>
+          <div>
+            <div class="text-[#202124] font-medium leading-none">BitOne Developers Center</div>
+            <div class="text-[#4d5156] text-[11px]">https://docs.bitone.co.kr › api › v1</div>
+          </div>
+        </div>
+        <h2 class="text-xl text-[#1a0dab] hover:underline cursor-pointer font-medium leading-snug pt-0.5">
+          비트원 Open API 레퍼런스 - WebSocket 시세 및 주문 API 연동 규격
+        </h2>
+        <p class="text-sm text-[#4d5156] leading-relaxed">
+          REST API 및 WebSocket을 통한 실시간 시세, 호가창(Orderbook), 자동 매매 및 잔고 조회 엔드포인트 공식 문서입니다. Rate Limit 및 서명 키 발급 절차를 제공합니다.
+        </p>
+      </div>
+
+      <!-- [사이트 6] 커뮤니티 토론 -->
+      <div class="space-y-1">
+        <div class="flex items-center space-x-2 text-xs text-[#202124]">
+          <div class="w-6 h-6 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center font-bold text-xs">C</div>
+          <div>
+            <div class="text-[#202124] font-medium leading-none">코인톡 커뮤니티</div>
+            <div class="text-[#4d5156] text-[11px]">https://coin-talk.co.kr › bitone_board › 1982741</div>
+          </div>
+        </div>
+        <h2 class="text-xl text-[#1a0dab] hover:underline cursor-pointer font-medium leading-snug pt-0.5">
+          실시간 비트원 거래소 KKE 호가창 매수벽 보신 분 계신가요?
+        </h2>
+        <p class="text-sm text-[#4d5156] leading-relaxed">
+          현재 18,740원 부근에서 대형 고래 계좌의 매도 대기 물량이 포착되고 있습니다. 300억대 이상 대량 매각 발생 시 시장가 슬리피지 주의해야 할 것 같네요...
+        </p>
+      </div>
+    </main>
+
+    <!-- 에이버 푸터 -->
+    <footer class="bg-[#f2f2f2] text-[#70757a] text-sm mt-12">
+      <div class="px-6 lg:pl-44 py-3 border-b border-[#dadce0]">대한민국 • IP 기준 위치 정보 사용</div>
+      <div class="px-6 lg:pl-44 py-3 flex space-x-6 text-xs">
+        <span class="hover:underline cursor-pointer">도움말</span>
+        <span class="hover:underline cursor-pointer">의견 보내기</span>
+        <span class="hover:underline cursor-pointer">개인정보처리방침</span>
+        <span class="hover:underline cursor-pointer">약관</span>
+      </div>
+    </footer>
+  </div>
+
+
+  <!-- ========================================================
+       STAGE 2: 비트원 (BitOne) 로그인 화면
+       ======================================================== -->
+  <div id="stage-login" class="view-transition min-h-screen bg-[#09152b] flex items-center justify-center p-4 hidden-view">
+    <div class="absolute w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative w-full max-w-[440px] bg-[#111e38] border border-blue-900/40 rounded-2xl p-8 shadow-2xl text-white">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center space-x-2 mb-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-lg text-white shadow-lg shadow-blue-500/30">B</div>
+          <span class="text-2xl font-black tracking-tight text-white">BitOne</span>
+        </div>
+        <p class="text-xs text-gray-400">대한민국 대표 디지털 자산 거래소 로그인</p>
+      </div>
+
+      <div class="bg-blue-950/60 border border-blue-800/40 rounded-lg p-3 text-xs text-blue-300 mb-6 flex items-center space-x-2">
+        <span class="text-base">🔒</span>
+        <span>보안 USB 키 인증 및 하드웨어 보안 모듈이 감지되었습니다.</span>
+      </div>
+
+      <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">회원 아이디</label>
+          <input type="text" id="login-id" 
+                 value="" 
+                 class="w-full bg-[#0a1324] border border-gray-700 rounded-lg px-4 py-3 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+                 placeholder="아이디를 입력하세요" required autofocus autocomplete="off">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">비밀번호</label>
+          <input type="password" id="login-pw" 
+                 value="" 
+                 class="w-full bg-[#0a1324] border border-gray-700 rounded-lg px-4 py-3 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono tracking-widest"
+                 placeholder="비밀번호를 입력하세요" required autocomplete="off">
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" id="login-submit-btn" 
+                  class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-lg text-sm transition shadow-lg shadow-blue-600/30 flex items-center justify-center space-x-2">
+            <span>보안 로그인 (VIP 접속)</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       STAGE 3: 업비트 스타일 KKE 코인 메인 거래소 화면
+       (실시간으로 틱과 차트, 호가창이 살아 움직이는 반응형 거래소)
+       ======================================================== -->
+  <div id="stage-exchange" class="view-transition min-h-screen bg-[#e9ecf1] flex flex-col hidden-view">
+    
+    <!-- 거래소 상단 네비게이션 바 -->
+    <header class="bg-[#093687] text-white h-14 flex items-center justify-between px-6 shadow-md shrink-0 select-none">
+      <div class="flex items-center space-x-8">
+        <div class="flex items-center space-x-2 cursor-pointer" onclick="goToStage('google-home')">
+          <span class="text-2xl font-black tracking-tight text-white">BitOne</span>
+          <span class="text-[11px] bg-blue-500/40 text-blue-200 px-1.5 py-0.5 rounded font-bold">VIP PRIME</span>
+        </div>
+        <nav class="flex items-center space-x-6 text-sm font-semibold text-blue-100">
+          <span class="text-white border-b-2 border-white pb-0.5 cursor-pointer">거래소</span>
+          <span class="hover:text-white cursor-pointer">입출금</span>
+          <span class="hover:text-white cursor-pointer">투자내역</span>
+          <span class="hover:text-white cursor-pointer">코인동향</span>
+          <span class="hover:text-white cursor-pointer">스테이킹</span>
+        </nav>
+      </div>
+
+      <div class="flex items-center space-x-5 text-xs text-blue-100 font-medium">
+        <div class="flex items-center space-x-2 bg-[#062763] px-3 py-1.5 rounded-full border border-blue-800">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="nav-user-id" class="font-bold text-white">파라오01</span>
+          <span class="text-yellow-400 font-extrabold">👑 VVIP</span>
+        </div>
+        <button onclick="toggleFullscreen()" class="hover:text-white bg-blue-900/60 px-2 py-1 rounded border border-blue-700/50">
+          전체화면 (F11)
+        </button>
+        <button onclick="resetAll()" class="hover:text-red-300 bg-red-950/40 text-red-200 px-2 py-1 rounded border border-red-900/50" title="촬영 리셋">
+          처음으로 (F2)
+        </button>
+      </div>
+    </header>
+
+    <!-- 거래소 메인 바디 그리드 -->
+    <div class="flex-1 p-2 grid grid-cols-12 gap-2 max-w-[1920px] mx-auto w-full">
+
+      <!-- [좌측/중앙] 실시간 차트 + 호가창 -->
+      <div class="col-span-8 flex flex-col space-y-2">
+
+        <!-- 코인 헤더 -->
+        <div class="bg-white rounded p-4 shadow-sm border border-[#d5dbe2] flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-700 to-indigo-500 text-white flex items-center justify-center font-black text-lg shadow">
+              K
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h1 class="text-xl font-black text-gray-900">KKE</h1>
+                <span class="text-xs font-bold text-gray-500">KKE/KRW</span>
+                <span class="text-[11px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded font-bold border border-red-200">투자유의</span>
+              </div>
+              <p class="text-xs text-gray-400">케이케이이 네트워크 코인</p>
+            </div>
+          </div>
+
+          <!-- 실시간 틱 연동 현재가 -->
+          <div class="text-right">
+            <div class="flex items-baseline space-x-2 justify-end">
+              <span id="header-price" class="text-3xl font-black font-mono text-[#c84a31] transition-colors duration-200 px-1 rounded">18,740</span>
+              <span class="text-xs font-bold text-gray-500">KRW</span>
+            </div>
+            <div id="header-change" class="text-xs font-bold text-[#c84a31] flex items-center space-x-2 justify-end">
+              <span id="header-change-val">▲ +20.0</span>
+              <span id="header-change-rate">(+0.11%)</span>
+            </div>
+          </div>
+
+          <!-- 24시간 고가/저가/거래대금 -->
+          <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-xs border-l border-gray-200 pl-6 text-gray-600">
+            <div><span class="text-gray-400">고가:</span> <span class="font-mono font-bold text-[#c84a31]">18,840</span></div>
+            <div><span class="text-gray-400">거래량(24H):</span> <span id="header-volume" class="font-mono font-bold">1,220,742 KKE</span></div>
+            <div><span class="text-gray-400">저가:</span> <span class="font-mono font-bold text-[#1261c4]">18,550</span></div>
+            <div><span class="text-gray-400">거래대금:</span> <span class="font-mono font-bold">22,798 백만</span></div>
+          </div>
+        </div>
+
+        <!-- 캔들스틱 차트 (실시간 역동적 틱 차트) -->
+        <div class="bg-white rounded p-3 shadow-sm border border-[#d5dbe2] relative h-[340px] flex flex-col">
+          <div class="flex items-center justify-between text-xs text-gray-500 border-b border-gray-100 pb-2 mb-2 font-medium">
+            <div class="flex items-center space-x-3">
+              <span class="font-black text-gray-900">KKE/KRW • 1분봉 • BITONE</span>
+              <span class="text-[#03c75a] flex items-center font-bold">
+                <span class="w-2 h-2 rounded-full bg-[#03c75a] animate-ping mr-1"></span>
+                실시간 틱 체결 중
+              </span>
+              <span>시 18,740.0</span>
+              <span>고 18,770.0</span>
+              <span>저 18,735.0</span>
+              <span id="chart-sub-label" class="font-black text-[#c84a31]">종 18,745.0 +25.0 (+0.13%)</span>
+            </div>
+            <div class="flex items-center space-x-2 text-xs text-gray-400">
+              <span class="px-2 py-0.5 bg-blue-50 text-blue-600 font-bold rounded">1분</span>
+              <span class="px-1.5 py-0.5 hover:bg-gray-100 rounded cursor-pointer">5분</span>
+              <span class="px-1.5 py-0.5 hover:bg-gray-100 rounded cursor-pointer">일봉</span>
+              <span class="text-gray-300">|</span>
+              <span class="hover:text-gray-700 cursor-pointer">지표</span>
+              <span class="hover:text-gray-700 cursor-pointer">기본차트</span>
+            </div>
+          </div>
+
+          <!-- 캔들스틱 SVG 차트 -->
+          <div class="flex-1 relative overflow-hidden flex items-center justify-center bg-[#fafbfc]">
+            <svg id="candlestick-chart" class="w-full h-full" viewBox="0 0 800 280" preserveAspectRatio="none">
+              <!-- 배경 수평 가격 가이드선 -->
+              <line x1="0" y1="35" x2="734" y2="35" stroke="#edf0f4" stroke-width="1" stroke-dasharray="2,2"/>
+              <line x1="0" y1="75" x2="734" y2="75" stroke="#edf0f4" stroke-width="1" stroke-dasharray="2,2"/>
+              <line x1="0" y1="115" x2="734" y2="115" stroke="#edf0f4" stroke-width="1" stroke-dasharray="2,2"/>
+              <line x1="0" y1="155" x2="734" y2="155" stroke="#edf0f4" stroke-width="1" stroke-dasharray="2,2"/>
+              <line x1="0" y1="195" x2="734" y2="195" stroke="#edf0f4" stroke-width="1" stroke-dasharray="2,2"/>
+              <line x1="0" y1="235" x2="734" y2="235" stroke="#e2e8f0" stroke-width="1.5"/>
+
+              <!-- 이동평균선 (MA5 - 노랑 / MA20 - 보라) -->
+              <path id="chart-ma20" d="M 30,170 Q 220,180 420,135 T 705,120" fill="none" stroke="#a855f7" stroke-width="1.5" opacity="0.65"/>
+              <path id="chart-ma5" d="M 30,160 Q 220,170 420,120 T 705,115" fill="none" stroke="#eab308" stroke-width="2" opacity="0.9" style="transition: d 0.35s ease-out;"/>
+
+              <!-- 이전 캔들들 (18개 봉) -->
+              <line x1="40" y1="140" x2="40" y2="195" stroke="#1261c4" stroke-width="1"/><rect x="34" y="155" width="12" height="30" fill="#1261c4"/>
+              <line x1="75" y1="135" x2="75" y2="190" stroke="#c84a31" stroke-width="1"/><rect x="69" y="145" width="12" height="32" fill="#c84a31"/>
+              <line x1="110" y1="125" x2="110" y2="185" stroke="#c84a31" stroke-width="1"/><rect x="104" y="135" width="12" height="38" fill="#c84a31"/>
+              <line x1="145" y1="130" x2="145" y2="180" stroke="#1261c4" stroke-width="1"/><rect x="139" y="140" width="12" height="28" fill="#1261c4"/>
+              <line x1="180" y1="115" x2="180" y2="175" stroke="#c84a31" stroke-width="1.5"/><rect x="174" y="125" width="12" height="42" fill="#c84a31"/>
+              <line x1="215" y1="100" x2="215" y2="165" stroke="#c84a31" stroke-width="1.5"/><rect x="209" y="110" width="12" height="45" fill="#c84a31"/>
+              <line x1="250" y1="95" x2="250" y2="155" stroke="#1261c4" stroke-width="1"/><rect x="244" y="105" width="12" height="30" fill="#1261c4"/>
+              <line x1="285" y1="85" x2="285" y2="145" stroke="#c84a31" stroke-width="1.5"/><rect x="279" y="95" width="12" height="38" fill="#c84a31"/>
+              <line x1="320" y1="75" x2="320" y2="135" stroke="#c84a31" stroke-width="1.5"/><rect x="314" y="85" width="12" height="40" fill="#c84a31"/>
+              <line x1="355" y1="80" x2="355" y2="140" stroke="#1261c4" stroke-width="1.5"/><rect x="349" y="90" width="12" height="35" fill="#1261c4"/>
+              <line x1="390" y1="90" x2="390" y2="150" stroke="#1261c4" stroke-width="1"/><rect x="384" y="100" width="12" height="38" fill="#1261c4"/>
+              <line x1="425" y1="95" x2="425" y2="160" stroke="#1261c4" stroke-width="1"/><rect x="419" y="110" width="12" height="36" fill="#1261c4"/>
+              <line x1="460" y1="90" x2="460" y2="155" stroke="#c84a31" stroke-width="1"/><rect x="454" y="100" width="12" height="38" fill="#c84a31"/>
+              <line x1="495" y1="100" x2="495" y2="165" stroke="#1261c4" stroke-width="1"/><rect x="489" y="115" width="12" height="35" fill="#1261c4"/>
+              <line x1="530" y1="95" x2="530" y2="160" stroke="#c84a31" stroke-width="1.5"/><rect x="524" y="105" width="12" height="42" fill="#c84a31"/>
+              <line x1="565" y1="90" x2="565" y2="155" stroke="#c84a31" stroke-width="1.5"/><rect x="559" y="100" width="12" height="42" fill="#c84a31"/>
+              <line x1="600" y1="85" x2="600" y2="150" stroke="#1261c4" stroke-width="1"/><rect x="594" y="98" width="12" height="32" fill="#1261c4"/>
+              <line x1="635" y1="95" x2="635" y2="160" stroke="#c84a31" stroke-width="1.5"/><rect x="629" y="108" width="12" height="38" fill="#c84a31"/>
+              <line x1="670" y1="105" x2="670" y2="165" stroke="#c84a31" stroke-width="1.5"/><rect x="664" y="118" width="12" height="35" fill="#c84a31"/>
+
+              <!-- ★ [실시간 틱 라이브 캔들 & 비콘] (선명한 상하 움직임!) ★ -->
+              <line id="live-candle-wick" x1="705" y1="95" x2="705" y2="165" stroke="#c84a31" stroke-width="2" style="transition: y1 0.35s ease-out, y2 0.35s ease-out, stroke 0.35s;"/>
+              <rect id="live-candle-body" x="697" y="120" width="16" height="32" rx="1.5" fill="#c84a31" style="transition: y 0.35s ease-out, height 0.35s ease-out, fill 0.35s;"/>
+              <circle id="live-pulse-dot" cx="705" cy="120" r="4" fill="#c84a31" style="transition: cy 0.35s ease-out, fill 0.35s;"/>
+              <circle id="live-pulse-ring" cx="705" cy="120" r="12" fill="none" stroke="#c84a31" stroke-width="1.5" class="beacon-pulse" style="transition: cy 0.35s ease-out, stroke 0.35s;"/>
+
+              <!-- 실시간 가로 현재가 점선 -->
+              <line id="live-price-line" x1="0" y1="120" x2="734" y2="120" stroke="#c84a31" stroke-width="1.5" stroke-dasharray="4,4" style="transition: y1 0.35s ease-out, y2 0.35s ease-out, stroke 0.35s;"/>
+
+              <!-- 현재가 슬라이딩 배지 (선 끝에 완벽 결합) -->
+              <g id="live-badge-group" transform="translate(0, 120)" style="transition: transform 0.35s ease-out;">
+                <rect id="live-badge-rect" x="734" y="-12" width="65" height="24" rx="4" fill="#c84a31" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.25))"/>
+                <text id="live-badge-text" x="766" y="5" text-anchor="middle" fill="#ffffff" font-family="JetBrains Mono" font-size="11" font-weight="bold">18,745.0</text>
+              </g>
+
+              <!-- 하단 거래량 막대그래프 -->
+              <g id="volume-bars">
+                <rect x="37" y="255" width="6" height="20" fill="#1261c4" opacity="0.5"/>
+                <rect x="72" y="248" width="6" height="27" fill="#c84a31" opacity="0.6"/>
+                <rect x="107" y="242" width="6" height="33" fill="#c84a31" opacity="0.6"/>
+                <rect x="142" y="258" width="6" height="17" fill="#1261c4" opacity="0.5"/>
+                <rect x="177" y="240" width="6" height="35" fill="#c84a31" opacity="0.7"/>
+                <rect x="212" y="235" width="6" height="40" fill="#c84a31" opacity="0.7"/>
+                <rect x="247" y="256" width="6" height="19" fill="#1261c4" opacity="0.5"/>
+                <rect x="282" y="246" width="6" height="29" fill="#c84a31" opacity="0.6"/>
+                <rect x="317" y="240" width="6" height="35" fill="#c84a31" opacity="0.7"/>
+                <rect x="352" y="252" width="6" height="23" fill="#1261c4" opacity="0.5"/>
+                <rect x="387" y="255" width="6" height="20" fill="#1261c4" opacity="0.5"/>
+                <rect x="422" y="250" width="6" height="25" fill="#1261c4" opacity="0.5"/>
+                <rect x="457" y="245" width="6" height="30" fill="#c84a31" opacity="0.6"/>
+                <rect x="492" y="254" width="6" height="21" fill="#1261c4" opacity="0.5"/>
+                <rect x="527" y="242" width="6" height="33" fill="#c84a31" opacity="0.6"/>
+                <rect x="562" y="240" width="6" height="35" fill="#c84a31" opacity="0.7"/>
+                <rect x="597" y="252" width="6" height="23" fill="#1261c4" opacity="0.5"/>
+                <rect x="632" y="246" width="6" height="29" fill="#c84a31" opacity="0.6"/>
+                <rect x="667" y="242" width="6" height="33" fill="#c84a31" opacity="0.6"/>
+                <rect id="live-vol-bar" x="702" y="238" width="6" height="37" fill="#c84a31" opacity="0.85" style="transition: height 0.35s ease-out, y 0.35s ease-out, fill 0.35s;"/>
+              </g>
+            </svg>
+
+            <!-- 우측 가격 눈금 라벨 (실제 KKE 시세 범위 18,700 ~ 18,780) -->
+            <div class="absolute right-0 top-0 bottom-0 w-16 bg-white/95 border-l border-gray-200 flex flex-col justify-between py-2 text-[10px] font-mono text-gray-400 pl-1.5 pointer-events-none">
+              <span>18,780.0</span>
+              <span>18,760.0</span>
+              <span>18,740.0</span>
+              <span>18,720.0</span>
+              <span>18,700.0</span>
+              <span class="text-[9px] text-gray-300">거래량(Vol)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 하단: 호가창(좌측 7칸) + 실시간 체결내역(우측 5칸) 2분할 (업비트 프로 데스크톱 화면) -->
+        <div class="grid grid-cols-12 gap-2 flex-1 min-h-[360px]">
+          
+          <!-- [좌측 7칸] 일반 호가창 -->
+          <div class="col-span-7 bg-white rounded shadow-sm border border-[#d5dbe2] p-3 flex flex-col">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
+              <div class="flex items-center space-x-4 text-xs font-bold text-gray-700">
+                <span class="text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer">일반호가</span>
+                <span class="text-gray-400 hover:text-gray-600 cursor-pointer">누적호가</span>
+                <span class="text-gray-400 hover:text-gray-600 cursor-pointer">호가주문</span>
+              </div>
+              <div class="flex items-center space-x-2 text-xs text-gray-400 font-medium">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                <span>호가 연동</span>
+              </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto text-xs font-mono">
+              <table class="w-full border-collapse">
+                <colgroup>
+                  <col style="width: 35%;">
+                  <col style="width: 35%;">
+                  <col style="width: 30%;">
+                </colgroup>
+                <tbody id="orderbook-body">
+                  <!-- 매도 호가 5개 -->
+                  <tr class="h-7 hover:bg-blue-50/50 cursor-pointer" onclick="setOrderPrice('18,770')">
+                    <td class="text-right pr-3 text-blue-800 bg-[#eef3f9] relative transition-colors duration-300" id="ob-sell-vol-4">
+                      <div class="absolute right-0 top-0 bottom-0 bg-blue-200/50" style="width: 72%;"></div>
+                      <span class="relative z-10" id="ob-sell-vol-val-4">2,418.906</span>
+                    </td>
+                    <td class="text-center font-bold text-[#c84a31] border-x border-gray-100 bg-[#f8fafc]">
+                      18,770 <span class="text-[10px] font-normal">+0.27%</span>
+                    </td>
+                    <td class="bg-white"></td>
+                  </tr>
+                  <tr class="h-7 hover:bg-blue-50/50 cursor-pointer" onclick="setOrderPrice('18,765')">
+                    <td class="text-right pr-3 text-blue-800 bg-[#eef3f9] relative transition-colors duration-300" id="ob-sell-vol-3">
+                      <div class="absolute right-0 top-0 bottom-0 bg-blue-200/50" style="width: 48%;"></div>
+                      <span class="relative z-10" id="ob-sell-vol-val-3">1,120.450</span>
+                    </td>
+                    <td class="text-center font-bold text-[#c84a31] border-x border-gray-100 bg-[#f8fafc]">
+                      18,765 <span class="text-[10px] font-normal">+0.24%</span>
+                    </td>
+                    <td class="bg-white"></td>
+                  </tr>
+                  <tr class="h-7 hover:bg-blue-50/50 cursor-pointer" onclick="setOrderPrice('18,760')">
+                    <td class="text-right pr-3 text-blue-800 bg-[#eef3f9] relative transition-colors duration-300" id="ob-sell-vol-2">
+                      <div class="absolute right-0 top-0 bottom-0 bg-blue-200/50" style="width: 55%;"></div>
+                      <span class="relative z-10" id="ob-sell-vol-val-2">1,540.126</span>
+                    </td>
+                    <td class="text-center font-bold text-[#c84a31] border-x border-gray-100 bg-[#f8fafc]">
+                      18,760 <span class="text-[10px] font-normal">+0.21%</span>
+                    </td>
+                    <td class="bg-white"></td>
+                  </tr>
+                  <tr class="h-7 hover:bg-blue-50/50 cursor-pointer" onclick="setOrderPrice('18,755')">
+                    <td class="text-right pr-3 text-blue-800 bg-[#eef3f9] relative transition-colors duration-300" id="ob-sell-vol-1">
+                      <div class="absolute right-0 top-0 bottom-0 bg-blue-200/50" style="width: 38%;"></div>
+                      <span class="relative z-10" id="ob-sell-vol-val-1">890.340</span>
+                    </td>
+                    <td class="text-center font-bold text-[#c84a31] border-x border-gray-100 bg-[#f8fafc]">
+                      18,755 <span class="text-[10px] font-normal">+0.19%</span>
+                    </td>
+                    <td class="bg-white"></td>
+                  </tr>
+                  <tr class="h-7 hover:bg-blue-50/50 cursor-pointer" onclick="setOrderPrice('18,750')">
+                    <td class="text-right pr-3 text-blue-800 bg-[#eef3f9] relative transition-colors duration-300" id="ob-sell-vol-0">
+                      <div class="absolute right-0 top-0 bottom-0 bg-blue-200/50" style="width: 25%;"></div>
+                      <span class="relative z-10" id="ob-sell-vol-val-0">435.870</span>
+                    </td>
+                    <td class="text-center font-bold text-[#c84a31] border-x border-gray-100 bg-[#f8fafc]">
+                      18,750 <span class="text-[10px] font-normal">+0.16%</span>
+                    </td>
+                    <td class="bg-white"></td>
+                  </tr>
+
+                  <!-- 기준 현재가 행 -->
+                  <tr class="h-8 border-2 border-gray-800 bg-yellow-50 cursor-pointer transition-colors duration-200" id="ob-row-current">
+                    <td class="text-right pr-3 text-blue-800 bg-[#eef3f9] relative">
+                      <div class="absolute right-0 top-0 bottom-0 bg-blue-200/50" style="width: 15%;"></div>
+                      <span class="relative z-10" id="ob-current-vol">124.691</span>
+                    </td>
+                    <td class="text-center font-black text-sm text-[#c84a31] bg-white" id="ob-current-price-cell">
+                      <span id="ob-current-price-val">18,745</span> <span class="text-[10px] font-bold" id="ob-current-percent">+0.13%</span>
+                    </td>
+                    <td class="bg-white text-left pl-3 text-red-600 font-bold flex items-center space-x-1 h-8">
+                      <span class="animate-pulse text-xs">◀</span>
+                      <span class="text-xs">현재가</span>
+                    </td>
+                  </tr>
+
+                  <!-- 매수 호가 5개 -->
+                  <tr class="h-7 hover:bg-red-50/50 cursor-pointer" onclick="setOrderPrice('18,740')">
+                    <td class="bg-white"></td>
+                    <td class="text-center font-bold text-gray-700 border-x border-gray-100 bg-[#f8fafc]">
+                      18,740 <span class="text-[10px] font-normal text-gray-400">+0.11%</span>
+                    </td>
+                    <td class="text-left pl-3 text-red-800 bg-[#fdf0ee] relative transition-colors duration-300" id="ob-buy-vol-0">
+                      <div class="absolute left-0 top-0 bottom-0 bg-red-200/50" style="width: 45%;"></div>
+                      <span class="relative z-10" id="ob-buy-vol-val-0">820.712</span>
+                    </td>
+                  </tr>
+                  <tr class="h-7 hover:bg-red-50/50 cursor-pointer" onclick="setOrderPrice('18,735')">
+                    <td class="bg-white"></td>
+                    <td class="text-center font-bold text-gray-700 border-x border-gray-100 bg-[#f8fafc]">
+                      18,735 <span class="text-[10px] font-normal text-gray-400">+0.08%</span>
+                    </td>
+                    <td class="text-left pl-3 text-red-800 bg-[#fdf0ee] relative transition-colors duration-300" id="ob-buy-vol-1">
+                      <div class="absolute left-0 top-0 bottom-0 bg-red-200/50" style="width: 60%;"></div>
+                      <span class="relative z-10" id="ob-buy-vol-val-1">1,340.500</span>
+                    </td>
+                  </tr>
+                  <tr class="h-7 hover:bg-red-50/50 cursor-pointer" onclick="setOrderPrice('18,730')">
+                    <td class="bg-white"></td>
+                    <td class="text-center font-bold text-gray-700 border-x border-gray-100 bg-[#f8fafc]">
+                      18,730 <span class="text-[10px] font-normal text-gray-400">+0.05%</span>
+                    </td>
+                    <td class="text-left pl-3 text-red-800 bg-[#fdf0ee] relative transition-colors duration-300" id="ob-buy-vol-2">
+                      <div class="absolute left-0 top-0 bottom-0 bg-red-200/50" style="width: 78%;"></div>
+                      <span class="relative z-10" id="ob-buy-vol-val-2">2,150.880</span>
+                    </td>
+                  </tr>
+                  <tr class="h-7 hover:bg-red-50/50 cursor-pointer" onclick="setOrderPrice('18,725')">
+                    <td class="bg-white"></td>
+                    <td class="text-center font-bold text-[#1261c4] border-x border-gray-100 bg-[#f8fafc]">
+                      18,725 <span class="text-[10px] font-normal text-gray-400">+0.03%</span>
+                    </td>
+                    <td class="text-left pl-3 text-red-800 bg-[#fdf0ee] relative transition-colors duration-300" id="ob-buy-vol-3">
+                      <div class="absolute left-0 top-0 bottom-0 bg-red-200/50" style="width: 52%;"></div>
+                      <span class="relative z-10" id="ob-buy-vol-val-3">980.210</span>
+                    </td>
+                  </tr>
+                  <tr class="h-7 hover:bg-red-50/50 cursor-pointer" onclick="setOrderPrice('18,720')">
+                    <td class="bg-white"></td>
+                    <td class="text-center font-bold text-[#1261c4] border-x border-gray-100 bg-[#f8fafc]">
+                      18,720 <span class="text-[10px] font-normal text-gray-400">0.00%</span>
+                    </td>
+                    <td class="text-left pl-3 text-red-800 bg-[#fdf0ee] relative transition-colors duration-300" id="ob-buy-vol-4">
+                      <div class="absolute left-0 top-0 bottom-0 bg-red-200/50" style="width: 85%;"></div>
+                      <span class="relative z-10" id="ob-buy-vol-val-4">3,210.040</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- [우측 5칸] 실시간 체결 내역 스트림 (비트원/업비트 실시간 체결창) -->
+          <div class="col-span-5 bg-white rounded shadow-sm border border-[#d5dbe2] p-3 flex flex-col">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2 text-xs font-bold text-gray-700">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-blue-600 border-b-2 border-blue-600 pb-1">실시간 체결</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+              </div>
+              <span class="text-[11px] text-gray-400 font-mono font-normal">체결강도 <b class="text-red-600 font-bold">116.4%</b></span>
+            </div>
+            
+            <div class="grid grid-cols-12 text-[10px] text-gray-400 font-semibold pb-1.5 border-b border-gray-100 px-1">
+              <span class="col-span-4">체결시간</span>
+              <span class="col-span-4 text-right">체결가(KRW)</span>
+              <span class="col-span-4 text-right">체결량(KKE)</span>
+            </div>
+
+            <!-- 실시간 롤링 체결 리스트 -->
+            <div id="live-trade-list" class="flex-1 overflow-hidden space-y-1 pt-1 font-mono text-[11px]">
+              <div class="grid grid-cols-12 py-1 px-1 border-b border-gray-50 items-center">
+                <span class="col-span-4 text-gray-400 text-[10px]">13:17:52</span>
+                <span class="col-span-4 text-right font-bold text-[#c84a31]">18,745</span>
+                <span class="col-span-4 text-right text-gray-700">240.120</span>
+              </div>
+              <div class="grid grid-cols-12 py-1 px-1 border-b border-gray-50 items-center">
+                <span class="col-span-4 text-gray-400 text-[10px]">13:17:51</span>
+                <span class="col-span-4 text-right font-bold text-[#c84a31]">18,750</span>
+                <span class="col-span-4 text-right text-gray-700">85.000</span>
+              </div>
+              <div class="grid grid-cols-12 py-1 px-1 border-b border-gray-50 items-center">
+                <span class="col-span-4 text-gray-400 text-[10px]">13:17:49</span>
+                <span class="col-span-4 text-right font-bold text-[#1261c4]">18,740</span>
+                <span class="col-span-4 text-right text-gray-700">512.450</span>
+              </div>
+              <div class="grid grid-cols-12 py-1 px-1 border-b border-gray-50 items-center">
+                <span class="col-span-4 text-gray-400 text-[10px]">13:17:48</span>
+                <span class="col-span-4 text-right font-bold text-[#c84a31]">18,745</span>
+                <span class="col-span-4 text-right text-gray-700">190.230</span>
+              </div>
+              <div class="grid grid-cols-12 py-1 px-1 border-b border-gray-50 items-center">
+                <span class="col-span-4 text-gray-400 text-[10px]">13:17:46</span>
+                <span class="col-span-4 text-right font-bold text-[#c84a31]">18,750</span>
+                <span class="col-span-4 text-right text-gray-700">620.000</span>
+              </div>
+              <div class="grid grid-cols-12 py-1 px-1 border-b border-gray-50 items-center">
+                <span class="col-span-4 text-gray-400 text-[10px]">13:17:44</span>
+                <span class="col-span-4 text-right font-bold text-[#1261c4]">18,740</span>
+                <span class="col-span-4 text-right text-gray-700">77.890</span>
+              </div>
+              <div class="grid grid-cols-12 py-1 px-1 border-b border-gray-50 items-center">
+                <span class="col-span-4 text-gray-400 text-[10px]">13:17:42</span>
+                <span class="col-span-4 text-right font-bold text-[#c84a31]">18,745</span>
+                <span class="col-span-4 text-right text-gray-700">310.150</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- [우측] 주문 패널 (처음엔 [매수] ➔ [매도] 클릭 시 379억 매도창) -->
+      <div class="col-span-4 flex flex-col space-y-2">
+
+        <!-- 주문 탭 패널 -->
+        <div class="bg-white rounded shadow-sm border border-[#d5dbe2] flex flex-col">
+          
+          <!-- 상단 탭 헤더 -->
+          <div class="grid grid-cols-4 border-b border-gray-200 text-sm font-bold text-center">
+            <button id="tab-btn-buy" onclick="switchTradingTab('buy')" 
+                    class="py-3 text-[#c84a31] border-b-2 border-[#c84a31] bg-white transition">
+              매수
+            </button>
+            <button id="tab-btn-sell" onclick="switchTradingTab('sell')" 
+                    class="py-3 text-gray-500 hover:text-gray-800 bg-[#f9fafb] transition flex items-center justify-center space-x-1">
+              <span>매도</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+            </button>
+            <button class="py-3 text-gray-500 hover:text-gray-800 bg-[#f9fafb]">간편주문</button>
+            <button class="py-3 text-gray-500 hover:text-gray-800 bg-[#f9fafb]">거래내역</button>
+          </div>
+
+          <!-- 패널 A: [매수] 주문 화면 -->
+          <div id="panel-buy" class="p-4 space-y-3.5 text-xs text-gray-700">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+              <span class="font-bold text-gray-600">주문구분</span>
+              <div class="flex items-center space-x-4">
+                <label class="flex items-center space-x-1 cursor-pointer">
+                  <input type="radio" name="buy-order-type" checked class="accent-[#c84a31]">
+                  <span class="font-semibold text-gray-800">지정가</span>
+                </label>
+                <label class="flex items-center space-x-1 cursor-pointer">
+                  <input type="radio" name="buy-order-type" class="accent-[#c84a31]">
+                  <span class="text-gray-500">시장가</span>
+                </label>
+                <label class="flex items-center space-x-1 cursor-pointer">
+                  <input type="radio" name="buy-order-type" class="accent-[#c84a31]">
+                  <span class="text-gray-400">예약-지정가</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="font-semibold text-gray-500">주문가능</span>
+              <div class="text-right font-mono">
+                <span class="font-bold text-gray-900 text-sm">17,947</span>
+                <span class="text-gray-500">KRW</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-semibold text-gray-600">매수가격 (KRW)</span>
+              </div>
+              <div class="flex items-center border border-gray-300 rounded overflow-hidden">
+                <input type="text" id="buy-price-input" value="18,730" class="w-full px-3 py-2 text-right font-mono font-bold text-sm outline-none bg-white">
+                <div class="flex border-l border-gray-200">
+                  <button class="px-2.5 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 font-bold border-r border-gray-200">−</button>
+                  <button class="px-2.5 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 font-bold">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-semibold text-gray-600">주문수량 (KKE)</span>
+              </div>
+              <div class="border border-gray-300 rounded overflow-hidden mb-2">
+                <input type="text" placeholder="0" class="w-full px-3 py-2 text-right font-mono font-bold text-sm outline-none bg-white">
+              </div>
+
+              <div class="grid grid-cols-5 gap-1 text-center font-semibold text-gray-600">
+                <button class="py-1.5 border border-gray-200 bg-[#f9fafb] rounded">10%</button>
+                <button class="py-1.5 border border-gray-200 bg-[#f9fafb] rounded">25%</button>
+                <button class="py-1.5 border border-gray-200 bg-[#f9fafb] rounded">50%</button>
+                <button class="py-1.5 border border-gray-200 bg-[#f9fafb] rounded">100%</button>
+                <button class="py-1.5 border border-gray-200 bg-[#f9fafb] rounded">직접입력</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-semibold text-gray-600">주문총액 (KRW)</span>
+              </div>
+              <div class="bg-gray-50 border border-gray-200 rounded px-3 py-2.5 text-right font-mono">
+                <span class="text-base font-black text-gray-900">0</span>
+                <span class="text-xs text-gray-500 ml-1">KRW</span>
+              </div>
+            </div>
+
+            <div class="text-[11px] text-gray-400 flex justify-between pt-1">
+              <span>• 최소주문금액: 5,000.0 KRW</span>
+              <span>• 수수료(부가세 포함): 0.05%</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 pt-2">
+              <button class="py-3 border border-gray-300 rounded bg-[#f9fafb] text-gray-700 font-bold">
+                초기화
+              </button>
+              <button class="col-span-2 py-3 bg-[#c84a31] text-white font-extrabold text-base rounded shadow-sm">
+                매수
+              </button>
+            </div>
+          </div>
+
+
+          <!-- 패널 B: [매도] 주문 화면 (379억원 보유 & 매각 화면) -->
+          <div id="panel-sell" class="p-4 space-y-3.5 text-xs text-gray-700 hidden-view">
+
+            <!-- 내 보유 자산 카드 (379억원 이상, VIP 글로우 & 골드 쉬머) -->
+            <div id="vip-asset-card" class="bg-gradient-to-br from-[#0c2461] via-[#112d7c] to-[#081a48] text-white p-4 rounded-xl shadow-lg border-2 border-blue-400/50 space-y-2.5 vip-card-glow transition-all">
+              <div class="flex items-center justify-between text-xs text-blue-200 border-b border-blue-400/25 pb-2">
+                <span class="font-bold flex items-center space-x-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span class="text-white font-extrabold text-sm">이장훈</span>
+                  <span class="text-blue-200">님의 KKE 보유 자산</span>
+                </span>
+                <span id="card-profit-rate" class="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold text-[10px] border border-emerald-500/30">
+                  수익률 +649.80%
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 text-xs bg-black/25 p-2 rounded-lg border border-blue-400/20">
+                <div>
+                  <span class="text-blue-200/80 block text-[10px]">보유 수량 (100%)</span>
+                  <span id="card-holding-amount" class="font-mono font-black text-sm text-yellow-300">2,022,418.52 KKE</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-blue-200/80 block text-[10px]">매수 평균가</span>
+                  <span class="font-mono font-semibold text-gray-200">2,500 KRW</span>
+                </div>
+              </div>
+
+              <div class="pt-1.5 border-t border-blue-400/20 flex items-baseline justify-between">
+                <div class="flex items-center space-x-1.5">
+                  <span class="text-blue-200 font-bold text-xs">총 평가 금액</span>
+                  <span class="text-[9px] bg-blue-500/30 text-blue-200 px-1.5 py-0.5 rounded font-mono border border-blue-400/30 font-bold">LIVE</span>
+                </div>
+                <div class="text-right">
+                  <span id="card-total-val" class="font-mono font-black text-xl text-white tracking-tight shimmer-text transition-all duration-300">37,910,235,157</span>
+                  <span class="text-xs text-blue-200 font-bold ml-0.5">KRW</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 주문구분 라디오 -->
+            <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+              <span class="font-bold text-gray-600">주문구분</span>
+              <div class="flex items-center space-x-4">
+                <label class="flex items-center space-x-1 cursor-pointer">
+                  <input type="radio" name="sell-order-type" value="limit" checked class="accent-[#1261c4]">
+                  <span class="font-semibold text-gray-800">지정가</span>
+                </label>
+                <label class="flex items-center space-x-1 cursor-pointer">
+                  <input type="radio" name="sell-order-type" value="market" class="accent-[#1261c4]">
+                  <span class="text-gray-500">시장가</span>
+                </label>
+                <label class="flex items-center space-x-1 cursor-pointer">
+                  <input type="radio" name="sell-order-type" value="reserved" class="accent-[#1261c4]">
+                  <span class="text-gray-400">예약-지정가</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- 주문가능 수량 -->
+            <div class="flex items-center justify-between">
+              <span class="font-semibold text-gray-500">주문가능</span>
+              <div class="text-right font-mono">
+                <span id="available-sell-amount" class="font-bold text-gray-900 text-sm">2,022,418.52</span>
+                <span class="text-gray-500">KKE</span>
+              </div>
+            </div>
+
+            <!-- 매도가격 입력 -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-semibold text-gray-600">매도가격 (KRW)</span>
+              </div>
+              <div class="flex items-center border border-gray-300 rounded overflow-hidden focus-within:border-[#1261c4]">
+                <input type="text" id="sell-price-input" 
+                       value="18,745" 
+                       class="w-full px-3 py-2 text-right font-mono font-bold text-sm outline-none bg-white"
+                       oninput="calculateTotal()">
+                <div class="flex border-l border-gray-200">
+                  <button onclick="adjustPrice(-10)" class="px-2.5 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 font-bold border-r border-gray-200">−</button>
+                  <button onclick="adjustPrice(10)" class="px-2.5 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 font-bold">+</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 주문수량 입력 및 퍼센트 버튼 -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-semibold text-gray-600">주문수량 (KKE)</span>
+              </div>
+              <div class="border border-gray-300 rounded overflow-hidden focus-within:border-[#1261c4] mb-2">
+                <input type="text" id="sell-amount-input" 
+                       placeholder="0" 
+                       value=""
+                       class="w-full px-3 py-2 text-right font-mono font-bold text-sm outline-none bg-white"
+                       oninput="calculateTotal()">
+              </div>
+
+              <!-- 퍼센트 버튼들 -->
+              <div class="grid grid-cols-5 gap-1 text-center font-semibold">
+                <button type="button" onclick="setPercent(10)" class="py-1.5 border border-gray-200 bg-[#f9fafb] hover:bg-gray-100 rounded text-gray-600">10%</button>
+                <button type="button" onclick="setPercent(25)" class="py-1.5 border border-gray-200 bg-[#f9fafb] hover:bg-gray-100 rounded text-gray-600">25%</button>
+                <button type="button" onclick="setPercent(50)" class="py-1.5 border border-gray-200 bg-[#f9fafb] hover:bg-gray-100 rounded text-gray-600">50%</button>
+                <button type="button" id="btn-percent-100" onclick="setPercent(100)" 
+                        class="py-1.5 border-2 border-blue-600 bg-blue-50 hover:bg-blue-100 rounded text-blue-700 font-extrabold shadow-sm transition">
+                  100% (전체)
+                </button>
+                <button type="button" onclick="setPercent(0)" class="py-1.5 border border-gray-200 bg-[#f9fafb] hover:bg-gray-100 rounded text-gray-500">직접입력</button>
+              </div>
+            </div>
+
+            <!-- 주문총액 (KRW) -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-semibold text-gray-600">주문총액 (KRW)</span>
+              </div>
+              <div class="bg-gray-50 border border-gray-200 rounded px-3 py-2.5 text-right font-mono">
+                <span id="sell-total-input" class="text-base font-black text-gray-900">0</span>
+                <span class="text-xs text-gray-500 ml-1">KRW</span>
+              </div>
+            </div>
+
+            <div class="text-[11px] text-gray-400 flex justify-between pt-1">
+              <span>• 최소주문금액: 5,000.0 KRW</span>
+              <span>• 수수료(VIP): <b class="text-blue-600">0.00%</b> 면제</span>
+            </div>
+
+            <!-- 하단 매도 액션 버튼 -->
+            <div class="grid grid-cols-3 gap-2 pt-2">
+              <button onclick="resetOrderInputs()" class="py-3 border border-gray-300 rounded bg-[#f9fafb] hover:bg-gray-100 text-gray-700 font-bold">
+                초기화
+              </button>
+              <button id="btn-execute-sell" onclick="triggerSellModal()" 
+                      class="col-span-2 py-3 bg-[#1261c4] hover:bg-[#0e4da0] active:scale-[0.99] text-white font-extrabold text-base rounded shadow-md transition flex items-center justify-center space-x-1">
+                <span id="btn-sell-text">매도하기</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 우측 하단: 원화 마켓 리스트 -->
+        <div class="bg-white rounded shadow-sm border border-[#d5dbe2] flex-1 p-3 flex flex-col min-h-[220px]">
+          <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2 text-xs font-bold text-gray-600">
+            <span class="text-blue-600">원화마켓</span>
+            <span>보유코인</span>
+            <span>관심코인</span>
+          </div>
+          <div class="flex-1 overflow-y-auto space-y-1 text-xs">
+            <div class="flex items-center justify-between p-1.5 bg-blue-50/60 rounded border border-blue-200 font-semibold cursor-pointer">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-yellow-500">★</span>
+                <span class="font-bold text-gray-900">KKE</span>
+                <span class="text-[10px] text-gray-400">/KRW</span>
+              </div>
+              <div class="text-right font-mono">
+                <span id="watchlist-kke-price" class="text-[#c84a31] font-bold">18,740</span>
+                <span id="watchlist-kke-rate" class="text-[10px] text-[#c84a31] ml-1">+0.11%</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between p-1.5 hover:bg-gray-50 rounded text-gray-600">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-gray-300">☆</span>
+                <span class="font-medium text-gray-800">비트코인</span>
+                <span class="text-[10px] text-gray-400">BTC</span>
+              </div>
+              <div class="text-right font-mono">
+                <span id="watchlist-btc-price" class="text-[#c84a31]">132,450,000</span>
+                <span class="text-[10px] text-[#c84a31] ml-1">+2.45%</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between p-1.5 hover:bg-gray-50 rounded text-gray-600">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-gray-300">☆</span>
+                <span class="font-medium text-gray-800">이더리움</span>
+                <span class="text-[10px] text-gray-400">ETH</span>
+              </div>
+              <div class="text-right font-mono">
+                <span id="watchlist-eth-price" class="text-[#1261c4]">4,210,000</span>
+                <span class="text-[10px] text-[#1261c4] ml-1">-1.02%</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between p-1.5 hover:bg-gray-50 rounded text-gray-600">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-gray-300">☆</span>
+                <span class="font-medium text-gray-800">리플</span>
+                <span class="text-[10px] text-gray-400">XRP</span>
+              </div>
+              <div class="text-right font-mono">
+                <span id="watchlist-xrp-price" class="text-[#c84a31]">890</span>
+                <span class="text-[10px] text-[#c84a31] ml-1">+4.21%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 1: 매도 최종 확인 팝업
+       ======================================================== -->
+  <div id="modal-confirm" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden-view">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-gray-200">
+      <div class="flex items-center space-x-3 text-red-600 mb-4">
+        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center font-bold text-xl">⚠️</div>
+        <div>
+          <h3 class="font-black text-lg text-gray-900">가상자산 전량 매각 확인</h3>
+          <p class="text-xs text-gray-500">주문 접수 즉시 취소가 불가능합니다.</p>
+        </div>
+      </div>
+
+      <div class="bg-[#f8fafc] border border-gray-200 rounded-xl p-4 space-y-2 text-xs mb-6">
+        <div class="flex justify-between">
+          <span class="text-gray-500">매각 대상:</span>
+          <span class="font-bold text-gray-900">KKE 코인 (케이케이이)</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">주문 수량:</span>
+          <span class="font-mono font-bold text-blue-700 text-sm">2,022,418.52 KKE (100%)</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">적용 단가:</span>
+          <span class="font-mono font-bold text-gray-900" id="modal-confirm-price">18,745 KRW</span>
+        </div>
+        <div class="border-t border-gray-200 pt-2 flex justify-between items-baseline">
+          <span class="font-bold text-gray-700">총 매각 예정액:</span>
+          <div class="text-right">
+            <span class="font-mono font-black text-lg text-red-600" id="modal-confirm-total">37,910,235,157</span>
+            <span class="text-xs text-red-600 font-bold">KRW</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="closeModal('modal-confirm')" class="py-3 rounded-lg border border-gray-300 font-bold text-gray-700 hover:bg-gray-100 text-sm">
+          취소
+        </button>
+        <button onclick="startSellingSequence()" class="py-3 rounded-lg bg-[#1261c4] hover:bg-[#0c4b9c] font-black text-white text-sm shadow-lg shadow-blue-500/30">
+          확인
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 2: 매도 주문 처리 중
+       ======================================================== -->
+  <div id="modal-processing" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden-view">
+    <div class="bg-[#0f172a] text-white rounded-2xl p-8 max-w-lg w-full shadow-2xl border border-blue-900/50 text-center space-y-6">
+      <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full border-4 border-blue-500/20"></div>
+        <div class="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
+        <span class="text-2xl font-mono font-bold text-blue-400" id="proc-percent">0%</span>
+      </div>
+
+      <div>
+        <h3 class="text-xl font-black tracking-tight text-white mb-1">
+          시장가 대량 매도 주문 체결 중...
+        </h3>
+        <p class="text-xs text-gray-400 font-mono" id="proc-subtext">
+          매수 호가 잔량 일괄 매칭 진행 중 (체결 대기: 2,022,418.52 KKE)
+        </p>
+      </div>
+
+      <div class="space-y-2">
+        <div class="w-full bg-gray-800 rounded-full h-3 overflow-hidden p-0.5 border border-gray-700">
+          <div id="proc-progress-bar" class="bg-gradient-to-r from-blue-600 via-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-300 w-0"></div>
+        </div>
+        <div class="flex justify-between text-[11px] font-mono text-gray-400">
+          <span>주문접수</span>
+          <span id="proc-matched-vol">0 / 2,022,418.52 체결</span>
+          <span class="text-emerald-400">정산대기</span>
+        </div>
+      </div>
+
+      <div class="bg-black/50 border border-gray-800 rounded-lg p-3 text-xs text-yellow-400/90 font-mono animate-pulse">
+        ⚠️ 대량 호가 일괄 매각으로 거래소 정산 엔진이 가동 중입니다.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 3: 매도 완료 알림
+       ======================================================== -->
+  <div id="modal-success" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center hidden-view">
+    <div class="bg-white rounded-2xl p-7 max-w-md w-full shadow-2xl border-2 border-blue-600 text-center space-y-5">
+      <div class="w-16 h-16 rounded-full bg-blue-50 text-blue-600 mx-auto flex items-center justify-center text-3xl shadow-inner border border-blue-200">
+        ✓
+      </div>
+
+      <div>
+        <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
+          체결 완료 통보
+        </span>
+        <h3 class="text-2xl font-black text-gray-900 mt-2">
+          매도가 완료되었습니다
+        </h3>
+        <p class="text-xs text-gray-500 mt-1">
+          KKE 코인 전량이 시장가에 전액 체결되었습니다.
+        </p>
+      </div>
+
+      <div class="bg-[#f8fafc] border border-gray-200 rounded-xl p-4 text-xs space-y-2 text-left">
+        <div class="flex justify-between">
+          <span class="text-gray-500">종목:</span>
+          <span class="font-bold text-gray-900">KKE / KRW</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">체결 수량:</span>
+          <span class="font-mono font-bold text-gray-900" id="success-amount">2,022,418.52 KKE (100%)</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">평균 체결가:</span>
+          <span class="font-mono font-bold text-gray-900" id="success-avg-price">18,745 KRW</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">거래 수수료:</span>
+          <span class="font-mono font-bold text-emerald-600">0 KRW (VIP 면제)</span>
+        </div>
+        <div class="border-t border-gray-200 pt-2.5 flex justify-between items-baseline">
+          <span class="font-bold text-gray-800">최종 입금액:</span>
+          <div class="text-right">
+            <span class="font-mono font-black text-xl text-blue-700" id="success-payout-total">37,910,235,157</span>
+            <span class="text-xs font-bold text-blue-700">KRW</span>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="finishAndSetZero()" class="w-full py-3.5 bg-[#1261c4] hover:bg-[#0c4b9c] text-white font-black text-base rounded-xl shadow-lg shadow-blue-500/30 transition">
+        확인
+      </button>
+    </div>
+  </div>
+
+
+
+
+  <!-- ========================================================
+       JAVASCRIPT 로직
+       ======================================================== -->
+  <script>
+    let currentView = 'google-home';
+    const TOTAL_HOLDING = 2022418.52; // 379억원 이상 유지하면서 자연스러운 뒷자리 연출
+    let currentKkePrice = 18745;
+    let isSoldOut = false;
+    let liveMarketTimer = null;
+    let orderbookJitterTimer = null;
+    let isLogoKorean = false;
+
+    // 로고 Aver ↔ 에이버 원터치 토글 함수
+    function togglePortalLogoText() {
+      isLogoKorean = !isLogoKorean;
+      const logoEl = document.getElementById('main-portal-logo');
+      const resultsLogo = document.getElementById('results-portal-logo');
+      const searchBtn = document.getElementById('btn-portal-search');
+
+      if (isLogoKorean) {
+        logoEl.innerText = '에이버';
+        resultsLogo.innerText = '에이버';
+        searchBtn.innerText = '에이버 검색';
+      } else {
+        logoEl.innerText = 'Aver';
+        resultsLogo.innerText = 'Aver';
+        searchBtn.innerText = 'Aver 검색';
+      }
+    }
+
+    // 1. 뷰 전환
+    function goToStage(viewName) {
+      currentView = viewName;
+      document.getElementById('stage-google-home').classList.add('hidden-view');
+      document.getElementById('stage-google-results').classList.add('hidden-view');
+      document.getElementById('stage-login').classList.add('hidden-view');
+      document.getElementById('stage-exchange').classList.add('hidden-view');
+
+      if (viewName === 'google-home') {
+        document.getElementById('stage-google-home').classList.remove('hidden-view');
+        document.getElementById('google-home-input').focus();
+        stopLiveSimulation();
+      } else if (viewName === 'google-results') {
+        document.getElementById('stage-google-results').classList.remove('hidden-view');
+        stopLiveSimulation();
+      } else if (viewName === 'login') {
+        document.getElementById('stage-login').classList.remove('hidden-view');
+        document.getElementById('login-id').focus();
+        stopLiveSimulation();
+      } else if (viewName === 'exchange') {
+        document.getElementById('stage-exchange').classList.remove('hidden-view');
+        switchTradingTab('buy');
+        startLiveSimulation();
+      }
+    }
+
+    // 2. 에이버 검색
+    function handleGoogleHomeKey(e) {
+      if (e.key === 'Enter') executeGoogleSearch();
+    }
+    function executeGoogleSearch() {
+      const q = document.getElementById('google-home-input').value.trim();
+      document.getElementById('google-results-input').value = q || '비트원';
+      goToStage('google-results');
+    }
+    function handleGoogleResultsKey(e) {
+      if (e.key === 'Enter') executeGoogleSearchFromInput();
+    }
+    function executeGoogleSearchFromInput() {
+      goToStage('google-results');
+    }
+
+    // 3. 로그인 핸들러
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const idVal = document.getElementById('login-id').value.trim() || '파라오01';
+      document.getElementById('nav-user-id').innerText = idVal;
+
+      const btn = document.getElementById('login-submit-btn');
+      btn.innerHTML = `<span class="mr-2">🔄</span> <span>보안 인증 확인 중...</span>`;
+
+      setTimeout(() => {
+        btn.innerHTML = `<span>보안 로그인 (VIP 접속)</span>`;
+        goToStage('exchange');
+      }, 500);
+    }
+
+    // 4. [매수] ↔ [매도] 탭 전환
+    function switchTradingTab(tab) {
+      const btnBuy = document.getElementById('tab-btn-buy');
+      const btnSell = document.getElementById('tab-btn-sell');
+      const panelBuy = document.getElementById('panel-buy');
+      const panelSell = document.getElementById('panel-sell');
+
+      if (tab === 'buy') {
+        btnBuy.className = 'py-3 text-[#c84a31] border-b-2 border-[#c84a31] bg-white transition font-bold';
+        btnSell.className = 'py-3 text-gray-500 hover:text-gray-800 bg-[#f9fafb] transition font-bold flex items-center justify-center space-x-1';
+        panelBuy.classList.remove('hidden-view');
+        panelSell.classList.add('hidden-view');
+      } else {
+        btnSell.className = 'py-3 text-[#1261c4] border-b-2 border-[#1261c4] bg-white transition font-bold flex items-center justify-center space-x-1 shadow-sm';
+        btnBuy.className = 'py-3 text-gray-500 hover:text-gray-800 bg-[#f9fafb] transition font-bold';
+        panelSell.classList.remove('hidden-view');
+        panelBuy.classList.add('hidden-view');
+        
+        // 매도화면 전환 시 감각적인 슬라이드 인 & 하이라이트 애니메이션
+        panelSell.classList.remove('animate-sell-enter');
+        void panelSell.offsetWidth;
+        panelSell.classList.add('animate-sell-enter');
+
+        if (!isSoldOut) {
+          document.getElementById('sell-price-input').value = currentKkePrice.toLocaleString();
+          // 매도화면 진입 즉시 차트와 호가가 활발히 반응하도록 즉각 틱 버스트 실행
+          triggerInstantBurst();
+        }
+      }
+    }
+
+    // 매도화면 진입 시 즉각적인 틱 & 활성화 연출
+    function triggerInstantBurst() {
+      applyPriceUpdate(currentKkePrice + 5);
+      setTimeout(() => applyPriceUpdate(currentKkePrice + 5), 180);
+      setTimeout(() => applyPriceUpdate(currentKkePrice - 5), 380);
+    }
+
+    // 실시간 차트 및 마켓 수치 렌더링 함수
+    function applyPriceUpdate(newPrice) {
+      if (isSoldOut) return;
+
+      // 18,740원 미만으로 떨어지지 않음 (379억 이상 원칙 엄수)
+      if (newPrice < 18740) newPrice = 18745;
+      if (newPrice > 18770) newPrice = 18765;
+
+      const isUp = newPrice >= currentKkePrice;
+      currentKkePrice = newPrice;
+
+      // 헤더 현재가 업데이트
+      const priceEl = document.getElementById('header-price');
+      priceEl.innerText = newPrice.toLocaleString();
+      priceEl.classList.remove('flash-red', 'flash-blue');
+      void priceEl.offsetWidth;
+      priceEl.classList.add(isUp ? 'flash-red' : 'flash-blue');
+
+      const diff = newPrice - 18720;
+      const rate = ((diff / 18720) * 100).toFixed(2);
+      const sign = diff >= 0 ? '▲ +' : '▼ ';
+      const color = diff >= 0 ? '#c84a31' : '#1261c4';
+      
+      document.getElementById('header-change').style.color = color;
+      document.getElementById('header-change-val').innerText = `${sign}${diff.toFixed(1)}`;
+      document.getElementById('header-change-rate').innerText = `(${diff >= 0 ? '+' : ''}${rate}%)`;
+      document.getElementById('chart-sub-label').innerText = `종 ${newPrice.toLocaleString()}.0 ${sign}${diff.toFixed(1)} (${diff >= 0 ? '+' : ''}${rate}%)`;
+      document.getElementById('chart-sub-label').style.color = color;
+
+      // 호가창 현재가 행 업데이트
+      document.getElementById('ob-current-price-val').innerText = newPrice.toLocaleString();
+      document.getElementById('ob-current-percent').innerText = `${diff >= 0 ? '+' : ''}${rate}%`;
+      document.getElementById('ob-current-vol').innerText = (110 + (Math.random() * 35)).toFixed(3);
+      const obCell = document.getElementById('ob-current-price-cell');
+      if (obCell) {
+        obCell.style.color = color;
+      }
+
+      // ★ [차트 캔들 & 수평선 & 배지 선명한 상하 움직임] ★
+      // 18,740원(저) -> Y: 145px, 18,765원(고) -> Y: 75px (70px 이상 대폭 오르락내리락!)
+      const currentY = 145 - (newPrice - 18740) * 2.8;
+      const openY = 125; // 시가 기준 125px (약 18,747원)
+      
+      const livePriceLine = document.getElementById('live-price-line');
+      const liveCandleBody = document.getElementById('live-candle-body');
+      const liveCandleWick = document.getElementById('live-candle-wick');
+      const livePulseDot = document.getElementById('live-pulse-dot');
+      const livePulseRing = document.getElementById('live-pulse-ring');
+      const liveBadgeGroup = document.getElementById('live-badge-group');
+      const liveBadgeRect = document.getElementById('live-badge-rect');
+      const liveBadgeText = document.getElementById('live-badge-text');
+      const chartMa5 = document.getElementById('chart-ma5');
+      const liveVolBar = document.getElementById('live-vol-bar');
+
+      const candleY = isUp ? currentY : openY;
+      const candleH = Math.max(Math.abs(currentY - openY), 10);
+      const wickTop = Math.min(currentY, openY) - 18;
+      const wickBottom = Math.max(currentY, openY) + 16;
+
+      if (livePriceLine && liveCandleBody) {
+        livePriceLine.setAttribute('y1', currentY);
+        livePriceLine.setAttribute('y2', currentY);
+        livePriceLine.setAttribute('stroke', color);
+
+        liveCandleBody.setAttribute('y', candleY);
+        liveCandleBody.setAttribute('height', candleH);
+        liveCandleBody.setAttribute('fill', color);
+
+        liveCandleWick.setAttribute('y1', wickTop);
+        liveCandleWick.setAttribute('y2', wickBottom);
+        liveCandleWick.setAttribute('stroke', color);
+
+        if (livePulseDot) {
+          livePulseDot.setAttribute('cy', currentY);
+          livePulseDot.setAttribute('fill', color);
+        }
+        if (livePulseRing) {
+          livePulseRing.setAttribute('cy', currentY);
+          livePulseRing.setAttribute('stroke', color);
+        }
+
+        if (liveBadgeGroup && liveBadgeRect && liveBadgeText) {
+          liveBadgeGroup.setAttribute('transform', `translate(0, ${currentY})`);
+          liveBadgeRect.setAttribute('fill', color);
+          liveBadgeText.innerText = `${newPrice.toLocaleString()}.0`;
+        }
+
+        if (chartMa5) {
+          chartMa5.setAttribute('d', `M 30,160 Q 220,170 420,120 T 705,${currentY}`);
+        }
+
+        if (liveVolBar) {
+          const volH = 18 + Math.floor(Math.random() * 24);
+          liveVolBar.setAttribute('height', volH);
+          liveVolBar.setAttribute('y', 275 - volH);
+          liveVolBar.setAttribute('fill', color);
+        }
+      }
+
+      // 관심종목 KKE 시세 동기화
+      const watchPrice = document.getElementById('watchlist-kke-price');
+      if (watchPrice) {
+        watchPrice.innerText = newPrice.toLocaleString();
+        watchPrice.style.color = color;
+        document.getElementById('watchlist-kke-rate').innerText = `${diff >= 0 ? '+' : ''}${rate}%`;
+        document.getElementById('watchlist-kke-rate').style.color = color;
+      }
+
+      // 실시간 자산 금액 업데이트 (379억 이상 유지, 뒷자리 자연스럽게 출렁임)
+      const liveTotalVal = Math.floor(TOTAL_HOLDING * newPrice);
+      document.getElementById('card-total-val').innerText = liveTotalVal.toLocaleString();
+      
+      const profitRate = (((newPrice - 2500) / 2500) * 100).toFixed(2);
+      document.getElementById('card-profit-rate').innerText = `수익률 +${profitRate}%`;
+
+      // 100% 수량 선택 상태라면 실시간 주문 총액도 함께 출렁임
+      const amtStr = document.getElementById('sell-amount-input').value.replace(/,/g, '');
+      if (amtStr && parseFloat(amtStr) >= Math.floor(TOTAL_HOLDING)) {
+        document.getElementById('sell-price-input').value = newPrice.toLocaleString();
+        calculateTotal();
+      }
+
+      // 실시간 체결 내역 롤링 추가
+      addLiveTrade(newPrice, isUp);
+    }
+
+    // 실시간 체결 스트림에 새 체결 건 추가
+    function addLiveTrade(price, isUp) {
+      const list = document.getElementById('live-trade-list');
+      if (!list) return;
+
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+      const vol = (Math.random() * 180 + 15).toFixed(3);
+      const color = isUp ? '#c84a31' : '#1261c4';
+
+      const row = document.createElement('div');
+      row.className = 'grid grid-cols-12 py-1 px-1 border-b border-gray-50 items-center trade-row-flash';
+      row.innerHTML = `
+        <span class="col-span-4 text-gray-400 text-[10px]">${timeStr}</span>
+        <span class="col-span-4 text-right font-bold" style="color:${color}">${price.toLocaleString()}</span>
+        <span class="col-span-4 text-right text-gray-700">${vol}</span>
+      `;
+
+      list.insertBefore(row, list.firstChild);
+      if (list.children.length > 8) {
+        list.removeChild(list.lastChild);
+      }
+    }
+
+    // 5. 실시간 시세 및 차트 / 호가창 애니메이션 엔진
+    function startLiveSimulation() {
+      if (liveMarketTimer) clearInterval(liveMarketTimer);
+      if (orderbookJitterTimer) clearInterval(orderbookJitterTimer);
+
+      // 750ms 간격으로 고빈도 틱 시뮬레이션 (선명하고 부드러운 차트 오르내림)
+      liveMarketTimer = setInterval(() => {
+        if (isSoldOut) return;
+
+        const deltas = [-5, 0, 5, 5, -5, 10, -5, 0, 5, -5];
+        const delta = deltas[Math.floor(Math.random() * deltas.length)];
+        applyPriceUpdate(currentKkePrice + delta);
+      }, 750);
+
+      // 호가창 잔량 실시간 지터링 (5개 호가 범위)
+      orderbookJitterTimer = setInterval(() => {
+        const idx = Math.floor(Math.random() * 5);
+        const isSell = Math.random() > 0.45;
+        
+        if (isSell) {
+          const volEl = document.getElementById(`ob-sell-vol-val-${idx}`);
+          const cellEl = document.getElementById(`ob-sell-vol-${idx}`);
+          if (volEl && cellEl) {
+            let val = parseFloat(volEl.innerText.replace(/,/g, ''));
+            val += (Math.random() * 20 - 9);
+            if (val < 100) val = 450;
+            volEl.innerText = val.toFixed(3);
+            cellEl.classList.add('flash-blue');
+            setTimeout(() => cellEl.classList.remove('flash-blue'), 400);
+          }
+        } else {
+          const buyIdx = Math.floor(Math.random() * 5);
+          const volEl = document.getElementById(`ob-buy-vol-val-${buyIdx}`);
+          const cellEl = document.getElementById(`ob-buy-vol-${buyIdx}`);
+          if (volEl && cellEl) {
+            let val = parseFloat(volEl.innerText.replace(/,/g, ''));
+            val += (Math.random() * 25 - 11);
+            if (val < 150) val = 650;
+            volEl.innerText = val.toFixed(3);
+            cellEl.classList.add('flash-red');
+            setTimeout(() => cellEl.classList.remove('flash-red'), 400);
+          }
+        }
+
+        if (Math.random() > 0.75) {
+          const btc = document.getElementById('watchlist-btc-price');
+          if (btc) {
+            const btcDelta = (Math.random() > 0.5 ? 50000 : -50000);
+            const btcVal = 132450000 + btcDelta;
+            btc.innerText = btcVal.toLocaleString();
+          }
+        }
+      }, 650);
+    }
+
+    function stopLiveSimulation() {
+      if (liveMarketTimer) clearInterval(liveMarketTimer);
+      if (orderbookJitterTimer) clearInterval(orderbookJitterTimer);
+      liveMarketTimer = null;
+      orderbookJitterTimer = null;
+    }
+
+    // 6. 매도 수량 및 100% 퍼센트 계산
+    function setPercent(percent) {
+      if (isSoldOut) return;
+
+      if (percent === 100) {
+        const amount = TOTAL_HOLDING;
+        document.getElementById('sell-amount-input').value = amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('sell-price-input').value = currentKkePrice.toLocaleString();
+        
+        const btn = document.getElementById('btn-percent-100');
+        btn.classList.add('pulse-blue');
+        setTimeout(() => btn.classList.remove('pulse-blue'), 1000);
+      } else if (percent === 0) {
+        document.getElementById('sell-amount-input').value = '';
+      } else {
+        const amount = (TOTAL_HOLDING * (percent / 100)).toFixed(2);
+        document.getElementById('sell-amount-input').value = parseFloat(amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      }
+      calculateTotal();
+    }
+
+    function calculateTotal() {
+      const priceStr = document.getElementById('sell-price-input').value.replace(/,/g, '');
+      const amountStr = document.getElementById('sell-amount-input').value.replace(/,/g, '');
+      const price = parseFloat(priceStr) || 0;
+      const amount = parseFloat(amountStr) || 0;
+      const total = Math.floor(price * amount);
+
+      document.getElementById('sell-total-input').innerText = total.toLocaleString();
+      document.getElementById('btn-sell-text').innerText = '매도하기';
+    }
+
+    function adjustPrice(delta) {
+      let price = parseInt(document.getElementById('sell-price-input').value.replace(/,/g, '')) || currentKkePrice;
+      price += delta;
+      document.getElementById('sell-price-input').value = price.toLocaleString();
+      calculateTotal();
+    }
+
+    function setOrderPrice(priceStr) {
+      document.getElementById('sell-price-input').value = priceStr;
+      calculateTotal();
+    }
+
+    function resetOrderInputs() {
+      document.getElementById('sell-amount-input').value = '';
+      document.getElementById('sell-total-input').innerText = '0';
+      document.getElementById('btn-sell-text').innerText = '매도하기';
+    }
+
+    // 7. 모달 제어 및 매도 시퀀스
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden-view');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden-view');
+    }
+
+    function triggerSellModal() {
+      const amountStr = document.getElementById('sell-amount-input').value.replace(/,/g, '');
+      if (!amountStr || parseFloat(amountStr) === 0) {
+        setPercent(100);
+      }
+
+      const totalStr = document.getElementById('sell-total-input').innerText;
+      document.getElementById('modal-confirm-price').innerText = `${currentKkePrice.toLocaleString()} KRW`;
+      document.getElementById('modal-confirm-total').innerText = totalStr;
+
+      openModal('modal-confirm');
+    }
+
+    function startSellingSequence() {
+      closeModal('modal-confirm');
+      openModal('modal-processing');
+
+      const progressBar = document.getElementById('proc-progress-bar');
+      const percentLabel = document.getElementById('proc-percent');
+      const matchedVol = document.getElementById('proc-matched-vol');
+
+      let progress = 0;
+      progressBar.style.width = '0%';
+      percentLabel.innerText = '0%';
+
+      const interval = setInterval(() => {
+        progress += 4;
+        if (progress > 100) progress = 100;
+
+        progressBar.style.width = progress + '%';
+        percentLabel.innerText = progress + '%';
+
+        const currentMatched = (TOTAL_HOLDING * (progress / 100)).toFixed(2);
+        matchedVol.innerText = `${parseFloat(currentMatched).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} / 2,022,418.52 체결`;
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            closeModal('modal-processing');
+
+            document.getElementById('success-avg-price').innerText = `${currentKkePrice.toLocaleString()} KRW`;
+            document.getElementById('success-payout-total').innerText = document.getElementById('sell-total-input').innerText || '37,910,235,157';
+
+            openModal('modal-success');
+          }, 600);
+        }
+      }, 100);
+    }
+
+    // 8. 매도 완료 후 잔고 0원 처리
+    function finishAndSetZero() {
+      closeModal('modal-success');
+      isSoldOut = true;
+      stopLiveSimulation();
+
+      document.getElementById('card-holding-amount').innerText = '0 KKE';
+      document.getElementById('card-holding-amount').className = 'font-mono font-black text-sm text-gray-400';
+      
+      document.getElementById('card-total-val').innerText = '0';
+      document.getElementById('card-total-val').className = 'font-mono font-black text-base text-gray-400';
+
+      document.getElementById('available-sell-amount').innerText = '0';
+      document.getElementById('sell-amount-input').value = '0';
+      document.getElementById('sell-total-input').innerText = '0';
+      document.getElementById('btn-sell-text').innerText = '매도 완료 (잔고 0)';
+      document.getElementById('btn-execute-sell').className = 'col-span-2 py-3 bg-gray-400 text-white font-extrabold text-base rounded shadow-none cursor-not-allowed flex items-center justify-center space-x-1';
+
+      const finalVal = document.getElementById('sell-total-input').innerText || '37,910,235,157';
+      const notice = document.createElement('div');
+      notice.className = 'fixed top-16 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50 text-xs font-bold';
+      notice.innerHTML = `💰 원화 예수금 +${finalVal} KRW 정산 입금 완료`;
+      document.body.appendChild(notice);
+      setTimeout(() => notice.remove(), 5000);
+    }
+
+    // 9. 전체 초기화 (F2)
+    function resetAll() {
+      isSoldOut = false;
+      currentKkePrice = 18745;
+      document.getElementById('google-home-input').value = '';
+      document.getElementById('login-id').value = '';
+      document.getElementById('login-pw').value = '';
+      
+      document.getElementById('header-price').innerText = '18,745';
+      document.getElementById('card-holding-amount').innerText = '2,022,418.52 KKE';
+      document.getElementById('card-holding-amount').className = 'font-mono font-black text-sm text-yellow-300';
+      document.getElementById('card-total-val').innerText = '37,910,235,157';
+      document.getElementById('card-total-val').className = 'font-mono font-black text-xl text-white tracking-tight shimmer-text transition-all duration-300';
+      document.getElementById('available-sell-amount').innerText = '2,022,418.52';
+      document.getElementById('sell-price-input').value = '18,745';
+      document.getElementById('sell-amount-input').value = '';
+      document.getElementById('sell-total-input').innerText = '0';
+      document.getElementById('btn-sell-text').innerText = '매도하기';
+      document.getElementById('btn-execute-sell').className = 'col-span-2 py-3 bg-[#1261c4] hover:bg-[#0e4da0] active:scale-[0.99] text-white font-extrabold text-base rounded shadow-md transition flex items-center justify-center space-x-1';
+
+      closeModal('modal-confirm');
+      closeModal('modal-processing');
+      closeModal('modal-success');
+
+      goToStage('google-home');
+    }
+
+    // 10. 스페이스바 자동 진행 치트키
+    function triggerAutoStep() {
+      if (currentView === 'google-home') {
+        document.getElementById('google-home-input').value = '비트원';
+        executeGoogleSearch();
+      } else if (currentView === 'google-results') {
+        goToStage('login');
+      } else if (currentView === 'login') {
+        document.getElementById('login-id').value = '파라오01';
+        document.getElementById('login-pw').value = 'password1234';
+        handleLoginSubmit(new Event('submit'));
+      } else if (currentView === 'exchange') {
+        const panelBuy = document.getElementById('panel-buy');
+        if (!panelBuy.classList.contains('hidden-view')) {
+          switchTradingTab('sell');
+        } else if (!document.getElementById('modal-confirm').classList.contains('hidden-view')) {
+          startSellingSequence();
+        } else if (!document.getElementById('modal-processing').classList.contains('hidden-view')) {
+          // 대기
+        } else if (!document.getElementById('modal-success').classList.contains('hidden-view')) {
+          finishAndSetZero();
+        } else {
+          setPercent(100);
+          triggerSellModal();
+        }
+      }
+    }
+
+    // 단축키 리스너
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'F2') {
+        e.preventDefault();
+        resetAll();
+      } else if (e.key === ' ' && e.target.tagName !== 'INPUT') {
+        e.preventDefault();
+        triggerAutoStep();
+      }
+    });
+
+    // 전체화면 토글
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
