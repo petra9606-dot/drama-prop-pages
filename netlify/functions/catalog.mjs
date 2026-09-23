@@ -1,5 +1,5 @@
 
-import { getStore } from "@netlify/blobs";
+import { uploadsStore, readFlags, merge, isInternalKey } from "../lib/flags.mjs";
 
 export default async (req) => {
   const url = new URL(req.url);
@@ -7,14 +7,18 @@ export default async (req) => {
   const part = url.searchParams.get("part") || "";
   const q = (url.searchParams.get("q") || "").trim().toLowerCase();
 
-  const store = getStore("disolveworks-uploads");
-  const { blobs } = await store.list({ prefix: project ? `${project}/` : undefined });
+  const store = uploadsStore();
+  const [{ blobs }, flags] = await Promise.all([
+    store.list({ prefix: project ? `${project}/` : undefined }),
+    readFlags(store)
+  ]);
   const items = [];
 
   for (const b of blobs) {
+    if (isInternalKey(b.key)) continue;
     const entry = await store.getMetadata(b.key);
     if (!entry) continue;
-    const m = entry.metadata || {};
+    const m = merge(entry.metadata, flags[b.key]);
     if (m.deleted) continue;
     if (m.visible === false) continue;
     if (project && m.project !== project) continue;

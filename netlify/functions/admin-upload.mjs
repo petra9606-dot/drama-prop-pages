@@ -1,5 +1,5 @@
 
-import { getStore } from "@netlify/blobs";
+import { uploadsStore } from "../lib/flags.mjs";
 import { isAdmin } from "../lib/auth.mjs";
 
 const MAX = 4 * 1024 * 1024;
@@ -39,7 +39,7 @@ export default async (req) => {
   const id = crypto.randomUUID();
   const key = `${project}/part${partNum}/scene-${sceneRaw}/${Date.now()}-${id}-${filename}`;
   const now = new Date().toISOString();
-  const store = getStore("disolveworks-uploads");
+  const store = uploadsStore();
 
   await store.set(key, file, {
     metadata: {

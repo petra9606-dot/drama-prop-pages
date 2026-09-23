@@ -1,6 +1,6 @@
 
-import { getStore } from "@netlify/blobs";
 import { isAdmin } from "../lib/auth.mjs";
+import { uploadsStore, dropFlags } from "../lib/flags.mjs";
 
 export default async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status:405 });
@@ -8,7 +8,12 @@ export default async (req) => {
   const body = await req.json().catch(() => ({}));
   const key = String(body.key || "");
   if (!key) return Response.json({ ok:false, error:"key가 없습니다." }, { status:400 });
-  const store = getStore("disolveworks-uploads");
-  await store.delete(key);
-  return Response.json({ ok:true }, { headers:{ "Cache-Control":"no-store" }});
+  try {
+    const store = uploadsStore();
+    await store.delete(key);
+    await dropFlags(store, key);
+    return Response.json({ ok:true }, { headers:{ "Cache-Control":"no-store" }});
+  } catch (err) {
+    return Response.json({ ok:false, error:`서버 오류: ${err && err.message ? err.message : String(err)}` }, { status:500 });
+  }
 };

@@ -1,15 +1,16 @@
 
-import { getStore } from "@netlify/blobs";
+import { uploadsStore, readFlags, merge } from "../lib/flags.mjs";
 
 export default async (req) => {
   const url = new URL(req.url);
   const key = url.searchParams.get("key") || "";
   if (!key) return new Response("Missing key", { status:400 });
 
-  const store = getStore("disolveworks-uploads");
+  const store = uploadsStore();
   const metaEntry = await store.getMetadata(key);
   if (!metaEntry) return new Response("Not found", { status:404 });
-  const m = metaEntry.metadata || {};
+  const flags = await readFlags(store);
+  const m = merge(metaEntry.metadata, flags[key]);
   if (m.deleted) return new Response("This file is in trash.", { status:410 });
 
   const data = await store.get(key, { type:"arrayBuffer" });
@@ -23,7 +24,7 @@ export default async (req) => {
     headers: {
       "Content-Type": type,
       "Content-Disposition": `${inline ? "inline" : "attachment"}; filename*=UTF-8''${encodeURIComponent(filename)}`,
-      "Cache-Control":"public, max-age=60",
+      "Cache-Control":"no-store",
       "X-Content-Type-Options":"nosniff"
     }
   });

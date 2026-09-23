@@ -115,7 +115,7 @@ $('#uploadForm').addEventListener('submit',async e=>{
   $('#uploadStatus').className='status oktxt';$('#file').value='';$('#title').value='';await loadItems();
 });
 
-async function loadItems(){const r=await fetch('/.netlify/functions/admin-list');if(r.status===401){location.reload();return;}const j=await r.json();allItems=j.items||[];renderItems();}
+async function loadItems(){const r=await fetch('/.netlify/functions/admin-list',{cache:'no-store'});if(r.status===401){location.reload();return;}const j=await r.json().catch(()=>({}));if(!r.ok){alert((j&&j.error)?j.error:('목록을 불러오지 못했습니다 ('+r.status+')'));return;}allItems=j.items||[];renderItems();}
 function setTab(t){currentTab=t;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));renderItems();}
 $('#adminSearch').addEventListener('input',renderItems);
 
@@ -138,11 +138,28 @@ function renderItems(){
 }
 function itemByKey(k){return allItems.find(x=>x.key===k);}
 function openEdit(k){const x=itemByKey(k);if(!x)return;$('#editKey').value=k;$('#editPart').value=x.partNum||parseInt(x.part);$('#editScene').value=(x.sceneRaw||x.scene||'').replace(/씬$/,'');$('#editTitle').value=x.title||'';$('#editVisible').checked=x.visible!==false;$('#editPinned').checked=!!x.pinned;$('#editModal').classList.add('show');}
-async function saveEdit(){const body={key:$('#editKey').value,partNum:Number($('#editPart').value),sceneRaw:$('#editScene').value,title:$('#editTitle').value,visible:$('#editVisible').checked,pinned:$('#editPinned').checked};const r=await fetch('/.netlify/functions/admin-update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok){alert('수정하지 못했습니다.');return;}closeModal('editModal');await loadItems();}
-async function quickPin(key,pinned){const x=itemByKey(key);const r=await fetch('/.netlify/functions/admin-update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key,pinned})});if(r.ok)loadItems();}
+async function saveEdit(){const body={key:$('#editKey').value,partNum:Number($('#editPart').value),sceneRaw:$('#editScene').value,title:$('#editTitle').value,visible:$('#editVisible').checked,pinned:$('#editPinned').checked};const j=await apiPost('/.netlify/functions/admin-update',body);if(!j)return;closeModal('editModal');await loadItems();}
+async function quickPin(key,pinned){const j=await apiPost('/.netlify/functions/admin-update',{key,pinned});if(j)loadItems();}
 function openReplace(k){const x=itemByKey(k);$('#replaceKey').value=k;$('#replaceName').textContent=`${x.scene} · ${x.title||x.filename}`;$('#replaceFile').value='';$('#replaceStatus').textContent='';$('#replaceModal').classList.add('show');}
-async function replaceFile(){const f=$('#replaceFile').files[0];if(!f)return alert('교체할 파일을 선택해 주세요.');const fd=new FormData();fd.append('key',$('#replaceKey').value);fd.append('file',f);$('#replaceStatus').textContent='교체 중...';const r=await fetch('/.netlify/functions/admin-replace',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));if(!r.ok){$('#replaceStatus').textContent=j.error||'교체 실패';return;}closeModal('replaceModal');await loadItems();}
-async function trashAction(key,action){if(action==='purge'&&!confirm('완전히 삭제하면 복구할 수 없습니다. 계속할까요?'))return;if(action==='trash'&&!confirm('휴지통으로 이동할까요?'))return;const r=await fetch('/.netlify/functions/admin-trash',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key,action})});if(r.ok)loadItems();}
+async function replaceFile(){const f=$('#replaceFile').files[0];if(!f)return alert('교체할 파일을 선택해 주세요.');const fd=new FormData();fd.append('key',$('#replaceKey').value);fd.append('file',f);$('#replaceStatus').textContent='교체 중...';const r=await fetch('/.netlify/functions/admin-replace',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));if(!r.ok){$('#replaceStatus').textContent=j.error||('교체 실패 ('+r.status+')');return;}closeModal('replaceModal');await loadItems();}
+async function apiPost(path,body){
+  try{
+    const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));
+    if(r.status===401){alert('로그인이 풀렸습니다. 다시 로그인해 주세요.');location.reload();return null;}
+    if(!r.ok){alert((j&&j.error)?j.error:('요청 실패 ('+r.status+')'));return null;}
+    return j;
+  }catch(e){alert('네트워크 오류: '+e.message);return null;}
+}
+async function trashAction(key,action){
+  if(action==='purge'&&!confirm('완전히 삭제하면 복구할 수 없습니다. 계속할까요?'))return;
+  if(action==='trash'&&!confirm('휴지통으로 이동할까요?'))return;
+  const j=await apiPost('/.netlify/functions/admin-trash',{key,action});
+  if(!j)return;
+  await loadItems();
+  const still=allItems.find(x=>x.key===key);
+  if(action==='trash'&&still&&!still.deleted){alert('서버에는 반영됐지만 목록이 아직 예전 상태입니다. 잠시 후 새로고침해 주세요.');}
+}
 function closeModal(id){document.getElementById(id).classList.remove('show');}
 function fmtSize(n){if(n<1024)return n+' B';if(n<1024*1024)return(n/1024).toFixed(1)+' KB';return(n/1024/1024).toFixed(1)+' MB';}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
