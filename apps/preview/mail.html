@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>레터메일 · 화면 미리보기</title>
+<link rel="stylesheet" href="phone.css">
+<style>
+.m{--red:#b8423d;background:#fff}
+.m .srch{height:52px;flex:0 0 auto;margin:16px;background:#f3f4f6;border-radius:28px;display:flex;align-items:center;padding:0 17px;gap:17px}
+.m .srch .mn{font-size:21px;color:#5d626b}
+.m .srch .tx{color:#777d85;flex:1;font-size:14px}
+.m .srch .pf{width:32px;height:32px;border-radius:16px;background:#bf666a;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.m .folders{display:flex;gap:24px;padding:0 25px 16px}
+.m .folders span{color:#90949a;font-size:15px}
+.m .folders span.on{color:var(--red);font-weight:800}
+.m .row{display:flex;align-items:center;padding:12px 16px;gap:13px}
+.m .av{width:42px;height:42px;border-radius:21px;background:#719599;color:#fff;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.m .av.b{background:#8a7fa0}.m .av.c{background:#9a8560}.m .av.d{background:#6f8aa5}
+.m .row .tx{flex:1;min-width:0}
+.m .row .t1{display:flex;align-items:center}
+.m .row .fr{flex:1;font-size:15px;color:#292e35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m .row .tm{font-size:11px;color:#6c717a;flex:0 0 auto;margin-left:8px}
+.m .row .sj{color:#313740;margin-top:2px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m .row .sn{color:#838891;margin-top:2px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m .row.unread .fr,.m .row.unread .sj{font-weight:800}
+.m .row .star{font-size:21px;color:#9fa4ad}
+.m .row .star.on{color:#e1a83d}
+.m .btns{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:9px 13px}
+.m .btns .stage{flex:1;border:1px solid #d6d9e0;border-radius:16px;padding:14px 10px;text-align:center;color:#596575;font-weight:700;font-size:12px}
+.m .btns .fab{background:#e6eaf9;border-radius:16px;padding:14px 16px;color:#243a68;font-weight:700;font-size:12px}
+.m .hint{font-size:10px;color:#aaa;text-align:center;padding:7px 0 10px}
+/* 상세 */
+.m .top{height:54px;flex:0 0 auto;display:flex;align-items:center;padding:0 18px;gap:15px}
+.m .top .bk{font-size:31px;color:#4a5058;line-height:1}
+.m .top .nm{flex:1;font-size:16px;font-weight:700;color:#282e35}
+.m .top .ac{color:var(--red);font-weight:800;font-size:15px}
+.m .detail{flex:1;min-height:0;overflow-y:auto;padding:20px}
+.m .detail::-webkit-scrollbar{width:0}
+.m .detail h2{margin:0;font-size:24px;font-weight:700;color:#282e35;line-height:1.3}
+.m .detail .dt{color:#888;margin-top:8px;font-size:13px}
+.m .sender{display:flex;align-items:center;gap:12px;margin-top:26px;padding-bottom:20px;border-bottom:1px solid #eee}
+.m .sender b{font-weight:700;color:#343a42;font-size:14px;display:block}
+.m .sender span{color:#9499a1;font-size:12px;display:block;margin-top:2px}
+.m .detail p{font-size:15px;color:#353a40;line-height:1.75;margin-top:26px;white-space:pre-line}
+.m .att{margin-top:22px;padding:14px;border-radius:12px;background:#f1f3f5;font-size:14px}
+.m .dacts{flex:0 0 auto;display:flex;gap:9px;padding:14px;border-top:1px solid #eee}
+.m .dacts div{flex:1;border:1px solid #dce1e6;border-radius:20px;text-align:center;padding:12px;color:#536174;font-weight:700;font-size:14px}
+/* 작성 */
+.m .ctop{height:64px;flex:0 0 auto;display:flex;align-items:center;gap:20px;padding:0 18px}
+.m .ctop .x{font-size:26px;color:#555}
+.m .ctop .ti{flex:1;font-size:17px;font-weight:700;color:#282e35}
+.m .line{min-height:50px;display:flex;align-items:center;border-bottom:1px solid #eee;padding:0 18px;font-size:14px}
+.m .line .lb{color:#8b9099;width:84px;flex:0 0 auto}
+.m .line .vl{flex:1;min-width:0;color:#282e35}
+.m .line .vl.ph{color:#a9aeb6}
+.m .bodyin{flex:1;min-height:0;padding:18px;font-size:15px;color:#353a40;line-height:1.7;white-space:pre-line;overflow-y:auto}
+.m .film{flex:0 0 auto;padding:16px 18px;background:#f7f7f7}
+.m .film .fl{color:#555;margin:5px 0;font-size:13px}
+.m .film .fi{background:#fff;border-radius:8px;padding:9px;font-size:14px;color:#282e35}
+.m .flags{display:flex;justify-content:space-between;margin-top:10px}
+.m .flags span{color:#555;font-size:13px}
+</style>
+</head>
+<body>
+<header class="pv-top">
+  <a class="pv-back" href="../showcase/index.html">← 촬영용 앱 화면</a>
+  <div class="pv-title">레터메일 <span>촬영용 메일 · 원격 제어</span></div>
+  <div class="pv-links">
+    <a href="../showcase/index.html">화면 캡처 보기</a>
+    <a class="solid" href="../disolve-mail-remote-v1.apk" download>APK 내려받기</a>
+  </div>
+</header>
+<main class="pv-main">
+  <div>
+    <div class="pv-stage"><div class="phone"><div class="phone-shell"><div class="phone-screen">
+      <div class="sbar light" id="sbar"><span>9:41</span><em>▮▮▮ ◗</em></div>
+      <div class="app m" id="app"></div>
+    </div></div></div></div>
+    <p class="pv-cap"></p>
+  </div>
+  <aside class="pv-side">
+    <h2>장면 고르기</h2>
+    <div class="pv-scenes" id="scenes"></div>
+    <p class="pv-note">메일을 <b>눌러 열어보고</b>, 편지쓰기·촬영용 저장 화면까지 그대로 따라가 볼 수 있습니다. 스태프폰에서 배우폰의 받은편지함을 원격으로 열고 닫는 기능은 실제 앱에서만 동작합니다.</p>
+  </aside>
+</main>
+<script src="phone.js"></script>
+<script>
+const mails = [
+  { from: '김도현 변호사', email: 'dh.kim@hanbit-law.co.kr', to: '나', subject: '[중요] 계약서 최종본 송부드립니다', time: '오후 2:41', date: '2026-09-17',
+    body: '안녕하세요, 한빛법률 김도현입니다.\n\n지난 회의에서 논의된 수정 사항을 모두 반영한 계약서 최종본을 첨부드립니다.\n17조 손해배상 조항은 말씀하신 대로 상한을 두는 방향으로 정리했습니다.\n\n검토 후 회신 부탁드립니다.\n\n감사합니다.', star: true, unread: true, att: '계약서_최종본_0917.pdf', av: '' },
+  { from: '인사팀', email: 'hr@seoyeon-group.com', to: '나', subject: '9월 정기 인사 발령 안내', time: '오전 11:20', date: '2026-09-17',
+    body: '9월 정기 인사 발령 내용을 안내드립니다. 자세한 내용은 사내 게시판을 확인해 주세요.', star: false, unread: true, av: 'b' },
+  { from: '한세연', email: 'sy.han@mail.com', to: '나', subject: '어제 말한 자료 보냅니다', time: '오전 9:04', date: '2026-09-17',
+    body: '말씀하신 자료 정리해서 보내드려요. 확인해 보시고 부족한 부분 알려주세요.', star: false, unread: false, av: 'c' },
+  { from: '서연그룹 총무팀', email: 'ga@seoyeon-group.com', to: '나', subject: '사옥 출입카드 재발급 안내', time: '어제', date: '2026-09-16',
+    body: '출입카드 재발급 신청 절차를 안내드립니다.', star: false, unread: false, av: 'd' }
+];
+let view = 'inbox', open = 0;
+const app = document.getElementById('app');
+
+function inboxScreen() {
+  return '<div class="srch"><div class="mn">☰</div><div class="tx">메일 검색</div><div class="pf">나</div></div>' +
+    '<div class="folders"><span class="on">받은편지함 (2)</span><span>보낸편지함</span></div>' +
+    '<div class="scroll">' + mails.map((m, i) =>
+      '<div class="row tap ' + (m.unread ? 'unread' : '') + '" data-open="' + i + '"><div class="av ' + m.av + '">' + m.from.slice(0, 1) + '</div>' +
+      '<div class="tx"><div class="t1"><div class="fr">' + m.from + '</div><div class="tm">' + m.time + '</div></div>' +
+      '<div class="sj">' + PV.esc(m.subject) + '</div><div class="sn">' + PV.esc(m.body.split('\n')[0]) + '</div></div>' +
+      '<div class="star ' + (m.star ? 'on' : '') + '">' + (m.star ? '★' : '☆') + '</div></div>').join('') + '</div>' +
+    '<div class="btns"><div class="stage tap" data-go="stage">＋ 촬영용 메일 저장</div><div class="fab tap" data-go="compose">✎　편지쓰기</div></div>' +
+    '<div class="hint">메일을 길게 누르면 제목·내용·시간·읽음 수정</div>';
+}
+
+function detailScreen() {
+  const m = mails[open];
+  return '<div class="top"><div class="bk tap" data-go="inbox">‹</div><div class="nm">메일</div><div class="ac">수정</div></div>' +
+    '<div class="detail"><h2>' + PV.esc(m.subject) + '</h2><div class="dt">' + m.date + ' · ' + m.time + '</div>' +
+    '<div class="sender"><div class="av ' + m.av + '">' + m.from.slice(0, 1) + '</div><div><b>' + m.from + ' ' + (m.star ? '★' : '') + '</b>' +
+    '<span>' + m.email + '</span><span>받는 사람: 나</span></div></div>' +
+    '<p>' + PV.esc(m.body) + '</p>' + (m.att ? '<div class="att">📎 ' + m.att + '</div>' : '') + '</div>' +
+    '<div class="dacts"><div>↶　답장</div><div>➜　전달</div><div>삭제</div></div>';
+}
+
+function composeScreen(stage) {
+  return '<div class="ctop"><div class="x tap" data-go="inbox">×</div><div class="ti">' + (stage ? '촬영용 메일 저장' : '편지쓰기') + '</div><div class="ac" style="color:#b8423d;font-weight:800">' + (stage ? '저장' : '보내기') + '</div></div>' +
+    '<div class="line"><div class="lb">보낸 사람</div><div class="vl">' + (stage ? '김도현 변호사' : '나') + '</div></div>' +
+    '<div class="line"><div class="lb">보낸 주소</div><div class="vl' + (stage ? '' : ' ph') + '">' + (stage ? 'dh.kim@hanbit-law.co.kr' : '주소 입력') + '</div></div>' +
+    '<div class="line"><div class="lb">받는 사람</div><div class="vl">' + (stage ? '나' : '한세연') + '</div></div>' +
+    '<div class="line"><div class="lb">받는 주소</div><div class="vl' + (stage ? ' ph' : '') + '">' + (stage ? '주소 입력' : 'sy.han@mail.com') + '</div></div>' +
+    '<div class="line"><div class="lb">제목</div><div class="vl">' + (stage ? '[중요] 계약서 최종본 송부드립니다' : '자료 확인했습니다') + '</div></div>' +
+    '<div class="bodyin">' + (stage
+      ? '안녕하세요, 한빛법률 김도현입니다.\n\n지난 회의에서 논의된 수정 사항을 모두 반영한 계약서 최종본을 첨부드립니다.'
+      : '보내주신 자료 잘 받았습니다.\n내일 오전까지 정리해서 회신드리겠습니다.') + '</div>' +
+    (stage ? '<div class="film"><div class="fl">촬영용 표시 날짜</div><div class="fi">2026-09-17</div>' +
+      '<div class="fl">촬영용 표시 시간</div><div class="fi">오후 2:41</div>' +
+      '<div class="flags"><span>읽음 ○</span><span>중요 ●</span><span>별표 ●</span></div></div>' : '');
+}
+
+function paint() {
+  app.innerHTML = view === 'inbox' ? inboxScreen() : view === 'detail' ? detailScreen() : composeScreen(view === 'stage');
+  app.querySelectorAll('[data-open]').forEach(n => n.addEventListener('click', () => { open = Number(n.dataset.open); mails[open].unread = false; view = 'detail'; paint(); }));
+  app.querySelectorAll('[data-go]').forEach(n => n.addEventListener('click', () => { view = n.dataset.go; paint(); }));
+}
+
+PV.boot({
+  scenes: [
+    { id: 'inbox', label: '받은편지함', cap: '읽지 않은 메일은 굵게, 별표는 노란색으로 표시됩니다. 보낸 사람·시간은 전부 촬영용으로 지정할 수 있습니다.' },
+    { id: 'detail', label: '메일 열람', cap: '본문·첨부파일·보낸 주소까지 실제 메일처럼 보입니다. 스태프폰에서 이 화면을 원격으로 띄울 수도 있습니다.' },
+    { id: 'compose', label: '편지쓰기', cap: '배우가 직접 메일을 쓰는 장면에 쓰는 화면입니다.' },
+    { id: 'stage', label: '촬영용 메일 저장', cap: '상대가 보낸 것처럼 메일을 미리 만들어 두는 화면입니다. 표시 날짜·시간과 읽음·중요·별표를 지정해 저장합니다.' }
+  ],
+  render: scene => {
+    if (scene.id === 'detail') { view = 'detail'; open = 0; }
+    else view = scene.id;
+    paint();
+  }
+});
+</script>
+</body>
+</html>

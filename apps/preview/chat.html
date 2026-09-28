@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>모아챗 · 화면 미리보기</title>
+<link rel="stylesheet" href="phone.css">
+<style>
+.c{--yellow:#f7db51;--ink:#27242a;--pale:#b8cad6;--light:#f6f4f0;background:var(--light)}
+.c .hd{height:68px;flex:0 0 68px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;background:var(--light)}
+.c .hd h1{margin:0;font-size:27px;font-weight:800;color:var(--ink)}
+.c .hd .gear{font-size:23px;color:#5a555c}
+.c .tabs{height:36px;flex:0 0 36px;display:flex;gap:25px;padding:0 20px;align-items:center}
+.c .tabs span{color:#a9a7aa;font-size:14px}
+.c .tabs span.on{color:var(--ink);font-weight:700}
+.c .sec{padding:9px 20px;background:#f5f4f4;color:#89868a;font-size:12px}
+.c .row{display:flex;align-items:center;padding:16px 18px;background:#fff;border-bottom:1px solid #f1f0ee}
+.c .av{width:50px;height:50px;border-radius:18px;background:#c9c7d5;display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;font-weight:700;flex:0 0 auto}
+.c .av.a2{background:#b6c3ce}.c .av.a3{background:#cfc3b6}.c .av.a4{background:#c2cec0}
+.c .row .main{flex:1;min-width:0;margin-left:13px}
+.c .row .nm{font-size:16px;font-weight:700;color:var(--ink)}
+.c .row .pv{color:#a09da1;font-size:13px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c .row .tm{font-size:11px;color:#b1aeb1;flex:0 0 auto;margin-left:8px}
+.c .nav{height:60px;flex:0 0 60px;background:#fff;display:flex;align-items:center;justify-content:space-around;border-top:1px solid #efeeec}
+.c .nav span{color:#a4a4a4;font-size:13px}
+.c .nav span.on{color:#4a4341;font-weight:800}
+/* 대화방 */
+.c .rhd{height:60px;flex:0 0 60px;background:var(--pale);display:flex;align-items:center;padding:0 16px;gap:14px}
+.c .rhd .bk{font-size:32px;color:var(--ink);line-height:1}
+.c .rhd .ttl{flex:1;font-size:20px;font-weight:700;color:var(--ink)}
+.c .rhd .ic{font-size:22px;color:var(--ink)}
+.c .msgs{flex:1;min-height:0;overflow-y:auto;background:var(--pale);padding:16px 16px 26px}
+.c .msgs::-webkit-scrollbar{width:0}
+.c .pill{width:fit-content;margin:0 auto 22px;background:#a6b8c5;color:#fff;font-size:12px;border-radius:20px;padding:5px 16px}
+.c .m{display:flex;align-items:flex-start;margin-bottom:16px}
+.c .m .mav{width:36px;height:36px;border-radius:13px;background:#b6c3ce;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px;margin-right:8px;flex:0 0 auto}
+.c .m .body{flex:1;min-width:0}
+.c .m .who{color:var(--ink);font-size:13px;margin-bottom:5px}
+.c .line{display:flex;align-items:flex-end}
+.c .line.mine{flex-direction:row-reverse}
+.c .bub{border-radius:14px;padding:10px 13px;max-width:76%;font-size:15px;line-height:1.45;color:var(--ink);cursor:pointer}
+.c .bub.me{background:var(--yellow);border-top-right-radius:3px}
+.c .bub.you{background:#fff;border-top-left-radius:3px}
+.c .meta{margin:0 5px;text-align:right;flex:0 0 auto}
+.c .meta .un{color:#836a0d;font-size:12px;display:block}
+.c .meta .tt{font-size:10px;color:#647686}
+.c .comp{min-height:60px;flex:0 0 auto;background:#fff;display:flex;align-items:flex-end;gap:9px;padding:8px 12px}
+.c .comp .plus{font-size:25px;color:#999;width:28px;text-align:center}
+.c .comp input{flex:1;min-width:0;height:42px;background:#f5f5f5;border:0;border-radius:15px;padding:0 14px;font-size:15px;font-family:inherit;outline:none;color:var(--ink)}
+.c .comp button{background:var(--yellow);border:0;border-radius:9px;padding:11px 14px;font-weight:700;color:var(--ink);font-size:14px}
+/* 수정 모달 */
+.c .veil{position:absolute;inset:0;background:rgba(0,0,0,.53);display:flex;align-items:center;justify-content:center;padding:20px;z-index:40}
+.c .modal{background:#fff;width:100%;border-radius:22px;padding:20px;max-height:100%;overflow-y:auto}
+.c .modal::-webkit-scrollbar{width:0}
+.c .modal h3{margin:0 0 15px;font-size:20px;font-weight:800;color:var(--ink)}
+.c .modal .lb{font-size:12px;color:#777;margin:10px 0 4px}
+.c .modal .fd{border:1px solid #ddd;border-radius:10px;padding:11px;color:var(--ink);min-height:44px;font-size:14px}
+.c .modal .fd.multi{min-height:62px}
+.c .chips{display:flex;gap:7px;margin-top:6px;flex-wrap:wrap}
+.c .chip{background:#f1f0ee;border-radius:14px;padding:7px 11px;font-size:13px;color:var(--ink)}
+.c .readrow{display:flex;justify-content:space-between;padding:15px 0;font-weight:600;color:var(--ink);font-size:14px}
+.c .acts{display:flex;gap:8px;margin-top:8px}
+.c .acts div{flex:1;text-align:center;padding:13px;border-radius:10px;background:#eee;font-size:14px}
+.c .acts div.save{background:var(--yellow);font-weight:800}
+</style>
+</head>
+<body>
+<header class="pv-top">
+  <a class="pv-back" href="../showcase/index.html">← 촬영용 앱 화면</a>
+  <div class="pv-title">모아챗 <span>촬영용 메신저</span></div>
+  <div class="pv-links">
+    <a href="../showcase/index.html">화면 캡처 보기</a>
+    <a class="solid" href="../moa-chat-final.apk" download>APK 내려받기</a>
+  </div>
+</header>
+<main class="pv-main">
+  <div>
+    <div class="pv-stage"><div class="phone"><div class="phone-shell"><div class="phone-screen">
+      <div class="sbar light" id="sbar"><span>9:41</span><em>▮▮▮ ◗</em></div>
+      <div class="app c" id="app"></div>
+    </div></div></div></div>
+    <p class="pv-cap"></p>
+  </div>
+  <aside class="pv-side">
+    <h2>장면 고르기</h2>
+    <div class="pv-scenes" id="scenes"></div>
+    <p class="pv-note">대화방에서 <b>메시지를 입력해 보내면</b> 그대로 화면에 올라오고, <b>말풍선을 누르면</b> 촬영용 연출 수정 창이 열립니다. 두 대의 휴대폰을 같은 촬영 코드로 연결하면 실제로 주고받는 장면을 찍을 수 있습니다.</p>
+  </aside>
+</main>
+<script src="phone.js"></script>
+<script>
+const me = '나';
+const friends = [
+  { n: '서정우', s: '어디야? 지금 출발함', t: '오후 2:41', c: '' },
+  { n: '한세연', s: '자료 보냈어요. 확인 부탁드려요', t: '오후 1:12', c: 'a2' },
+  { n: '엄마', s: '밥은 먹었니', t: '오전 11:40', c: 'a3' },
+  { n: '김실장', s: '내일 촬영 콜시트 공유드립니다', t: '어제', c: 'a4' }
+];
+let msgs = [
+  { me: false, t: '어디야? 지금 출발함', tm: '오후 2:40' },
+  { me: true, t: '나 거의 다 왔어. 5분만', tm: '오후 2:41', unread: true },
+  { me: false, t: '알겠어. 1층 로비에서 기다릴게', tm: '오후 2:41' },
+  { me: true, t: '응 금방 갈게', tm: '오후 2:42', unread: true }
+];
+let view = 'list', tab = 'chat', peer = '서정우', modal = false;
+const app = document.getElementById('app');
+
+const avatar = (name, cls) => '<div class="av ' + (cls || '') + '">' + name.slice(0, 1) + '</div>';
+
+function listScreen() {
+  const rows = tab === 'friends'
+    ? '<div class="sec">내 프로필</div>' +
+      '<div class="row">' + avatar(me) + '<div class="main"><div class="nm">나</div><div class="pv">촬영용 프로필</div></div></div>' +
+      '<div class="sec">친구 ' + friends.length + '</div>' +
+      friends.map(f => '<div class="row tap" data-open="' + f.n + '">' + avatar(f.n, f.c) + '<div class="main"><div class="nm">' + f.n + '</div><div class="pv">대화를 시작하세요</div></div></div>').join('')
+    : friends.map(f => '<div class="row tap" data-open="' + f.n + '">' + avatar(f.n, f.c) + '<div class="main"><div class="nm">' + f.n + '</div><div class="pv">' + f.s + '</div></div><div class="tm">' + f.t + '</div></div>').join('');
+  return '<div class="hd"><h1>' + (tab === 'chat' ? '채팅' : '친구') + '</h1><div class="gear">⚙</div></div>' +
+    '<div class="tabs"><span class="' + (tab === 'chat' ? 'on' : '') + '" data-tab="chat">채팅</span><span class="' + (tab === 'friends' ? 'on' : '') + '" data-tab="friends">친구</span><span>더보기</span></div>' +
+    '<div class="scroll">' + rows + '</div>' +
+    '<div class="nav"><span class="' + (tab === 'chat' ? 'on' : '') + '" data-tab="chat">●　채팅</span><span class="' + (tab === 'friends' ? 'on' : '') + '" data-tab="friends">●　친구</span><span>설정</span></div>';
+}
+
+function roomScreen() {
+  const body = msgs.map((m, i) => m.me
+    ? '<div class="m"><div class="body"><div class="line mine"><div class="bub me tap" data-edit="' + i + '">' + PV.esc(m.t) + '</div><div class="meta">' + (m.unread ? '<span class="un">1</span>' : '') + '<span class="tt">' + m.tm + '</span></div></div></div></div>'
+    : '<div class="m"><div class="mav">' + peer.slice(0, 1) + '</div><div class="body"><div class="who">' + peer + '</div><div class="line"><div class="bub you tap" data-edit="' + i + '">' + PV.esc(m.t) + '</div><div class="meta"><span class="tt">' + m.tm + '</span></div></div></div></div>').join('');
+  return '<div class="rhd"><div class="bk tap" data-back="1">‹</div><div class="ttl">' + peer + '</div><div class="ic">⌕</div><div class="ic">☰</div></div>' +
+    '<div class="msgs" id="msgs"><div class="pill">오늘</div>' + body + '</div>' +
+    '<div class="comp"><div class="plus">＋</div><input id="draft" placeholder="메시지 입력"><button id="send">전송</button></div>' +
+    (modal ? modalHtml() : '');
+}
+
+function modalHtml() {
+  return '<div class="veil"><div class="modal"><h3>대화 연출 수정</h3>' +
+    '<div class="lb">내용</div><div class="fd multi">나 거의 다 왔어. 5분만</div>' +
+    '<div class="lb">보낸 시각</div><div class="fd">오후 2:41</div>' +
+    '<div class="lb">받은 시각</div><div class="fd">오후 2:41</div>' +
+    '<div class="lb">보낸 사람</div><div class="fd">나</div>' +
+    '<div class="chips">' + friends.map(f => '<div class="chip">' + f.n + '</div>').join('') + '</div>' +
+    '<div class="readrow"><span>읽음 표시</span><span>○ 꺼짐</span></div>' +
+    '<div class="acts"><div class="tap" data-close="1">취소</div><div class="save tap" data-close="1">저장</div></div></div></div>';
+}
+
+function paint() {
+  const bar = document.getElementById('sbar');
+  bar.style.background = view === 'room' ? '#b8cad6' : '#f6f4f0';
+  bar.style.color = '#3f4a52';
+  app.innerHTML = view === 'list' ? listScreen() : roomScreen();
+  app.querySelectorAll('[data-tab]').forEach(n => n.addEventListener('click', () => { tab = n.dataset.tab; paint(); }));
+  app.querySelectorAll('[data-open]').forEach(n => n.addEventListener('click', () => { peer = n.dataset.open; view = 'room'; paint(); }));
+  const back = app.querySelector('[data-back]');
+  if (back) back.addEventListener('click', () => { view = 'list'; paint(); });
+  app.querySelectorAll('[data-edit]').forEach(n => n.addEventListener('click', () => { modal = true; paint(); }));
+  app.querySelectorAll('[data-close]').forEach(n => n.addEventListener('click', () => { modal = false; paint(); }));
+  const send = app.querySelector('#send');
+  if (send) send.addEventListener('click', () => {
+    const input = app.querySelector('#draft');
+    const text = (input.value || '').trim();
+    if (!text) return;
+    msgs.push({ me: true, t: text, tm: '오후 2:43', unread: true });
+    paint();
+  });
+  const input = app.querySelector('#draft');
+  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') send.click(); });
+  const box = app.querySelector('#msgs');
+  if (box) box.scrollTop = box.scrollHeight;
+}
+
+PV.boot({
+  scenes: [
+    { id: 'list', label: '채팅 목록', cap: '촬영용으로 만든 친구 목록과 최근 대화가 보이는 첫 화면입니다.' },
+    { id: 'friends', label: '친구 탭', cap: '친구 탭. 이름·프로필 사진은 촬영 전에 자유롭게 바꿀 수 있습니다.' },
+    { id: 'room', label: '대화방', cap: '노란 말풍선이 내 메시지입니다. 보낸 시각·받은 시각·읽음(1) 표시까지 장면에 맞춰 연출할 수 있습니다.' },
+    { id: 'edit', label: '대화 연출 수정', cap: '말풍선을 길게 누르면 내용·시각·보낸 사람·읽음 표시를 그 자리에서 고칠 수 있습니다. 두 폰 모두에 반영됩니다.' }
+  ],
+  render: scene => {
+    modal = false;
+    if (scene.id === 'list') { view = 'list'; tab = 'chat'; }
+    else if (scene.id === 'friends') { view = 'list'; tab = 'friends'; }
+    else if (scene.id === 'room') { view = 'room'; }
+    else { view = 'room'; modal = true; }
+    paint();
+  }
+});
+</script>
+</body>
+</html>

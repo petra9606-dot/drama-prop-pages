@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>달림콜 라이더 · 화면 미리보기</title>
+<link rel="stylesheet" href="phone.css">
+<style>
+/* 달림콜 (딥네이비 · 틸 · 앰버) */
+.r{--ink:#132A32;--teal:#13B89A;--paper:#F3F6F5;--amber:#F29A2E;background:var(--paper)}
+.r .hd{height:56px;flex:0 0 56px;background:var(--ink);padding:0 16px;display:flex;align-items:center}
+.r .brand{color:#fff;font-size:21px;font-weight:900;letter-spacing:-.7px}
+.r .brand b{color:#5CE0C7;font-weight:900}
+.r .live{margin-left:auto;display:flex;align-items:center;gap:6px;background:#203C45;padding:5px 10px;border-radius:16px}
+.r .live i{width:7px;height:7px;border-radius:4px;background:#5CE0C7;display:block}
+.r .live span{color:#D6E6E3;font-size:11px;font-weight:700}
+.r .dots{color:#D6E6E3;font-size:17px;font-weight:900;letter-spacing:2px;padding-left:12px}
+.r .map{flex:0 0 212px;height:212px;overflow:hidden;position:relative;background:#eaf0ec}
+.r .map.small{flex:0 0 158px;height:158px}
+.r .map svg{display:block;width:100%;height:100%}
+.r .mapchip{position:absolute;left:10px;top:9px;background:rgba(19,42,50,.86);color:#d9ece8;font-size:9px;font-weight:800;padding:4px 8px;border-radius:8px;letter-spacing:.02em}
+.r .dock{padding:11px 14px 2px;background:var(--paper)}
+.r .body{flex:1;min-height:0;overflow-y:auto;padding:12px 14px 22px;display:flex;flex-direction:column;gap:10px}
+.r .body::-webkit-scrollbar{width:0}
+.r .card{background:#fff;border:1px solid #E5ECE9;border-radius:16px;padding:14px}
+.r .ordno{color:#778682;font-size:11px;font-weight:700}
+.r .badge{color:#087D6C;background:#E3F7F2;border-radius:12px;padding:4px 9px;font-size:11px;font-weight:900}
+.r .stages{display:flex;align-items:flex-start;margin-top:12px}
+.r .stg{width:74px;text-align:center}
+.r .stg i{width:23px;height:23px;border-radius:12px;background:#E7ECEB;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:900;font-style:normal}
+.r .stg.done i{background:#CBEFE7}
+.r .stg.act i{background:var(--teal)}
+.r .stg p{margin:5px 0 0;color:#8B9895;font-size:10px;font-weight:700}
+.r .stg.done p,.r .stg.act p{color:var(--ink)}
+.r .stgline{flex:1;height:2px;margin-top:11px;background:#DFE7E4}
+.r .rrow{display:flex;align-items:center}
+.r .rmk{width:31px;height:31px;border-radius:9px;background:#8DA09B;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:900;flex:0 0 auto}
+.r .rmk.strong{background:var(--ink)}
+.r .rcopy{flex:1;min-width:0;margin-left:11px}
+.r .rlabel{color:#8A9794;font-size:10px;font-weight:800}
+.r .rtitle{color:var(--ink);font-size:15px;font-weight:900;margin-top:1px}
+.r .rsub{color:#71807D;font-size:11px;margin-top:2px}
+.r .rarrow{color:#9AA7A4;font-size:23px}
+.r .rstem{width:2px;height:15px;background:#DDE7E4;margin:3px 0 3px 15px}
+.r .metrics{display:flex;margin-top:14px;padding-top:12px;border-top:1px solid #EDF1F0}
+.r .metric{flex:1}
+.r .metric span{color:#8A9794;font-size:10px;display:block}
+.r .metric b{color:var(--ink);font-size:13px;font-weight:900;display:block;margin-top:3px}
+.r .fee{background:#fff;border:1px solid #E5ECE9;border-left:4px solid var(--teal);border-radius:16px;padding:15px;display:flex;align-items:center;justify-content:space-between}
+.r .fee .t{color:var(--ink);font-size:13px;font-weight:900}
+.r .fee .n{color:#83908D;font-size:10px;margin-top:4px}
+.r .fee .v{color:var(--ink);font-size:27px;font-weight:900;font-variant-numeric:tabular-nums}
+.r .fee .v i{font-size:15px;font-style:normal}
+.r .timer{background:#fff;border:1px solid #DDE8E5;border-radius:16px;padding:15px}
+.r .teyebrow{color:var(--ink);font-size:12px;font-weight:900}
+.r .tbonus{color:var(--teal);font-size:11px;font-weight:800;margin-top:3px}
+.r .tlive{color:#fff;background:var(--teal);padding:4px 8px;border-radius:9px;font-size:9px;font-weight:900}
+.r .tbig{font-size:47px;line-height:1.16;font-weight:900;letter-spacing:-.8px;font-variant-numeric:tabular-nums;margin:7px 0 6px}
+.r .track{height:5px;border-radius:3px;background:#E5ECEA;overflow:hidden}
+.r .track i{display:block;height:5px;border-radius:3px}
+.r .earn{display:flex;align-items:center;margin-top:13px}
+.r .earn span{color:#8A9794;font-size:9px;display:block}
+.r .earn b{color:var(--ink);font-size:13px;font-weight:900;display:block;margin-top:2px}
+.r .earn .plus{color:#A4AFAC;margin:0 9px}
+.r .earn .total{margin-left:auto;border-left:1px solid #E1E7E5;padding-left:12px;text-align:right}
+.r .earn .total b{font-size:16px}
+.r .req{background:#EAF1EF;border-radius:13px;padding:12px;display:flex}
+.r .req i{width:24px;height:24px;border-radius:12px;background:#D4E3DF;display:flex;align-items:center;justify-content:center;color:#526964;font-weight:900;font-style:normal;flex:0 0 auto}
+.r .req div{flex:1;margin-left:9px}
+.r .req b{color:#516660;font-size:10px;font-weight:900;display:block}
+.r .req p{color:#344B45;font-size:11px;line-height:1.45;margin:3px 0 0}
+.r .bottom{flex:0 0 auto;min-height:84px;background:#fff;border-top:1px solid #DCE4E2;padding:11px 15px;display:flex;align-items:center}
+.r .bottom .cap{color:#8A9794;font-size:9px}
+.r .bottom .st{color:var(--ink);font-size:12px;font-weight:900;margin-top:3px}
+.r .btn{margin-left:auto;min-width:126px;height:52px;border-radius:13px;background:var(--teal);color:#fff;font-size:15px;font-weight:900;border:0;display:flex;align-items:center;justify-content:center}
+.r .btn.dark{background:var(--ink)}
+/* 콜 대기 */
+.r .wait{background:#fff;border:1px solid #E5ECE9;border-radius:18px;padding:22px;text-align:center}
+.r .pulse{width:80px;height:80px;margin:0 auto 12px;position:relative;display:flex;align-items:center;justify-content:center}
+.r .pulse i{position:absolute;width:80px;height:80px;border-radius:40px;background:rgba(19,184,154,.35);animation:rpulse 1.9s ease-out infinite}
+.r .pulse b{width:30px;height:30px;border-radius:15px;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px}
+@keyframes rpulse{0%{transform:scale(.6);opacity:.45}100%{transform:scale(1.9);opacity:0}}
+.r .wait h3{margin:0;color:var(--ink);font-size:19px;font-weight:900}
+.r .wait p{color:#7D8A87;font-size:12px;margin:7px 0 0;line-height:1.5}
+.r .online{display:inline-flex;align-items:center;gap:7px;background:#E3F4EF;border-radius:999px;padding:7px 13px;margin-top:15px}
+.r .online i{width:7px;height:7px;border-radius:4px;background:var(--teal)}
+.r .online span{color:#0B6B5B;font-size:11px;font-weight:800}
+.r .wstats{display:flex;align-items:center;margin-top:19px;border-top:1px solid #EDF1F0;padding-top:15px}
+.r .wstat{flex:1}
+.r .wstat span{color:#8A9794;font-size:10px;display:block}
+.r .wstat b{color:var(--ink);font-size:16px;font-weight:900;display:block;margin-top:4px}
+.r .wdiv{width:1px;height:26px;background:#EDF1F0}
+/* 시트 · 팝업 */
+.r .veil{position:absolute;inset:0;background:rgba(7,25,31,.4);display:flex;align-items:flex-end;z-index:50}
+.r .veil.mid{background:rgba(7,25,31,.66);align-items:center;justify-content:center;padding:0 22px}
+.r .sheet{width:100%;background:#fff;padding:22px 22px 28px;border-radius:26px 26px 0 0;animation:rup .24s ease-out}
+.r .sheet.special{background:#FFFBF5;border-top:5px solid var(--amber)}
+.r .sheet.settle{border-top:5px solid var(--teal)}
+@keyframes rup{from{transform:translateY(30px)}to{transform:translateY(0)}}
+.r .handle{width:40px;height:4px;border-radius:2px;background:#D7DEDC;margin:0 auto 17px}
+.r .kick{color:var(--teal);font-size:11px;font-weight:900}
+.r .kick.am{color:#D87813}
+.r .stitle{color:var(--ink);font-size:19px;font-weight:900;margin-top:8px}
+.r .stitle i{font-size:28px;font-style:normal;font-weight:900}
+.r .sroute{color:#60726E;font-size:13px;line-height:1.55;margin-top:13px;white-space:pre-line}
+.r .ohead{display:flex;align-items:center}
+.r .oicon{width:39px;height:39px;border-radius:12px;background:#DDF6F0;display:flex;align-items:center;justify-content:center;margin-right:11px;color:var(--ink);font-size:14px;font-weight:900;flex:0 0 auto}
+.r .oicon.am{background:#FFF0D9}
+.r .osub{color:#83918E;font-size:10px;margin-top:3px}
+.r .oamt{display:flex;align-items:baseline;justify-content:space-between;margin-top:11px}
+.r .oamt b{color:var(--ink);font-size:30px;font-weight:900}
+.r .oamt b.am{color:#D87813}
+.r .pop{width:100%;background:#fff;border-radius:22px;padding:24px;border-top:5px solid var(--teal);animation:rpop .26s cubic-bezier(.2,1.2,.4,1)}
+@keyframes rpop{from{transform:scale(.94)}to{transform:scale(1)}}
+.r .bicon{width:42px;height:42px;border-radius:21px;background:#DDF6F0;display:flex;align-items:center;justify-content:center;color:var(--teal);font-size:24px;font-weight:900}
+.r .peyebrow{color:var(--teal);font-size:11px;font-weight:900;margin-top:15px}
+.r .ptitle{color:var(--ink);font-size:21px;font-weight:900;margin-top:5px}
+.r .pnum{color:var(--teal);font-size:41px;font-weight:900;margin-top:12px;font-variant-numeric:tabular-nums}
+.r .pnum i{font-size:20px;font-style:normal}
+.r .psub{color:#71817D;font-size:12px;line-height:1.5;margin-top:8px;white-space:pre-line}
+.r .primary{width:100%;min-height:52px;background:var(--teal);border:0;border-radius:13px;color:#fff;font-size:15px;font-weight:900;margin-top:18px}
+.r .shead{color:var(--ink);font-size:21px;font-weight:900;margin:8px 0 18px}
+.r .shead i{color:var(--teal);font-style:normal}
+.r .sline{display:flex;align-items:center;justify-content:space-between;padding:7px 0}
+.r .sline span{color:#647570;font-size:13px}
+.r .sline b{color:var(--ink);font-size:15px;font-weight:900}
+.r .sline b.teal{color:var(--teal)}
+.r .sdiv{height:1px;background:#E3E9E7;margin:7px 0}
+.r .sline.tot span{color:var(--ink);font-size:14px;font-weight:900}
+.r .sline.tot b{font-size:23px}
+/* 슬라이더 */
+.r .slides{margin-top:18px;display:flex;flex-direction:column;gap:9px}
+.r .sl{position:relative;width:100%;border:1px solid;overflow:hidden;display:flex;align-items:center;touch-action:none;cursor:grab}
+.r .sl-fill{position:absolute;inset:0}
+.r .sl-label,.r .sl-done{position:absolute;text-align:center;font-size:14px;font-weight:900;letter-spacing:-.3px}
+.r .sl-knob{position:absolute;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:900;box-shadow:0 3px 6px rgba(0,0,0,.2)}
+.r .sl.acc{height:64px;border-radius:32px;background:#E3F4EF;border-color:#B4E1D6}
+.r .sl.acc .sl-fill{background:var(--teal)}
+.r .sl.acc .sl-label{color:#0B6B5B}
+.r .sl.acc .sl-knob{background:var(--teal);width:54px;height:54px;border-radius:27px;left:5px}
+.r .sl.spc{height:64px;border-radius:32px;background:#FFF1DD;border-color:#F2D5AE}
+.r .sl.spc .sl-fill{background:var(--amber)}
+.r .sl.spc .sl-label{color:#95580E}
+.r .sl.spc .sl-knob{background:var(--amber);width:54px;height:54px;border-radius:27px;left:5px}
+.r .sl.rej{height:54px;border-radius:27px;background:#EDF1F0;border-color:#D9E0DE}
+.r .sl.rej .sl-fill{background:#8E9C99}
+.r .sl.rej .sl-label{color:#6C7A77}
+.r .sl.rej .sl-knob{background:var(--ink);width:44px;height:44px;border-radius:22px;right:5px}
+.r .sl-done{color:#fff;opacity:0}
+/* 잠금화면 알림 */
+.r .lock{flex:1;background:linear-gradient(170deg,#0d1f27,#16333c 55%,#1d4048);padding:0 16px;display:flex;flex-direction:column;align-items:center;color:#fff}
+.r .lock .date{margin-top:52px;font-size:14px;color:#c6dbd7;letter-spacing:.02em}
+.r .lock .time{font-size:72px;font-weight:200;letter-spacing:-2px;line-height:1.05}
+.r .noti{width:100%;margin-top:28px;background:rgba(255,255,255,.93);border-radius:18px;padding:13px 15px;display:flex;gap:12px;color:#132A32;box-shadow:0 12px 30px rgba(0,0,0,.35);animation:rslide .35s ease-out}
+@keyframes rslide{from{transform:translateY(-14px);opacity:0}to{transform:translateY(0);opacity:1}}
+.r .noti .ico{width:38px;height:38px;border-radius:11px;background:var(--ink);color:#5CE0C7;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.r .noti .t{display:flex;align-items:baseline;gap:6px}
+.r .noti .t b{font-size:13px;font-weight:900}
+.r .noti .t span{font-size:10px;color:#7c8a87;margin-left:auto}
+.r .noti p{margin:3px 0 0;font-size:12px;color:#374845;line-height:1.45}
+.r .lock .hint{margin-top:auto;margin-bottom:26px;font-size:11px;color:#9fc3bd;text-align:center;line-height:1.7}
+/* CONTROL */
+.r .ctl{flex:1;background:#10262E;overflow-y:auto;padding:20px 20px 40px;color:#fff}
+.r .ctl::-webkit-scrollbar{width:0}
+.r .ctl h3{margin:0;font-size:22px;font-weight:900}
+.r .ctl .csub{color:#82A7A0;font-size:10px;margin-top:4px}
+.r .ctl .close{color:#65D7C1;font-weight:900;font-size:12px}
+.r .status{background:#19363F;padding:16px;border-radius:16px;margin-top:18px}
+.r .status span{color:#789A95;font-size:9px;display:block;margin-top:6px}
+.r .status b{color:#fff;font-size:14px;font-weight:800;display:block;margin-top:3px}
+.r .status .big{color:#62DCC5;font-size:39px;font-weight:900;font-variant-numeric:tabular-nums;margin-top:3px}
+.r .csec{font-size:14px;font-weight:900;margin:21px 0 9px}
+.r .cgrid{display:flex;flex-wrap:wrap;gap:8px}
+.r .cbtn{width:calc(50% - 4px);min-height:49px;background:#294852;border:0;border-radius:11px;color:#fff;font-size:11px;font-weight:900;padding:8px;line-height:1.35}
+.r .cbtn.acc{background:#087D6C}
+.r .cbtn.warn{background:#9B5B20}
+.r .chint{color:#789A95;font-size:10px;line-height:1.6;margin-top:18px}
+/* 설정 */
+.r .set{flex:1;background:#fff;overflow-y:auto;padding:20px 20px 40px}
+.r .set::-webkit-scrollbar{width:0}
+.r .set .top{display:flex;align-items:center;gap:14px}
+.r .set .back{color:var(--ink);font-size:32px;line-height:1}
+.r .set h3{margin:0;color:var(--ink);font-size:22px;font-weight:900}
+.r .set .help{color:#71817D;font-size:11px;line-height:1.6;margin-top:10px}
+.r .set .lab{color:var(--ink);font-weight:800;font-size:12px;margin:17px 0 6px}
+.r .set .inp{border:1px solid #D7E2DF;border-radius:11px;min-height:44px;padding:11px 12px;font-size:14px;color:var(--ink);background:#fff}
+.r .set .inp.num{font-variant-numeric:tabular-nums}
+.r .choices{display:flex;gap:7px}
+.r .choice{flex:1;min-height:42px;background:#E9EFED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:11px;font-weight:800;text-align:center;padding:0 6px}
+.r .choice.on{background:#D4F3EC;border:1px solid var(--teal)}
+.r .link{background:#E9F6F2;border-radius:12px;padding:13px;margin-top:12px;display:flex;align-items:center;justify-content:space-between}
+.r .link b{color:var(--ink);font-size:13px;font-weight:900;display:block}
+.r .link span{color:#627772;font-size:9px;display:block;margin-top:4px}
+.r .link i{color:var(--teal);font-size:24px;font-style:normal}
+.r .newtag{display:inline-block;background:var(--teal);color:#fff;font-size:9px;font-weight:900;border-radius:5px;padding:2px 5px;margin-left:6px;vertical-align:2px}
+</style>
+</head>
+<body>
+<header class="pv-top">
+  <a class="pv-back" href="../showcase/index.html">← 촬영용 앱 화면</a>
+  <div class="pv-title">달림콜 라이더 <span>v10 · 예약 알림 / 긴 경로</span></div>
+  <div class="pv-links">
+    <a href="../showcase/index.html">화면 캡처 보기</a>
+    <a class="solid" href="../dallim-rider-v10-schedule-route.apk" download>APK 내려받기</a>
+  </div>
+</header>
+<main class="pv-main">
+  <div>
+    <div class="pv-stage"><div class="phone"><div class="phone-shell"><div class="phone-screen">
+      <div class="sbar" id="sbar"><span>9:41</span><em>▮▮▮ ◗</em></div>
+      <div class="app r" id="app"></div>
+    </div></div></div></div>
+    <p class="pv-cap"></p>
+  </div>
+  <aside class="pv-side">
+    <h2>장면 고르기</h2>
+    <div class="pv-scenes" id="scenes"></div>
+    <p class="pv-note">
+      실제 앱과 같은 화면을 브라우저에서 그대로 재현한 것입니다. <b>수락·거절 슬라이더를 마우스로 끌어보고</b>, 버튼을 눌러 다음 장면으로 넘어갈 수 있습니다. 키보드 <b>← →</b> 로도 장면을 넘길 수 있습니다.<br><br>
+      지도에 나오는 도로·건물·학교 이름은 <b>모두 가상 지명</b>입니다. 금액·상호·경로 길이는 앱 설정에서 촬영 때 바꿀 수 있습니다.
+    </p>
+  </aside>
+</main>
+<script src="phone.js"></script>
+<script>
+const cfg = {
+  store: '윤담헌 한정식', address: '서연동 나래타워 1층',
+  standardStore: '온기분식 서연점', nextAddress: '서연동 달빛로 28',
+  specialStore: '달빛치킨 서연점', specialAddress: '서연동 은하수길 17',
+  callFee: 3000, bonus: 2000, standardFee: 2800, specialFee: 4000,
+  vehicle: '오토바이', film: '서연동', km: '5.9 km', mins: '약 13분'
+};
+const total = cfg.callFee + cfg.bonus;
+let st = { phase: 'accepted', seconds: 540, moving: false };
+let ticker = null;
+
+/* ── 가상 지명 지도 (SVG · 외부 지도 없이 그린다) ───────────── */
+const ROUTE = 'M 34 196 L 34 150 L 104 150 L 104 98 L 168 98 L 168 176 L 244 176 L 244 120 L 316 120 L 316 64 L 358 64';
+function mapSvg() {
+  return `<svg viewBox="0 0 390 212" preserveAspectRatio="xMidYMid slice">
+    <rect width="390" height="212" fill="#eaf0ec"/>
+    <g stroke="#d3ddd8" stroke-width="20"><path d="M0 64 H390 M0 120 H390 M0 176 H390 M34 0 V212 M104 0 V212 M168 0 V212 M244 0 V212 M316 0 V212"/></g>
+    <g stroke="#fff" stroke-width="16"><path d="M0 64 H390 M0 120 H390 M0 176 H390 M34 0 V212 M104 0 V212 M168 0 V212 M244 0 V212 M316 0 V212"/></g>
+    <path d="M0 40 C 90 26, 200 58, 390 34" stroke="#bfdde6" stroke-width="13" fill="none"/>
+    <g fill="#cfdccf">
+      <rect x="118" y="24" width="38" height="30" rx="3"/><rect x="186" y="128" width="46" height="38" rx="3"/>
+      <rect x="258" y="26" width="46" height="28" rx="3"/><rect x="44" y="82" width="46" height="54" rx="3"/>
+      <rect x="330" y="140" width="44" height="26" rx="3"/>
+    </g>
+    <g fill="#f0e6d4">
+      <rect x="52" y="186" width="40" height="22" rx="3"/><rect x="200" y="74" width="34" height="18" rx="3"/>
+      <rect x="276" y="140" width="32" height="24" rx="3"/>
+    </g>
+    <g font-size="9" fill="#7d8c86" font-family="'Malgun Gothic',sans-serif">
+      <text x="120" y="42">청운빌딩</text><text x="190" y="152">서연고등학교</text><text x="260" y="44">나래타워</text>
+      <text x="47" y="112">온기시장</text><text x="332" y="156">달빛공원</text><text x="6" y="30" fill="#6f9fae">은하수천</text>
+      <text x="200" y="88" font-size="8">한길우체국</text>
+    </g>
+    <g font-size="8.5" fill="#94a19b" font-family="'Malgun Gothic',sans-serif">
+      <text x="8" y="60">달빛로</text><text x="8" y="116">서연대로</text><text x="8" y="172">노을대로</text>
+      <text x="108" y="14">은하수길</text><text x="248" y="14">한별로</text><text x="320" y="208">솔밭길</text>
+    </g>
+    <path d="${ROUTE}" stroke="#fff" stroke-width="12" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${ROUTE}" stroke="#13B89A" stroke-width="7" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="104" cy="98" r="11" fill="#132A32"/><text x="100" y="102" font-size="9" fill="#fff" font-weight="bold">P</text>
+    <circle cx="358" cy="64" r="11" fill="#D94B45"/><text x="354" y="68" font-size="9" fill="#fff" font-weight="bold">D</text>
+    <circle cx="${st.moving ? 244 : 168}" cy="${st.moving ? 150 : 130}" r="17" fill="#13B89A33"/>
+    <circle cx="${st.moving ? 244 : 168}" cy="${st.moving ? 150 : 130}" r="9" fill="#13B89A" stroke="#fff" stroke-width="3.5"/>
+  </svg>
+  <div class="mapchip">FILM LOCATION · ${cfg.film} · 가상 지명</div>`;
+}
+
+/* ── 부분 화면 ─────────────────────────────── */
+const header = idle => `<div class="hd"><div class="brand">달림<b>콜</b></div>
+  <div class="live"><i></i><span>${idle ? '콜 대기 중' : '배달 수행 중'}</span></div><div class="dots">•••</div></div>`;
+
+const timerDock = () => {
+  const tone = st.seconds <= 60 ? '#D94B45' : st.seconds <= 180 ? '#F29A2E' : '#13B89A';
+  const pct = Math.max(0, Math.min(100, st.seconds / 600 * 100));
+  return `<div class="dock"><div class="timer">
+    <div class="between"><div><div class="teyebrow">도착 보너스 남은 시간</div><div class="tbonus">+${PV.money(cfg.bonus)}원 적용 중</div></div><div class="tlive">LIVE</div></div>
+    <div class="tbig" style="color:${tone}">${PV.clock(st.seconds)}</div>
+    <div class="track"><i style="width:${pct}%;background:${tone}"></i></div>
+    <div class="earn">
+      <div><span>배달 수수료</span><b>${PV.money(cfg.callFee)}원</b></div><div class="plus">＋</div>
+      <div><span>도착 보너스</span><b style="color:#13B89A">${PV.money(cfg.bonus)}원</b></div>
+      <div class="total"><span>예상 수입</span><b>${PV.money(total)}원</b></div>
+    </div></div></div>`;
+};
+
+const waitCard = () => `<div class="wait">
+  <div class="pulse"><i></i><b>●</b></div>
+  <h3>콜을 기다리는 중</h3>
+  <p>${cfg.film} 주변 주문을 확인하고 있습니다<br>콜이 들어오면 화면에 바로 표시됩니다</p>
+  <div class="online"><i></i><span>온라인 · 배차 대기</span></div>
+  <div class="wstats">
+    <div class="wstat"><span>오늘 배달</span><b>0건</b></div><div class="wdiv"></div>
+    <div class="wstat"><span>오늘 수입</span><b>0원</b></div><div class="wdiv"></div>
+    <div class="wstat"><span>수락률</span><b>100%</b></div>
+  </div></div>`;
+
+const stageCard = () => `<div class="card">
+  <div class="between"><div class="ordno">주문 #D8-2417</div><div class="badge">${st.phase === 'accepted' ? '접수 확인' : '픽업 이동'}</div></div>
+  <div class="stages">
+    <div class="stg done"><i>✓</i><p>배달 수락</p></div><div class="stgline"></div>
+    <div class="stg act"><i>2</i><p>픽업 이동</p></div><div class="stgline"></div>
+    <div class="stg"><i>3</i><p>고객 전달</p></div>
+  </div></div>`;
+
+const jobCard = () => `<div class="card">
+  <div class="rrow"><div class="rmk strong">P</div><div class="rcopy"><div class="rlabel">픽업</div><div class="rtitle">${cfg.store}</div><div class="rsub">달빛로 128 · 1층</div></div><div class="rarrow">›</div></div>
+  <div class="rstem"></div>
+  <div class="rrow"><div class="rmk">D</div><div class="rcopy"><div class="rlabel">전달</div><div class="rtitle">${cfg.address}</div><div class="rsub">문 앞에 놓고 벨을 눌러주세요</div></div><div class="rarrow">›</div></div>
+  <div class="metrics">
+    <div class="metric"><span>이동거리</span><b>${cfg.km}</b></div>
+    <div class="metric"><span>예상시간</span><b>${cfg.mins}</b></div>
+    <div class="metric"><span>배달수단</span><b>${cfg.vehicle}</b></div>
+  </div></div>`;
+
+const feeCard = () => `<div class="fee"><div><div class="t">이번 배달 수수료</div><div class="n">거리·예상시간 반영 · 확정 금액</div></div>
+  <div class="v">${PV.money(cfg.callFee)}<i>원</i></div></div>`;
+
+const reqCard = () => `<div class="req"><i>i</i><div><b>고객 요청사항</b><p>문 앞에 놓고 벨을 눌러주세요. 공동현관 호출 1204.</p></div></div>`;
+
+const slides = (special, acceptLabel) => `<div class="slides">
+  <div class="sl ${special ? 'spc' : 'acc'}" data-slide="accept"><div class="sl-fill"></div>
+    <div class="sl-label" style="left:68px;right:68px">${acceptLabel}</div><div class="sl-done" style="left:68px;right:68px">수락 완료</div>
+    <div class="sl-knob">→</div></div>
+  <div class="sl rej" data-slide="reject"><div class="sl-fill"></div>
+    <div class="sl-label" style="left:58px;right:58px">밀어서 거절</div><div class="sl-done" style="left:58px;right:58px">거절 완료</div>
+    <div class="sl-knob">←</div></div></div>`;
+
+const bottomBar = () => {
+  if (st.phase === 'waiting' || st.phase === 'fee') return `<div class="bottom"><div><div class="cap">운행 중 · 콜이 오면 바로 알려드립니다</div><div class="st">${cfg.vehicle} · ${cfg.film}</div></div><button class="btn dark" data-go="accepted">운행 중</button></div>`;
+  const first = st.phase === 'accepted';
+  return `<div class="bottom"><div><div class="cap">${first ? '매장에서 상품을 확인한 뒤 눌러주세요' : '안전 운행 중 · 도착지까지 ' + cfg.mins}</div>
+    <div class="st">${first ? '픽업 준비 완료' : '픽업 완료 · 전달지 이동'}</div></div>
+    <button class="btn ${first ? '' : 'dark'}" data-act="${first ? 'bonus' : 'move'}">${first ? '접수 완료' : st.moving ? '이동 중' : '이동 시작'}</button></div>`;
+};
+
+/* ── 장면별 전체 화면 ───────────────────────── */
+function mainScreen() {
+  const idle = st.phase === 'waiting' || st.phase === 'fee';
+  const timed = ['timer', 'bonus', 'earnings', 'offer', 'special'].includes(st.phase);
+  let html = header(idle) + `<div class="map${timed ? ' small' : ''}">${mapSvg()}</div>`;
+  if (timed) html += timerDock();
+  html += '<div class="body">';
+  html += idle ? waitCard() : stageCard() + jobCard();
+  if (!timed) html += feeCard();
+  if (!idle) html += reqCard();
+  html += '</div>' + bottomBar();
+
+  if (st.phase === 'fee') html += `<div class="veil"><div class="sheet"><div class="handle"></div>
+    <div class="kick">새 배달 요청 · ${cfg.km} · ${cfg.mins}</div>
+    <div class="stitle">배달 수수료 <i>${PV.money(cfg.callFee)}원</i></div>
+    <div class="sroute">${cfg.store}  →  ${cfg.address}</div>${slides(false, '밀어서 수락')}</div></div>`;
+
+  if (st.phase === 'bonus') html += `<div class="veil mid"><div class="pop">
+    <div class="bicon">＋</div><div class="peyebrow">도착 인센티브 적용</div>
+    <div class="ptitle">10분 이내 도착 보너스</div><div class="pnum">+${PV.money(cfg.bonus)}<i>원</i></div>
+    <div class="psub">접수 시점부터 시간이 계산됩니다.\n잠시 후 배달 화면으로 돌아갑니다.</div>
+    <button class="primary" data-go="timer">확인</button></div></div>`;
+
+  if (st.phase === 'earnings') html += `<div class="veil"><div class="sheet settle"><div class="handle"></div>
+    <div class="kick">배달 예상 수입</div>
+    <div class="shead">이번 배달은 총 <i>${PV.money(total)}원</i></div>
+    <div class="sline"><span>배달 수수료</span><b>${PV.money(cfg.callFee)}원</b></div>
+    <div class="sline"><span>도착 보너스</span><b class="teal">+${PV.money(cfg.bonus)}원</b></div>
+    <div class="sdiv"></div>
+    <div class="sline tot"><span>예상 합계</span><b>${PV.money(total)}원</b></div>
+    <button class="primary" data-go="timer">확인</button></div></div>`;
+
+  if (st.phase === 'offer' || st.phase === 'special') {
+    const sp = st.phase === 'special';
+    html += `<div class="veil"><div class="sheet ${sp ? 'special' : ''}"><div class="handle"></div>
+      <div class="ohead"><div class="oicon ${sp ? 'am' : ''}">${sp ? '특' : 'N'}</div>
+        <div><div class="kick ${sp ? 'am' : ''}">${sp ? '우선 배차 · 특별 배달콜' : '새로운 배달 요청'}</div>
+        <div class="osub">${sp ? '현재 위치와 가까운 고수익 주문' : '현재 배달 이후 이어서 수행 가능'}</div></div></div>
+      <div class="oamt"><div class="stitle" style="margin:0">${sp ? '배달료 특!' : '배달 수수료'}</div>
+        <b class="${sp ? 'am' : ''}">${PV.money(sp ? cfg.specialFee : cfg.standardFee)}원</b></div>
+      <div class="sroute">${sp ? cfg.specialStore : cfg.standardStore}\n→ ${sp ? cfg.specialAddress : cfg.nextAddress}</div>
+      ${slides(sp, sp ? '밀어서 특별콜 수락' : '밀어서 수락')}</div></div>`;
+  }
+  return html;
+}
+
+function lockScreen() {
+  return `<div class="lock">
+    <div class="date">9월 17일 목요일</div><div class="time">9:41</div>
+    <div class="noti"><div class="ico">달</div><div class="grow">
+      <div class="t"><b>새로운 배달 요청</b><span>지금</span></div>
+      <p>배달 수수료 ${PV.money(cfg.callFee)}원 · ${cfg.store} → ${cfg.address}</p></div></div>
+    <div class="hint">화면이 꺼져 있어도 예약해 둔 시간에 알림이 뜹니다.<br>알림을 누르면 바로 콜 수락 화면이 열립니다.</div></div>`;
+}
+
+function controlScreen() {
+  const timers = [600, 540, 480, 420, 360, 300, 240, 180, 120, 60];
+  return `<div class="ctl">
+    <div class="between"><div><h3>촬영 CONTROL</h3><div class="csub">LOCAL · 이 휴대폰에서 바로 실행</div></div><div class="close">촬영 화면</div></div>
+    <div class="status"><span>현재 장면</span><b>배달 접수 완료 전</b><span>보너스 남은 시간</span>
+      <div class="big">${PV.clock(st.seconds)}</div><span>${cfg.film} · 원격 꺼짐</span></div>
+    <div class="csec">기본 흐름</div>
+    <div class="cgrid">
+      <button class="cbtn" data-go="accepted">초기 상태</button><button class="cbtn" data-go="accepted">접수 완료</button>
+      <button class="cbtn acc" data-go="bonus">보너스 +${PV.money(cfg.bonus)}원</button>
+      <button class="cbtn acc" data-go="earnings">${PV.money(cfg.callFee)} + ${PV.money(cfg.bonus)}원</button>
+      <button class="cbtn" data-go="waiting">콜 대기 화면</button>
+      <button class="cbtn acc" data-go="call">${PV.money(cfg.callFee)}원 콜 띄우기</button>
+    </div>
+    <div class="csec">타이머 바로 이동</div>
+    <div class="cgrid">${timers.map(v => `<button class="cbtn" data-timer="${v}">${v / 60}분 · ${PV.clock(v)}</button>`).join('')}
+      <button class="cbtn warn" data-timer="10">종료 직전 · 00:10</button></div>
+    <div class="csec">콜 · 시스템 알림</div>
+    <div class="cgrid">
+      <button class="cbtn" data-go="offer">${PV.money(cfg.standardFee)}원 알림</button>
+      <button class="cbtn warn" data-go="special">특! ${PV.money(cfg.specialFee)}원</button>
+      <button class="cbtn" data-act="move">가상 이동 시작</button>
+      <button class="cbtn" data-timer="600">타이머 리셋</button></div>
+    <div class="csec">콜 예약 알림 · 화면이 꺼져 있어도 도착</div>
+    <div class="cgrid">
+      <button class="cbtn acc" data-go="notify">30초 뒤 콜</button><button class="cbtn acc" data-go="notify">1분 뒤 콜</button>
+      <button class="cbtn acc" data-go="notify">3분 뒤 콜</button><button class="cbtn acc" data-go="notify">5분 뒤 콜</button>
+      <button class="cbtn warn">예약 모두 취소</button></div>
+    <div class="chint">예약 알림은 앱을 닫거나 화면을 꺼도 잠금화면에 뜹니다. 알림을 누르면 바로 콜 화면이 열립니다. 시간이 밀리면 휴대폰 설정에서 달림콜을 배터리 최적화 제외로 두세요.</div>
+    <div class="chint">앱 로고를 0.8초 길게 누르면 언제든 이 화면이 열립니다.</div></div>`;
+}
+
+const field = (label, value, num, tag) =>
+  `<div class="lab">${label}${tag ? '<span class="newtag">NEW</span>' : ''}</div><div class="inp${num ? ' num' : ''}">${value}</div>`;
+
+function settingsScreen() {
+  return `<div class="set">
+    <div class="top"><div class="back">‹</div><h3>촬영 설정</h3></div>
+    <div class="help">설정은 이 휴대폰에만 저장됩니다. 앱 로고를 길게 누르면 촬영 컨트롤이 열립니다.</div>
+    <div class="lab">현재 위치 방식</div>
+    <div class="choices"><div class="choice on">촬영용 좌표</div><div class="choice">실제 GPS</div></div>
+    <div class="link"><div><b>FILM LOCATION</b><span>${cfg.film} · 37.49800, 127.02700</span></div><i>›</i></div>
+    <div class="lab">가상 이동 수단</div>
+    <div class="choices"><div class="choice">도보</div><div class="choice">자전거</div><div class="choice on">오토바이</div><div class="choice">자동차</div></div>
+    ${field('앱 이름', '달림콜')}
+    ${field('픽업 상호', cfg.store)}
+    ${field('전달지', cfg.address)}
+    ${field('배달 수수료 (원)', '3000', 1, 1)}
+    ${field('도착 보너스 (원)', '2000', 1, 1)}
+    ${field('표준 콜 상호', cfg.standardStore)}
+    ${field('표준 콜 수수료 (원)', '2800', 1, 1)}
+    ${field('특별 콜 상호', cfg.specialStore)}
+    ${field('특별 콜 수수료 (원)', '4000', 1, 1)}
+    ${field('경로 경유지 수 (0~10)', '4', 1, 1)}
+    ${field('경로 반경 (m)', '700', 1, 1)}
+    ${field('타이머 배속', '1', 1)}
+    <div class="help">NEW 표시된 항목이 v10에서 새로 설정 가능해진 값입니다. 경유지 수·반경을 올리면 지도 경로가 더 길고 복잡해집니다.</div></div>`;
+}
+
+/* ── 렌더 & 조작 ────────────────────────────── */
+const app = document.getElementById('app');
+const sbar = document.getElementById('sbar');
+
+function stopTicker() { if (ticker) { clearInterval(ticker); ticker = null; } }
+
+function paint() {
+  let html, bar = 'sbar';
+  if (st.phase === 'notify') { html = lockScreen(); bar = 'sbar dim'; }
+  else if (st.phase === 'control') { html = controlScreen(); bar = 'sbar dim'; }
+  else if (st.phase === 'settings') { html = settingsScreen(); bar = 'sbar light'; }
+  else html = mainScreen();
+  sbar.className = bar;
+  app.innerHTML = html;
+  wire();
+}
+
+function wire() {
+  app.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => setPhase(b.dataset.go)));
+  app.querySelectorAll('[data-timer]').forEach(b => b.addEventListener('click', () => { st.seconds = Number(b.dataset.timer); setPhase('timer'); }));
+  app.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.act === 'bonus') return setPhase('bonus');
+    if (b.dataset.act === 'move') { st.moving = true; paint(); }
+  }));
+  const accept = app.querySelector('[data-slide="accept"]');
+  const reject = app.querySelector('[data-slide="reject"]');
+  if (accept) PV.slider(accept, { direction: 'right', onComplete: () => {
+    if (reject) reject.dataset.locked = '1';
+    st.phase === 'fee' ? setPhase('bonus') : setPhase('timer');
+  } });
+  if (reject) PV.slider(reject, { direction: 'left', onComplete: () => {
+    if (accept) accept.dataset.locked = '1';
+    setPhase(st.phase === 'fee' ? 'waiting' : 'timer');
+  } });
+  const logo = app.querySelector('.brand');
+  if (logo) logo.addEventListener('click', () => setPhase('control'));
+  const dots = app.querySelector('.dots');
+  if (dots) dots.addEventListener('click', () => setPhase('settings'));
+  const close = app.querySelector('.ctl .close');
+  if (close) close.addEventListener('click', () => setPhase('timer'));
+  const back = app.querySelector('.set .back');
+  if (back) back.addEventListener('click', () => setPhase('timer'));
+  const noti = app.querySelector('.noti');
+  if (noti) noti.addEventListener('click', () => setPhase('call'));
+}
+
+function setPhase(next) {
+  stopTicker();
+  if (next === 'call') { st.phase = 'fee'; }
+  else if (next === 'waiting') { st.phase = 'waiting'; }
+  else st.phase = next;
+  if (st.phase === 'timer' && !document.body.classList.contains('shot')) {
+    ticker = setInterval(() => {
+      st.seconds = Math.max(0, st.seconds - 1);
+      if (st.phase !== 'timer') return stopTicker();
+      paint();
+    }, 1000);
+  }
+  paint();
+}
+
+PV.boot({
+  scenes: [
+    { id: 'waiting', label: '콜 대기 중', cap: '운행을 시작하면 콜이 올 때까지 대기 화면이 유지됩니다. 오늘 배달·수입·수락률이 함께 보입니다.' },
+    { id: 'call', label: '콜 수신 · 수락/거절', cap: '콜이 들어오면 수수료와 경로가 시트로 올라옵니다. 초록 슬라이더를 오른쪽으로 끝까지 밀면 수락, 아래 슬라이더를 왼쪽으로 밀면 거절입니다.' },
+    { id: 'accepted', label: '배달 접수 확인', cap: '수락 직후 화면. 픽업·전달지와 이동거리·예상시간·배달수단이 한눈에 정리됩니다.' },
+    { id: 'bonus', label: '도착 보너스 팝업', cap: '접수 완료를 누르면 10분 이내 도착 보너스가 안내되고, 확인을 누르면 타이머가 시작됩니다.' },
+    { id: 'timer', label: '타이머 진행 중', cap: '타이머는 스크롤하지 않아도 지도 바로 아래에 계속 보입니다. 3분 이하로 내려가면 주황, 1분 이하는 빨강으로 바뀝니다.' },
+    { id: 'timerEnd', label: '종료 직전 00:10', cap: '숨겨진 버튼으로 종료 직전까지 한 번에 점프할 수 있습니다. 촬영에서 긴박한 컷을 바로 찍을 때 씁니다.' },
+    { id: 'earnings', label: '예상 수입 정산', cap: '수수료와 보너스가 합쳐진 예상 수입 시트입니다.' },
+    { id: 'offer', label: '표준 콜 알림', cap: '배달 중에 다음 콜이 들어오는 장면입니다.' },
+    { id: 'special', label: '특별 콜 알림', cap: '고수익 특별 콜은 앰버 색으로 구분되고 슬라이더도 함께 바뀝니다.' },
+    { id: 'notify', label: '예약 알림 (잠금화면)', cap: 'v10 신규. 예약해 둔 시간에 화면이 꺼져 있어도 잠금화면에 콜 알림이 뜹니다. 알림을 누르면 바로 콜 화면이 열립니다.' },
+    { id: 'control', label: '촬영 CONTROL 패널', cap: '앱 로고를 0.8초 길게 누르면 열립니다. 장면·타이머·콜 알림·콜 예약을 여기서 한 번에 조작합니다.' },
+    { id: 'settings', label: '촬영 설정', cap: 'v10에서 수수료·보너스·경유지 수·경로 반경까지 촬영 현장에서 직접 바꿀 수 있습니다.' }
+  ],
+  render: scene => {
+    stopTicker();
+    st.moving = false;
+    if (scene.id === 'timerEnd') { st.seconds = 10; setPhase('timer'); }
+    else if (scene.id === 'timer') { st.seconds = 540; setPhase('timer'); }
+    else if (scene.id === 'earnings') { st.seconds = 480; setPhase('earnings'); }
+    else if (scene.id === 'offer' || scene.id === 'special') { st.seconds = 420; setPhase(scene.id); }
+    else if (scene.id === 'bonus') { st.seconds = 600; setPhase('bonus'); }
+    else setPhase(scene.id);
+  }
+});
+</script>
+</body>
+</html>

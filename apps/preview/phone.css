@@ -1,0 +1,105 @@
+/* 촬영용 앱 웹 프리뷰 - 공용 폰 프레임 · DisolveWorks */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(circle at 16% 0,rgba(80,105,190,.13),transparent 28%),
+    #0b0f19;
+  color:#eef2ff;
+  font-family:'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+  min-height:100vh;
+}
+a{color:#8fa8ff}
+
+.pv-top{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:18px 26px;border-bottom:1px solid #1b2334;
+}
+.pv-back{font-size:13px;text-decoration:none}
+.pv-title{font-size:17px;font-weight:800;letter-spacing:-.02em}
+.pv-title span{font-size:11px;font-weight:700;color:#7d8aa4;margin-left:7px;letter-spacing:.08em}
+.pv-top .pv-links{margin-left:auto;display:flex;gap:8px}
+.pv-top .pv-links a{
+  font-size:12px;font-weight:800;text-decoration:none;border-radius:10px;padding:9px 13px;
+  background:#1c2743;color:#b7c5ff;border:1px solid #30436e;
+}
+.pv-top .pv-links a.solid{background:#7590ff;color:#fff;border-color:#7590ff}
+
+.pv-main{
+  max-width:1120px;margin:0 auto;padding:28px 22px 60px;
+  display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:32px;align-items:start;
+}
+.pv-stage{display:flex;justify-content:center}
+.pv-side h2{margin:2px 0 12px;font-size:14px;letter-spacing:.04em;color:#c3cde4}
+.pv-scenes{display:flex;flex-direction:column;gap:7px}
+.pv-scenes button{
+  text-align:left;cursor:pointer;font:inherit;font-size:13px;
+  background:#111827;border:1px solid #263244;border-radius:11px;color:#cbd5ea;
+  padding:11px 13px;transition:.15s;display:flex;gap:9px;align-items:center;
+}
+.pv-scenes button:hover{border-color:#5878de;background:#151e30}
+.pv-scenes button.on{border-color:#7590ff;background:#1a2440;color:#fff}
+.pv-scenes button i{
+  font-style:normal;font-size:10px;font-weight:800;color:#8b9ac2;
+  background:#1c2743;border:1px solid #30436e;border-radius:999px;padding:3px 7px;flex:0 0 auto;
+}
+.pv-scenes button.on i{color:#cdd8ff}
+.pv-note{color:#6a7691;font-size:11px;line-height:1.75;margin-top:16px}
+.pv-note b{color:#9fb0d4}
+.pv-cap{
+  margin:14px auto 0;max-width:360px;text-align:center;
+  font-size:12px;color:#8a97b2;line-height:1.7;
+}
+
+/* ── 폰 프레임 ───────────────────────────────── */
+.phone{
+  width:412px;max-width:100%;
+  border-radius:44px;padding:11px;
+  background:linear-gradient(160deg,#2b3446,#171d2a 45%,#0e131d);
+  box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.05) inset;
+}
+.phone-shell{
+  border-radius:34px;overflow:hidden;background:#000;
+  box-shadow:0 0 0 2px #05080d;
+}
+.phone-screen{
+  position:relative;width:390px;height:800px;max-width:100%;
+  background:#fff;overflow:hidden;
+  font-size:14px;line-height:1.35;color:#132a32;
+  display:flex;flex-direction:column;
+}
+@media(max-width:480px){
+  .phone{width:100%;border-radius:0;padding:0;box-shadow:none;background:none}
+  .phone-shell{border-radius:0;box-shadow:none}
+  .phone-screen{width:100%;height:calc(100vh - 210px);min-height:560px}
+}
+
+/* 상태바 */
+.sbar{
+  height:26px;flex:0 0 26px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 15px;font-size:11px;font-weight:700;letter-spacing:.02em;
+  background:#132a32;color:#dbe8e5;
+}
+.sbar.light{background:#fff;color:#4a5560}
+.sbar.dim{background:#10262e;color:#9dc0ba}
+.sbar em{font-style:normal;letter-spacing:1px}
+
+/* 화면 본문 */
+.app{flex:1;min-height:0;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{width:0}
+
+/* 공용 유틸 */
+.row{display:flex;align-items:center}
+.between{display:flex;align-items:center;justify-content:space-between}
+.grow{flex:1;min-width:0}
+.tap{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.hidden{display:none!important}
+
+/* 스크린샷 모드 */
+body.shot{background:#fff}
+body.shot .pv-top,body.shot .pv-side,body.shot .pv-cap{display:none}
+body.shot .pv-main{padding:0;display:block;max-width:none}
+body.shot .phone{width:390px;padding:0;border-radius:0;background:none;box-shadow:none}
+body.shot .phone-shell{border-radius:0;box-shadow:none}
+body.shot .pv-stage{display:block}

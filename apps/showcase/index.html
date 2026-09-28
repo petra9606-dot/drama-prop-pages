@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>촬영용 앱 화면 | DisolveWorks</title>
+<meta name="description" content="드라마 촬영용 소품 앱의 주요 화면을 설치 없이 바로 확인하고, 필요하면 APK로 내려받을 수 있습니다.">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 16% 0,rgba(80,105,190,.13),transparent 28%),#0b0f19;color:#eef2ff;
+  font-family:'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif}
+a{color:#8fa8ff}
+.wrap{max-width:1180px;margin:0 auto;padding:44px 26px 70px}
+.back{display:inline-block;margin-bottom:22px;color:#8fa8ff;text-decoration:none;font-size:13px}
+h1{margin:0;font-size:34px;letter-spacing:-.03em}
+.sub{color:#78869f;font-size:12px;letter-spacing:.12em;margin-top:8px}
+.lead{color:#9aa7c0;font-size:14px;line-height:1.8;margin:18px 0 26px;max-width:760px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+.tabs button{font:inherit;font-size:13px;font-weight:800;cursor:pointer;border-radius:999px;padding:10px 16px;
+  background:#111827;border:1px solid #263244;color:#c2ccE4;transition:.15s}
+.tabs button:hover{border-color:#5878de}
+.tabs button.on{background:#7590ff;border-color:#7590ff;color:#fff}
+.panel{display:grid;grid-template-columns:minmax(0,430px) minmax(0,1fr);gap:34px;align-items:start}
+.viewer{background:#111827;border:1px solid #263244;border-radius:22px;padding:20px}
+.frame{border-radius:26px;overflow:hidden;background:#000;box-shadow:0 22px 50px rgba(0,0,0,.5);position:relative;display:flex;justify-content:center}
+.frame img{display:block;height:min(66vh,780px);width:auto;max-width:100%;cursor:pointer}
+.nav{display:flex;align-items:center;gap:10px;margin-top:16px}
+.nav button{font:inherit;cursor:pointer;width:40px;height:40px;border-radius:12px;background:#1c2743;border:1px solid #30436e;color:#cdd8ff;font-size:17px;font-weight:800}
+.nav button:disabled{opacity:.35;cursor:default}
+.nav .idx{margin-left:auto;font-size:12px;color:#7d8aa4;font-variant-numeric:tabular-nums}
+.cap{margin-top:14px;font-size:13px;color:#a9b5cc;line-height:1.8;min-height:66px}
+.cap b{color:#fff;display:block;font-size:15px;margin-bottom:6px}
+.side h2{margin:0 0 6px;font-size:26px;letter-spacing:-.02em}
+.side .meta{color:#78869f;font-size:12px;letter-spacing:.08em;margin-bottom:16px}
+.side .desc{color:#9aa7c0;font-size:14px;line-height:1.85}
+.acts{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0 8px}
+.acts a{text-decoration:none;font-size:13px;font-weight:800;border-radius:12px;padding:13px 18px}
+.acts a.solid{background:#7590ff;color:#fff}
+.acts a.ghost{background:#1c2743;color:#b7c5ff;border:1px solid #30436e}
+.note{color:#69748c;font-size:11px;line-height:1.8;margin-top:8px}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:9px;margin-top:24px}
+.thumbs button{padding:0;border:2px solid #263244;border-radius:11px;overflow:hidden;background:#0d121b;cursor:pointer;line-height:0}
+.thumbs button img{width:100%;height:auto;display:block;opacity:.6}
+.thumbs button.on{border-color:#7590ff}
+.thumbs button.on img{opacity:1}
+.list{margin-top:26px;border-top:1px solid #1b2334;padding-top:20px}
+.list h3{margin:0 0 10px;font-size:13px;color:#8895b0;letter-spacing:.06em}
+.list ol{margin:0;padding-left:18px;color:#93a0b9;font-size:13px;line-height:2}
+.list ol li::marker{color:#5c6a86;font-variant-numeric:tabular-nums}
+.list ol li.on{color:#fff;font-weight:700}
+@media(max-width:880px){
+  .panel{grid-template-columns:1fr;gap:24px}
+  .wrap{padding:28px 16px 56px}
+  h1{font-size:27px}
+  .viewer{padding:12px;border-radius:18px}
+  .frame img{height:auto;width:100%}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="../../pyramid/index.html">← 피라밋</a>
+  <h1>촬영용 앱 화면</h1>
+  <div class="sub">PROP APPS · SCREEN PREVIEW</div>
+  <p class="lead">설치하지 않아도 각 앱의 주요 화면을 그대로 볼 수 있습니다. <b>웹에서 직접 조작</b>을 누르면 브라우저에서 버튼과 슬라이더까지 움직여 볼 수 있고, 실제 촬영에 쓸 때는 APK를 내려받아 휴대폰에 설치하면 됩니다.</p>
+  <div class="tabs" id="tabs"></div>
+  <div class="panel">
+    <div class="viewer">
+      <div class="frame"><img id="shot" alt=""></div>
+      <div class="nav">
+        <button id="prev" aria-label="이전 화면">‹</button>
+        <button id="next" aria-label="다음 화면">›</button>
+        <span class="idx" id="idx"></span>
+      </div>
+      <div class="cap" id="cap"></div>
+    </div>
+    <div class="side">
+      <h2 id="title"></h2>
+      <div class="meta" id="meta"></div>
+      <div class="desc" id="desc"></div>
+      <div class="acts" id="acts"></div>
+      <div class="note" id="note"></div>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="list"><h3>화면 목록</h3><ol id="list"></ol></div>
+    </div>
+  </div>
+</main>
+<script>
+const APPS = [
+  {
+    id: 'rider', name: '달림콜 라이더', meta: 'v10 · 예약 알림 / 긴 경로 · 50.2MB',
+    desc: '배달 라이더 앱. 콜 대기 → 수락 → 도착 보너스 타이머 → 정산까지 촬영 순서대로 흘러가고, 화면이 꺼져 있어도 지정한 시간에 콜 알림이 뜹니다. 지도의 도로·건물·학교 이름은 모두 가상 지명입니다.',
+    preview: '../preview/rider.html', apk: '../dallim-rider-v10-schedule-route.apk', qr: '../qr/dallim-rider-v9-waiting-map.png',
+    note: '앱 로고를 0.8초 길게 누르면 촬영 CONTROL 패널이 열립니다. 예약 알림이 밀리지 않도록 휴대폰 설정에서 배터리 최적화 제외로 두세요.',
+    shots: [
+      ['01-waiting', '콜 대기 중', '운행을 시작하면 콜이 올 때까지 대기 화면이 유지됩니다. 오늘 배달 건수·수입·수락률이 함께 표시됩니다.'],
+      ['02-call', '콜 수신 · 수락/거절', '콜이 들어오면 수수료와 경로가 시트로 올라옵니다. 초록 슬라이더를 오른쪽 끝까지 밀면 수락, 아래 슬라이더를 왼쪽으로 밀면 거절입니다.'],
+      ['03-accepted', '배달 접수 확인', '픽업·전달지와 이동거리·예상시간·배달수단이 한 화면에 정리됩니다.'],
+      ['04-bonus', '도착 보너스 팝업', '접수 완료를 누르면 10분 이내 도착 보너스가 안내되고, 확인과 동시에 타이머가 시작됩니다.'],
+      ['05-timer', '타이머 진행 중', '타이머는 스크롤하지 않아도 지도 바로 아래에 고정되어 첫 화면에서 바로 보입니다.'],
+      ['06-timer-end', '종료 직전 00:10', '숨겨진 버튼으로 1분 전·종료 직전으로 한 번에 점프할 수 있습니다. 긴박한 컷을 여러 번 찍을 때 씁니다.'],
+      ['07-earnings', '예상 수입 정산', '수수료와 보너스가 합쳐진 정산 시트입니다. 금액은 설정에서 바꿀 수 있습니다.'],
+      ['08-offer', '표준 콜 알림', '배달 중 다음 콜이 들어오는 장면입니다.'],
+      ['09-special', '특별 콜 알림', '고수익 특별 콜은 앰버 색으로 구분되고 슬라이더 색도 함께 바뀝니다.'],
+      ['10-lock-notify', '예약 알림 (잠금화면)', 'v10 신규. 예약한 시간이 되면 앱을 닫았거나 화면이 꺼져 있어도 잠금화면에 콜 알림이 뜨고, 누르면 바로 콜 화면이 열립니다.'],
+      ['11-control', '촬영 CONTROL 패널', '장면·타이머·콜 알림·콜 예약을 스태프가 한 화면에서 조작합니다. 같은 Wi-Fi의 배우폰을 원격으로 제어할 수도 있습니다.'],
+      ['12-settings', '촬영 설정', 'v10에서 수수료·보너스·경유지 수·경로 반경까지 현장에서 직접 바꿀 수 있게 되었습니다.']
+    ]
+  },
+  {
+    id: 'chat', name: '모아챗', meta: '촬영용 메신저 · 86MB',
+    desc: '두 대의 휴대폰을 같은 촬영 코드로 연결해 실제로 주고받는 대화를 찍는 메신저입니다. 보낸 시각·받은 시각·읽음(1) 표시까지 장면에 맞춰 연출할 수 있습니다.',
+    preview: '../preview/chat.html', apk: '../moa-chat-final.apk', qr: '../qr/moa-chat-v3-phone.png',
+    note: '말풍선을 길게 누르면 그 자리에서 내용·시각·보낸 사람·읽음 표시를 고칠 수 있고, 두 휴대폰에 함께 반영됩니다.',
+    shots: [
+      ['01-list', '채팅 목록', '촬영용으로 만들어 둔 친구 목록과 최근 대화가 보이는 첫 화면입니다.'],
+      ['02-friends', '친구 탭', '이름과 프로필은 촬영 전에 자유롭게 바꿀 수 있습니다.'],
+      ['03-room', '대화방', '노란 말풍선이 내 메시지입니다. 읽음 표시(1)와 시각을 장면에 맞춰 남기거나 지울 수 있습니다.'],
+      ['04-edit', '대화 연출 수정', '이미 보낸 메시지의 내용·시각·보낸 사람·읽음 표시를 수정하는 창입니다.']
+    ]
+  },
+  {
+    id: 'nav', name: '길봄 내비', meta: 'v3 · 실제 지도 + 가상 지명 · 57.8MB',
+    desc: '가상의 목적지를 입력해 두고 길안내를 재생하는 내비게이션입니다. 남은 거리와 시간이 실제로 줄어들고, 음성 안내가 단계마다 나옵니다.',
+    preview: '../preview/nav.html', apk: '../gilbom-nav-v3-real-map.apk', qr: '../qr/gilbom-nav-v2.png',
+    note: '안내 재생 시간과 도착 후 복귀 시간을 초 단위로 정할 수 있어, 장면 길이에 맞춰 한 번에 맞아떨어지게 찍을 수 있습니다.',
+    shots: [
+      ['01-home', '목적지 검색', '출발지와 목적지를 가상의 이름으로 직접 적어 둡니다.'],
+      ['02-guide', '길안내 진행', '남은 거리·시간이 줄어들고 회전 안내가 단계별로 바뀝니다.'],
+      ['03-arrived', '도착 안내', '도착 안내 후 지정한 시간이 지나면 자동으로 첫 화면으로 돌아갑니다.'],
+      ['04-settings', '촬영용 설정', '표시 거리·시간과 재생 속도를 장면에 맞춰 조절합니다.']
+    ]
+  },
+  {
+    id: 'mail', name: '레터메일', meta: 'v3 · 원격 제어 · 87.5MB',
+    desc: '받은편지함·메일 열람·편지쓰기를 갖춘 촬영용 메일 앱입니다. 스태프폰에서 배우폰의 화면을 원격으로 넘길 수 있어, 배우가 조작하지 않아도 원하는 순간에 메일이 열립니다.',
+    preview: '../preview/mail.html', apk: '../disolve-mail-remote-v1.apk', qr: '../qr/disolve-mail-remote-v1.png',
+    note: '상대가 보낸 것처럼 보이는 메일을 미리 저장해 둘 수 있고, 표시 날짜·시간과 읽음·중요·별표까지 지정할 수 있습니다.',
+    shots: [
+      ['01-inbox', '받은편지함', '읽지 않은 메일은 굵게, 별표는 노란색으로 표시됩니다.'],
+      ['02-detail', '메일 열람', '본문·첨부파일·보낸 주소까지 실제 메일처럼 보입니다.'],
+      ['03-compose', '편지쓰기', '배우가 직접 메일을 쓰는 장면에 쓰는 화면입니다.'],
+      ['04-stage', '촬영용 메일 저장', '상대가 보낸 것처럼 메일을 미리 만들어 두는 화면입니다.']
+    ]
+  }
+];
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+let app = APPS[0], index = 0;
+const $ = id => document.getElementById(id);
+
+$('tabs').innerHTML = APPS.map(a => '<button data-app="' + a.id + '">' + esc(a.name) + '</button>').join('');
+$('tabs').querySelectorAll('button').forEach(b => b.addEventListener('click', () => select(b.dataset.app, 0)));
+
+function shotSrc(i) { return 'shots/' + app.id + '/' + app.shots[i][0] + '.png'; }
+
+function paint() {
+  const s = app.shots[index];
+  $('shot').src = shotSrc(index);
+  $('shot').alt = app.name + ' ' + s[1];
+  $('idx').textContent = (index + 1) + ' / ' + app.shots.length;
+  $('cap').innerHTML = '<b>' + esc(s[1]) + '</b>' + esc(s[2]);
+  $('prev').disabled = index === 0;
+  $('next').disabled = index === app.shots.length - 1;
+  $('thumbs').querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', i === index));
+  $('list').querySelectorAll('li').forEach((li, i) => li.classList.toggle('on', i === index));
+  try { history.replaceState(null, '', '#' + app.id + '-' + (index + 1)); } catch (e) {}
+}
+
+function select(id, at) {
+  app = APPS.find(a => a.id === id) || APPS[0];
+  index = Math.max(0, Math.min(app.shots.length - 1, at || 0));
+  $('tabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.app === app.id));
+  $('title').textContent = app.name;
+  $('meta').textContent = app.meta;
+  $('desc').textContent = app.desc;
+  $('note').textContent = app.note;
+  $('acts').innerHTML =
+    '<a class="solid" href="' + app.preview + '">웹에서 직접 조작</a>' +
+    '<a class="ghost" href="' + app.apk + '" download>APK 내려받기</a>' +
+    '<a class="ghost" href="' + app.qr + '" target="_blank">설치 QR</a>';
+  $('thumbs').innerHTML = app.shots.map((s, i) =>
+    '<button data-i="' + i + '" title="' + esc(s[1]) + '"><img loading="lazy" src="shots/' + app.id + '/' + s[0] + '.png" alt="' + esc(s[1]) + '"></button>').join('');
+  $('thumbs').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { index = Number(b.dataset.i); paint(); }));
+  $('list').innerHTML = app.shots.map(s => '<li>' + esc(s[1]) + '</li>').join('');
+  $('list').querySelectorAll('li').forEach((li, i) => { li.style.cursor = 'pointer'; li.addEventListener('click', () => { index = i; paint(); }); });
+  paint();
+}
+
+$('prev').addEventListener('click', () => { if (index > 0) { index--; paint(); } });
+$('next').addEventListener('click', () => { if (index < app.shots.length - 1) { index++; paint(); } });
+$('shot').addEventListener('click', () => { index = (index + 1) % app.shots.length; paint(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft' && index > 0) { index--; paint(); }
+  if (e.key === 'ArrowRight' && index < app.shots.length - 1) { index++; paint(); }
+});
+
+const hash = (location.hash || '').replace('#', '').split('-');
+select(hash[0] || 'rider', Number(hash[1] || 1) - 1);
+</script>
+</body>
+</html>
