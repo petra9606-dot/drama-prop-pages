@@ -43,3 +43,17 @@ export async function dropFlags(store, key) {
 export function merge(metadata, override) {
   return { ...(metadata || {}), ...(override || {}) };
 }
+
+// 깃허브로 직접 올린 자료(static-items.json)의 숨김 목록
+export const STATIC_HIDDEN_KEY = "__meta/static-hidden.json";
+
+export async function readStaticHidden(store) {
+  try {
+    const v = await store.get(STATIC_HIDDEN_KEY, { type: "json" });
+    return Array.isArray(v) ? v.map(String) : [];
+  } catch { return []; }
+}
+
+export async function writeStaticHidden(store, list) {
+  await store.setJSON(STATIC_HIDDEN_KEY, list);
+}

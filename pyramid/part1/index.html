@@ -25,8 +25,9 @@ h1{margin:0;font-size:38px;letter-spacing:-.03em}.sub{color:#7e8ba3;font-size:12
 <div class="header"><div><h1>1부</h1><div class="sub">SCENE MATERIALS</div></div><div class="count" id="count">자료 불러오는 중...</div></div>
 <div class="filter"><input id="localSearch" placeholder="이 부에서 씬 / 제목 검색"></div><div id="grid" class="grid"></div>
 </main>
+<script src="/static-items.js"></script>
 <script>
-const staticItems=[{scene:"4씬",title:"청약 당첨조회",filename:"cheongyak/index.html",url:"cheongyak/index.html",source:"기존"},{scene:"46씬",title:"진술서",filename:"진술서.html",url:"statement.html",source:"기존"},{scene:"46씬",title:"진술서 (한글 인쇄 시뮬레이션)",filename:"statement-hwp.html",url:"statement-hwp.html",source:"기존"}];
+let staticItems=[];
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 function render(uploaded=[]){
   const all=[...staticItems.map(x=>({...x,pinned:false})),...uploaded.map(x=>({scene:x.scene,title:x.title||x.filename,filename:x.filename,url:x.url,source:"웹 업로드",pinned:!!x.pinned}))].sort((a,b)=>Number(!!b.pinned)-Number(!!a.pinned));
@@ -39,7 +40,9 @@ function render(uploaded=[]){
     <div class="filename">${esc(x.filename||'')}</div><div class="open">↗</div>
   </a>`).join('');
 }
+let uploadedItems=[];
 render([]);
-fetch('/.netlify/functions/catalog?project=pyramid&part=1부').then(r=>r.json()).then(({items=[]})=>render(items)).catch(()=>render([]));
+DW_STATIC.then(({scenes})=>{staticItems=scenes.filter(x=>x.part==='1부').map(x=>({...x,source:'기존'}));render(uploadedItems);});
+fetch('/.netlify/functions/catalog?project=pyramid&part=1부').then(r=>r.json()).then(({items=[]})=>{uploadedItems=items;render(items);}).catch(()=>render(uploadedItems));
 document.getElementById('localSearch').addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('#grid .card').forEach(c=>c.style.display=c.innerText.toLowerCase().includes(q)?'block':'none');});
 </script></body></html>

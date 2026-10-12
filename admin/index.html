@@ -18,7 +18,7 @@ input:focus,select:focus{border-color:#718cff}.filebox{border:1px dashed #3a465e
 .toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.toolbar .search{max-width:430px}.tabs{display:flex;gap:8px;margin:18px 0 8px}
 .tab{padding:8px 12px;border-radius:999px;border:1px solid #2d3850;background:#121826;color:#97a4ba;cursor:pointer;font-size:11px}.tab.active{background:#253354;color:#dce5ff;border-color:#4a63a4}
 .item{display:grid;grid-template-columns:82px minmax(220px,1fr) auto;gap:14px;align-items:center;padding:15px 0;border-bottom:1px solid #202738}.item:last-child{border-bottom:0}
-.scene{font-weight:900;font-size:14px}.name{font-weight:800;font-size:15px}.meta{font-size:11px;color:#7e899f;margin-top:5px}.flags{font-size:10px;margin-top:5px}.pin{color:#f0be65}.hidden{color:#9a87d7}.trash{color:#d77a7a}.item-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.scene{font-weight:900;font-size:14px}.name{font-weight:800;font-size:15px}.meta{font-size:11px;color:#7e899f;margin-top:5px}.flags{font-size:10px;margin-top:5px}.pin{color:#f0be65}.hidden{color:#9a87d7}.trash{color:#d77a7a}.group-title{font-size:12px;font-weight:900;color:#9fb5ff;letter-spacing:.06em;margin:18px 0 2px}.static-note{font-size:11px;color:#7e899f;line-height:1.6;background:#0d121b;border:1px solid #232c3f;border-radius:10px;padding:10px 12px;margin:6px 0 4px}.item.off .name,.item.off .scene{opacity:.45}.item-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .check{display:flex;align-items:center;gap:8px;color:#b6c0d3;font-size:12px}.check input{width:auto}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal.show{display:flex}.modal-card{width:min(560px,100%);background:#10151f;border:1px solid #2b3750;border-radius:18px;padding:22px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.x{background:none;border:0;color:#9aa7bc;font-size:22px;cursor:pointer}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.item{grid-template-columns:70px 1fr}.item-actions{grid-column:1/-1;justify-content:flex-start}.top{align-items:flex-start}.wrap{padding:25px 15px}}
@@ -58,10 +58,10 @@ input:focus,select:focus{border-color:#718cff}.filebox{border:1px dashed #3a465e
 
   <section class="panel">
     <div class="toolbar">
-      <div><h1 style="font-size:22px">콘텐츠 관리</h1><div class="sub" style="margin:3px 0 0">검색 · 수정 · 교체 · 숨김 · 고정 · 휴지통</div></div>
+      <div><h1 style="font-size:22px">콘텐츠 관리</h1><div class="sub" style="margin:3px 0 0">검색 · 수정 · 교체 · 숨김 · 고정 · 휴지통 · 깃허브 자료 숨김</div></div>
       <input id="adminSearch" class="search" placeholder="씬, 제목, 파일명, 부 검색">
     </div>
-    <div class="tabs"><button class="tab active" data-tab="active" onclick="setTab('active')">활성 파일</button><button class="tab" data-tab="trash" onclick="setTab('trash')">휴지통</button></div>
+    <div class="tabs"><button class="tab active" data-tab="active" onclick="setTab('active')">활성 파일</button><button class="tab" data-tab="trash" onclick="setTab('trash')">휴지통</button><button class="tab" data-tab="static" onclick="setTab('static')">깃허브 자료</button></div>
     <div id="items"><div class="status">불러오는 중...</div></div>
   </section>
 </div>
@@ -93,12 +93,12 @@ input:focus,select:focus{border-color:#718cff}.filebox{border:1px dashed #3a465e
 
 <script>
 const $=s=>document.querySelector(s);
-let allItems=[], currentTab='active';
+let allItems=[], currentTab='active', staticData={scenes:[],apps:[]}, staticHidden=new Set();
 for(let i=1;i<=12;i++){for(const id of ['part','editPart']){const o=document.createElement('option');o.value=i;o.textContent=i+'부';document.getElementById(id).appendChild(o);}}
 
 async function login(){const r=await fetch('/.netlify/functions/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('#password').value})});const j=await r.json().catch(()=>({}));if(!r.ok){$('#loginStatus').textContent=j.error||'로그인 실패';$('#loginStatus').className='status badtxt';return;}showAdmin();}
 async function logout(){await fetch('/.netlify/functions/admin-logout',{method:'POST'});location.reload();}
-async function checkSession(){const r=await fetch('/.netlify/functions/admin-list');if(r.ok){$('#loginView').style.display='none';$('#adminView').style.display='block';const j=await r.json();allItems=j.items||[];renderItems();}}
+async function checkSession(){const r=await fetch('/.netlify/functions/admin-list');if(r.ok){$('#loginView').style.display='none';$('#adminView').style.display='block';const j=await r.json();allItems=j.items||[];renderItems();loadStatic();}}
 async function showAdmin(){$('#loginView').style.display='none';$('#adminView').style.display='block';await loadItems();}
 $('#password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
 
@@ -115,12 +115,43 @@ $('#uploadForm').addEventListener('submit',async e=>{
   $('#uploadStatus').className='status oktxt';$('#file').value='';$('#title').value='';await loadItems();
 });
 
-async function loadItems(){const r=await fetch('/.netlify/functions/admin-list',{cache:'no-store'});if(r.status===401){location.reload();return;}const j=await r.json().catch(()=>({}));if(!r.ok){alert((j&&j.error)?j.error:('목록을 불러오지 못했습니다 ('+r.status+')'));return;}allItems=j.items||[];renderItems();}
+async function loadItems(){const r=await fetch('/.netlify/functions/admin-list',{cache:'no-store'});if(r.status===401){location.reload();return;}const j=await r.json().catch(()=>({}));if(!r.ok){alert((j&&j.error)?j.error:('목록을 불러오지 못했습니다 ('+r.status+')'));return;}allItems=j.items||[];renderItems();loadStatic();}
 function setTab(t){currentTab=t;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));renderItems();}
 $('#adminSearch').addEventListener('input',renderItems);
 
+async function loadStatic(){
+  const [d,h]=await Promise.all([
+    fetch('/static-items.json',{cache:'no-cache'}).then(r=>r.json()).catch(()=>({scenes:[],apps:[]})),
+    fetch('/.netlify/functions/static-hidden',{cache:'no-store'}).then(r=>r.json()).then(j=>j.hidden||[]).catch(()=>[])
+  ]);
+  staticData={scenes:d.scenes||[],apps:d.apps||[]};staticHidden=new Set(h);
+  if(currentTab==='static')renderItems();
+}
+async function toggleStatic(id,hide){
+  if(hide&&!confirm('사이트에서 숨길까요? (파일은 남아 있고, 여기서 다시 표시할 수 있습니다)'))return;
+  const j=await apiPost('/.netlify/functions/admin-static',{id,hidden:hide});
+  if(!j)return;staticHidden=new Set(j.hidden||[]);renderItems();
+}
+function renderStatic(q){
+  const match=x=>!q||[x.part,x.scene,x.title,x.filename].join(' ').toLowerCase().includes(q);
+  const row=(x,label)=>{const off=staticHidden.has(x.id);return `<div class="item${off?' off':''}">
+    <div class="scene">${esc(label)}</div>
+    <div><div class="name">${esc(x.title)}</div><div class="meta">${esc(x.part?x.part+' · ':'')}${esc(x.filename||'')} · 깃허브</div>
+    <div class="flags">${off?'<span class="hidden">● 사이트에서 숨김</span>':''}</div></div>
+    <div class="item-actions"><a class="btn secondary small" target="_blank" href="${esc(x.url)}">열기</a>${off
+      ?`<button class="btn ok small" onclick='toggleStatic(${JSON.stringify(x.id)},false)'>다시 표시</button>`
+      :`<button class="btn danger small" onclick='toggleStatic(${JSON.stringify(x.id)},true)'>사이트에서 숨김</button>`}</div>
+  </div>`;};
+  const sc=staticData.scenes.filter(match).sort((a,b)=>(a.partNum-b.partNum)||String(a.scene).localeCompare(String(b.scene),'ko',{numeric:true}));
+  const ap=staticData.apps.filter(match);
+  return `<div class="static-note">깃허브로 직접 올린 자료입니다. <b>사이트에서 숨김</b>을 누르면 사이트 목록·검색·메인 카드에서 바로 사라지고, 언제든 <b>다시 표시</b>할 수 있습니다. 파일 자체는 지워지지 않습니다.</div>`
+    +(sc.length?`<div class="group-title">씬 자료</div>`+sc.map(x=>row(x,x.scene)).join(''):'')
+    +(ap.length?`<div class="group-title">기타 · 촬영용 앱</div>`+ap.map(x=>row(x,'APP')).join(''):'')
+    +(!sc.length&&!ap.length?'<div class="status" style="padding:20px 0">표시할 자료가 없습니다.</div>':'');
+}
 function renderItems(){
   const q=$('#adminSearch').value.trim().toLowerCase();
+  if(currentTab==='static'){$('#items').innerHTML=renderStatic(q);return;}
   let items=allItems.filter(x=>currentTab==='trash'?!!x.deleted:!x.deleted);
   if(q)items=items.filter(x=>[x.part,x.scene,x.title,x.filename].join(' ').toLowerCase().includes(q));
   const box=$('#items');
