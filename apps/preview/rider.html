@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>달림콜 라이더 · 화면 미리보기</title>
+<title>달림콜 라이더 v13 · 화면 미리보기</title>
 <link rel="stylesheet" href="phone.css">
+<link rel="stylesheet" href="rider-v13.css">
 <style>
 /* 달림콜 (딥네이비 · 틸 · 앰버) */
 .r{--ink:#132A32;--teal:#13B89A;--paper:#F3F6F5;--amber:#F29A2E;background:var(--paper)}
@@ -195,13 +196,13 @@
 .r .newtag{display:inline-block;background:var(--teal);color:#fff;font-size:9px;font-weight:900;border-radius:5px;padding:2px 5px;margin-left:6px;vertical-align:2px}
 </style>
 </head>
-<body>
+<body class="rider-preview">
 <header class="pv-top">
   <a class="pv-back" href="../showcase/index.html">← 촬영용 앱 화면</a>
-  <div class="pv-title">달림콜 라이더 <span>v10 · 예약 알림 / 긴 경로</span></div>
+  <div class="pv-title">달림콜 라이더 <span>v13 · 검은 화면 팝업 / 보너스 카드</span></div>
   <div class="pv-links">
     <a href="../showcase/index.html">화면 캡처 보기</a>
-    <a class="solid" href="../dallim-rider-v10-schedule-route.apk" download>APK 내려받기</a>
+    <a class="solid" href="../dallim-rider-v13-black-screen.apk" download>APK 내려받기</a>
   </div>
 </header>
 <main class="pv-main">
@@ -224,18 +225,19 @@
 <script src="phone.js"></script>
 <script>
 const cfg = {
-  store: '윤담헌 한정식', address: '서연동 나래타워 1층',
+  store: '예담손만두', address: '서연동 나래타워 1층',
   standardStore: '온기분식 서연점', nextAddress: '서연동 달빛로 28',
   specialStore: '달빛치킨 서연점', specialAddress: '서연동 은하수길 17',
   callFee: 3000, bonus: 2000, standardFee: 2800, specialFee: 4000,
-  vehicle: '오토바이', film: '서연동', km: '5.9 km', mins: '약 13분'
+  vehicle: '오토바이', film: '서연동', km: '1.2 km', mins: '약 3분', firstDelay: 6, specialGap: 5
 };
 const total = cfg.callFee + cfg.bonus;
-let st = { phase: 'accepted', seconds: 540, moving: false };
+let st = { phase: 'accepted', seconds: 540, moving: false, waiting: false, blackStage: 0 };
 let ticker = null;
+let blackTimers = [], bonusDelay = null;
 
 /* ── 가상 지명 지도 (SVG · 외부 지도 없이 그린다) ───────────── */
-const ROUTE = 'M 34 196 L 34 150 L 104 150 L 104 98 L 168 98 L 168 176 L 244 176 L 244 120 L 316 120 L 316 64 L 358 64';
+const ROUTE = 'M 34 176 L 104 176 L 104 64 L 358 64';
 function mapSvg() {
   return `<svg viewBox="0 0 390 212" preserveAspectRatio="xMidYMid slice">
     <rect width="390" height="212" fill="#eaf0ec"/>
@@ -262,10 +264,10 @@ function mapSvg() {
     </g>
     <path d="${ROUTE}" stroke="#fff" stroke-width="12" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
     <path d="${ROUTE}" stroke="#13B89A" stroke-width="7" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="104" cy="98" r="11" fill="#132A32"/><text x="100" y="102" font-size="9" fill="#fff" font-weight="bold">P</text>
+    <circle cx="104" cy="176" r="11" fill="#132A32"/><text x="100" y="180" font-size="9" fill="#fff" font-weight="bold">P</text>
     <circle cx="358" cy="64" r="11" fill="#D94B45"/><text x="354" y="68" font-size="9" fill="#fff" font-weight="bold">D</text>
-    <circle cx="${st.moving ? 244 : 168}" cy="${st.moving ? 150 : 130}" r="17" fill="#13B89A33"/>
-    <circle cx="${st.moving ? 244 : 168}" cy="${st.moving ? 150 : 130}" r="9" fill="#13B89A" stroke="#fff" stroke-width="3.5"/>
+    <circle cx="${st.moving ? 34.2 : 34}" cy="176" r="17" fill="#1577ef33"/>
+    <circle cx="${st.moving ? 34.2 : 34}" cy="176" r="9" fill="#1577ef" stroke="#fff" stroke-width="3.5"/>
   </svg>
   <div class="mapchip">FILM LOCATION · ${cfg.film} · 가상 지명</div>`;
 }
@@ -278,14 +280,11 @@ const timerDock = () => {
   const tone = st.seconds <= 60 ? '#D94B45' : st.seconds <= 180 ? '#F29A2E' : '#13B89A';
   const pct = Math.max(0, Math.min(100, st.seconds / 600 * 100));
   return `<div class="dock"><div class="timer">
-    <div class="between"><div><div class="teyebrow">도착 보너스 남은 시간</div><div class="tbonus">+${PV.money(cfg.bonus)}원 적용 중</div></div><div class="tlive">LIVE</div></div>
+    <div class="between"><div><div class="teyebrow">도착 보너스 남은 시간</div><div class="tbonus">+${PV.money(cfg.bonus)}원 적용 중</div></div><div class="timer-tools"><button class="time-hotspot" data-act="time-edit" aria-label="숨은 시간 설정"></button><div class="tlive">LIVE</div></div></div>
     <div class="tbig" style="color:${tone}">${PV.clock(st.seconds)}</div>
     <div class="track"><i style="width:${pct}%;background:${tone}"></i></div>
-    <div class="earn">
-      <div><span>배달 수수료</span><b>${PV.money(cfg.callFee)}원</b></div><div class="plus">＋</div>
-      <div><span>도착 보너스</span><b style="color:#13B89A">${PV.money(cfg.bonus)}원</b></div>
-      <div class="total"><span>예상 수입</span><b>${PV.money(total)}원</b></div>
-    </div></div></div>`;
+    <div class="money-grid"><div class="money-cell"><div class="money-label">배달 수수료</div><div class="money-value">${PV.money(cfg.callFee)}<i>원</i></div></div><div class="money-div"></div><div class="money-cell"><div class="money-label">도착 보너스</div><div class="money-value bonus">${PV.money(cfg.bonus)}<i>원</i></div></div></div>
+    <div class="money-total"><span>보너스 포함 예상 수입</span><b>${PV.money(total)}원</b></div></div></div>`;
 };
 
 const waitCard = () => `<div class="wait">
@@ -331,7 +330,7 @@ const slides = (special, acceptLabel) => `<div class="slides">
     <div class="sl-knob">←</div></div></div>`;
 
 const bottomBar = () => {
-  if (st.phase === 'waiting' || st.phase === 'fee') return `<div class="bottom"><div><div class="cap">운행 중 · 콜이 오면 바로 알려드립니다</div><div class="st">${cfg.vehicle} · ${cfg.film}</div></div><button class="btn dark" data-go="accepted">운행 중</button></div>`;
+  if (st.phase === 'waiting' || st.phase === 'fee' || (st.waiting && ['offer','special'].includes(st.phase))) return `<div class="bottom"><div><div class="cap">운행 중 · 콜이 오면 바로 알려드립니다</div><div class="st">${cfg.vehicle} · ${cfg.film}</div></div><button class="btn dark" data-go="accepted">운행 중</button></div>`;
   const first = st.phase === 'accepted';
   return `<div class="bottom"><div><div class="cap">${first ? '매장에서 상품을 확인한 뒤 눌러주세요' : '안전 운행 중 · 도착지까지 ' + cfg.mins}</div>
     <div class="st">${first ? '픽업 준비 완료' : '픽업 완료 · 전달지 이동'}</div></div>
@@ -340,8 +339,8 @@ const bottomBar = () => {
 
 /* ── 장면별 전체 화면 ───────────────────────── */
 function mainScreen() {
-  const idle = st.phase === 'waiting' || st.phase === 'fee';
-  const timed = ['timer', 'bonus', 'earnings', 'offer', 'special'].includes(st.phase);
+  const idle = st.phase === 'waiting' || st.phase === 'fee' || (st.waiting && ['offer', 'special'].includes(st.phase));
+  const timed = st.phase === 'timer';
   let html = header(idle) + `<div class="map${timed ? ' small' : ''}">${mapSvg()}</div>`;
   if (timed) html += timerDock();
   html += '<div class="body">';
@@ -355,11 +354,9 @@ function mainScreen() {
     <div class="stitle">배달 수수료 <i>${PV.money(cfg.callFee)}원</i></div>
     <div class="sroute">${cfg.store}  →  ${cfg.address}</div>${slides(false, '밀어서 수락')}</div></div>`;
 
-  if (st.phase === 'bonus') html += `<div class="veil mid"><div class="pop">
-    <div class="bicon">＋</div><div class="peyebrow">도착 인센티브 적용</div>
-    <div class="ptitle">10분 이내 도착 보너스</div><div class="pnum">+${PV.money(cfg.bonus)}<i>원</i></div>
-    <div class="psub">접수 시점부터 시간이 계산됩니다.\n잠시 후 배달 화면으로 돌아갑니다.</div>
-    <button class="primary" data-go="timer">확인</button></div></div>`;
+  if (st.phase === 'bonus') html += `<div class="veil mid"><div class="arrival-bonus"><div class="arrival-head">도착 보너스<span class="arrival-badge">추가 지급</span></div><div class="arrival-title">10분 안에 도착하면</div><div class="arrival-subtitle">이번 배달에 보너스가 더해집니다</div><div class="arrival-amount-box"><div class="arrival-amount">+${PV.money(cfg.bonus)}<i>원</i></div><div class="arrival-rule"><i></i>10분 이내 전달 완료</div></div><div class="arrival-summary"><span>배달 수수료</span><b>${PV.money(cfg.callFee)}원</b></div><div class="arrival-summary total"><span>보너스 포함 수입</span><b>${PV.money(total)}원</b></div><div class="arrival-note">접수 시점부터 남은 시간이 계산됩니다.</div><button class="arrival-confirm" data-go="timer">확인</button></div></div>`;
+
+  if (st.phase === 'bonusFailed') html += `<div class="veil mid"><div class="failed"><div class="failed-mark">!</div><div class="peyebrow" style="color:#d94b45">도착 보너스 실패</div><div class="ptitle">보너스 시간이 종료됐어요</div><div class="psub">2,000원 보너스는 적용되지 않지만<br>현재 배달은 그대로 이어갈 수 있어요.</div><button class="primary" data-go="delivery">배달 이어하기</button></div></div>`;
 
   if (st.phase === 'earnings') html += `<div class="veil"><div class="sheet settle"><div class="handle"></div>
     <div class="kick">배달 예상 수입</div>
@@ -380,17 +377,19 @@ function mainScreen() {
         <b class="${sp ? 'am' : ''}">${PV.money(sp ? cfg.specialFee : cfg.standardFee)}원</b></div>
       <div class="sroute">${sp ? cfg.specialStore : cfg.standardStore}\n→ ${sp ? cfg.specialAddress : cfg.nextAddress}</div>
       ${slides(sp, sp ? '밀어서 특별콜 수락' : '밀어서 수락')}</div></div>`;
+    if (sp) html += '<div class="special-banner">배달료 특! 4,000원</div>';
   }
   return html;
 }
 
 function lockScreen() {
-  return `<div class="lock">
-    <div class="date">9월 17일 목요일</div><div class="time">9:41</div>
-    <div class="noti"><div class="ico">달</div><div class="grow">
-      <div class="t"><b>새로운 배달 요청</b><span>지금</span></div>
-      <p>배달 수수료 ${PV.money(cfg.callFee)}원 · ${cfg.store} → ${cfg.address}</p></div></div>
-    <div class="hint">화면이 꺼져 있어도 예약해 둔 시간에 알림이 뜹니다.<br>알림을 누르면 바로 콜 수락 화면이 열립니다.</div></div>`;
+  const card = sp => `<div class="black-card ${sp ? 'special' : ''}" data-go="${sp ? 'special' : 'offer'}"><div class="black-app"><div class="black-icon">달</div><span class="black-name">달림콜</span><span class="black-now">지금</span></div><div class="black-title">${sp ? '배달료 특!' : '새 배달 요청'}<span class="black-tag">${sp ? '우선 배차' : '주변 주문'}</span></div><div class="black-amount">${PV.money(sp ? cfg.specialFee : cfg.standardFee)}<i>원</i></div><div class="black-route"><span>픽업</span><b>${sp ? cfg.specialStore : cfg.standardStore}</b></div><div class="black-route"><span>전달</span><b>${sp ? cfg.specialAddress : cfg.nextAddress}</b></div><div class="black-footer">눌러서 배달 요청 확인<i>›</i></div></div>`;
+  return `<div class="blackstage"><div class="black-cards">${st.blackStage >= 2 ? card(true) : ''}${st.blackStage >= 1 ? card(false) : ''}</div><button class="black-exit" data-go="blackSettings" aria-label="검은 화면 촬영 종료"></button></div>`;
+}
+
+function blackSettingsScreen() {
+  const choices = (values, key) => `<div class="popup-options ${key === 'specialGap' ? 'gap' : ''}">${values.map(v => `<button data-delay="${key}" data-value="${v}" class="${cfg[key] === v ? 'on' : ''}">${v}초</button>`).join('')}</div>`;
+  return `<div class="set"><div class="top"><div class="back" data-go="settings">‹</div><h3>검은 화면 팝업 시간</h3></div><div class="help">촬영 시작 버튼을 누르면 화면이 검게 바뀌고 두 번의 팝업이 나타납니다. 화면은 켜둔 채 촬영하며 전원 버튼으로 잠그지 마세요.</div><div class="lab">첫 2,800원 알림</div><div class="help">버튼을 누른 뒤 몇 초 후에 받을지 선택</div>${choices([5,6,7], 'firstDelay')}<div class="lab">4,000원 특별 알림 간격</div><div class="help">첫 알림이 온 뒤 몇 초 후에 받을지 선택</div>${choices([2,3,5,7,10,15], 'specialGap')}<div class="popup-order">${cfg.firstDelay}초 후 · 새 배달 요청 2,800원<br><span style="color:#d87813">${cfg.firstDelay+cfg.specialGap}초 후 · 우선 배차 4,000원</span></div><button class="arrival-confirm" data-go="notify">이 시간으로 검은 화면 촬영 시작</button><button class="primary" data-go="settings" style="background:#e9efed;color:#132a32">시간 설정만 저장</button><div class="help">검은 화면 하단 빈 공간을 누르면 종료합니다. 팝업을 누르면 해당 배달콜 화면이 열립니다.</div></div>`;
 }
 
 function controlScreen() {
@@ -421,6 +420,8 @@ function controlScreen() {
       <button class="cbtn acc" data-go="notify">30초 뒤 콜</button><button class="cbtn acc" data-go="notify">1분 뒤 콜</button>
       <button class="cbtn acc" data-go="notify">3분 뒤 콜</button><button class="cbtn acc" data-go="notify">5분 뒤 콜</button>
       <button class="cbtn warn">예약 모두 취소</button></div>
+    <div class="csec">검은 화면 팝업 촬영</div><div class="cgrid"><button class="cbtn acc" data-go="notify">검은 화면 시작<br>${cfg.firstDelay}초 뒤 2,800원 → +${cfg.specialGap}초 4,000원</button><button class="cbtn" data-go="blackSettings">팝업 시간 설정</button></div>
+    <div class="chint">시작하면 검은 화면에서 팝업이 자동으로 등장합니다. 전원 버튼은 누르지 마세요.</div>
     <div class="chint">예약 알림은 앱을 닫거나 화면을 꺼도 잠금화면에 뜹니다. 알림을 누르면 바로 콜 화면이 열립니다. 시간이 밀리면 휴대폰 설정에서 달림콜을 배터리 최적화 제외로 두세요.</div>
     <div class="chint">앱 로고를 0.8초 길게 누르면 언제든 이 화면이 열립니다.</div></div>`;
 }
@@ -437,6 +438,8 @@ function settingsScreen() {
     <div class="link"><div><b>FILM LOCATION</b><span>${cfg.film} · 37.49800, 127.02700</span></div><i>›</i></div>
     <div class="lab">가상 이동 수단</div>
     <div class="choices"><div class="choice">도보</div><div class="choice">자전거</div><div class="choice on">오토바이</div><div class="choice">자동차</div></div>
+    <div class="lab">숨은 버튼 위치 안내</div><div class="guide"><p>앱 로고 0.8초 · 촬영 CONTROL 열기</p><p>왼쪽 상단 0.65초 · 보너스 화면</p><p>왼쪽 중앙 위/아래 · 1분 / 10초 타이머</p><p>왼쪽 / 오른쪽 하단 0.65초 · 2,800원 / 4,000원 콜</p><p>하단 중앙 0.65초 · 콜 대기 화면</p><p>LIVE 위 빈 공간 · 시간 설정</p></div>
+    <div class="link tap" data-go="blackSettings"><div><b>검은 화면 팝업 촬영</b><span>${cfg.firstDelay}초 후 2,800원 → ${cfg.specialGap}초 간격 → 4,000원</span></div><i>›</i></div>
     ${field('앱 이름', '달림콜')}
     ${field('픽업 상호', cfg.store)}
     ${field('전달지', cfg.address)}
@@ -446,10 +449,9 @@ function settingsScreen() {
     ${field('표준 콜 수수료 (원)', '2800', 1, 1)}
     ${field('특별 콜 상호', cfg.specialStore)}
     ${field('특별 콜 수수료 (원)', '4000', 1, 1)}
-    ${field('경로 경유지 수 (0~10)', '4', 1, 1)}
-    ${field('경로 반경 (m)', '700', 1, 1)}
+    ${field('단순 경로 우회 크기 (m)', '700', 1)}
     ${field('타이머 배속', '1', 1)}
-    <div class="help">NEW 표시된 항목이 v10에서 새로 설정 가능해진 값입니다. 경유지 수·반경을 올리면 지도 경로가 더 길고 복잡해집니다.</div></div>`;
+    <div class="help">가상 이동은 12분 동안 경로의 약 1.5%만 움직입니다. 지도 카메라는 고정되어 있습니다.</div></div>`;
 }
 
 /* ── 렌더 & 조작 ────────────────────────────── */
@@ -460,7 +462,8 @@ function stopTicker() { if (ticker) { clearInterval(ticker); ticker = null; } }
 
 function paint() {
   let html, bar = 'sbar';
-  if (st.phase === 'notify') { html = lockScreen(); bar = 'sbar dim'; }
+  if (st.phase === 'notify') { html = lockScreen(); bar = 'sbar hidden'; }
+  else if (st.phase === 'blackSettings') { html = blackSettingsScreen(); bar = 'sbar light'; }
   else if (st.phase === 'control') { html = controlScreen(); bar = 'sbar dim'; }
   else if (st.phase === 'settings') { html = settingsScreen(); bar = 'sbar light'; }
   else html = mainScreen();
@@ -473,18 +476,25 @@ function wire() {
   app.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => setPhase(b.dataset.go)));
   app.querySelectorAll('[data-timer]').forEach(b => b.addEventListener('click', () => { st.seconds = Number(b.dataset.timer); setPhase('timer'); }));
   app.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => {
-    if (b.dataset.act === 'bonus') return setPhase('bonus');
+    if (b.dataset.act === 'bonus') { b.disabled = true; b.textContent = '확인 중…'; bonusDelay = setTimeout(() => { bonusDelay = null; st.seconds = 600; setPhase('bonus'); }, 850); return; }
     if (b.dataset.act === 'move') { st.moving = true; paint(); }
+    if (b.dataset.act === 'time-edit') {
+      stopTicker();
+      const veil = document.createElement('div'); veil.className = 'veil mid time-editor';
+      veil.innerHTML = `<div class="arrival-bonus"><div class="arrival-title">도착 시간 수정</div><div class="time-inputs"><input id="edit-minutes" type="number" min="0" max="99" value="${Math.floor(st.seconds/60)}"><span>:</span><input id="edit-seconds" type="number" min="0" max="59" value="${st.seconds%60}"></div><button class="arrival-confirm">적용</button></div>`;
+      app.appendChild(veil); veil.querySelector('button').onclick = () => { st.seconds = Math.max(0, Math.min(5999, Number(veil.querySelector('#edit-minutes').value)*60+Number(veil.querySelector('#edit-seconds').value))); setPhase(st.seconds > 0 ? 'timer' : 'bonusFailed'); };
+    }
   }));
+  app.querySelectorAll('[data-delay]').forEach(b => b.addEventListener('click', () => { cfg[b.dataset.delay] = Number(b.dataset.value); paint(); }));
   const accept = app.querySelector('[data-slide="accept"]');
   const reject = app.querySelector('[data-slide="reject"]');
   if (accept) PV.slider(accept, { direction: 'right', onComplete: () => {
     if (reject) reject.dataset.locked = '1';
-    st.phase === 'fee' ? setPhase('bonus') : setPhase('timer');
+    setPhase(st.phase === 'fee' || st.waiting ? 'accepted' : 'timer');
   } });
   if (reject) PV.slider(reject, { direction: 'left', onComplete: () => {
     if (accept) accept.dataset.locked = '1';
-    setPhase(st.phase === 'fee' ? 'waiting' : 'timer');
+    setPhase(st.phase === 'fee' || st.waiting ? 'waiting' : 'timer');
   } });
   const logo = app.querySelector('.brand');
   if (logo) logo.addEventListener('click', () => setPhase('control'));
@@ -493,20 +503,29 @@ function wire() {
   const close = app.querySelector('.ctl .close');
   if (close) close.addEventListener('click', () => setPhase('timer'));
   const back = app.querySelector('.set .back');
-  if (back) back.addEventListener('click', () => setPhase('timer'));
+  if (back && !back.dataset.go) back.addEventListener('click', () => setPhase('timer'));
   const noti = app.querySelector('.noti');
   if (noti) noti.addEventListener('click', () => setPhase('call'));
 }
 
 function setPhase(next) {
   stopTicker();
+  blackTimers.forEach(clearTimeout); blackTimers = [];
+  if (bonusDelay) { clearTimeout(bonusDelay); bonusDelay = null; }
+  if (['waiting', 'call', 'notify'].includes(next)) st.waiting = true;
+  if (['accepted', 'timer', 'delivery', 'bonus'].includes(next)) st.waiting = false;
   if (next === 'call') { st.phase = 'fee'; }
   else if (next === 'waiting') { st.phase = 'waiting'; }
   else st.phase = next;
+  if (st.phase === 'notify') {
+    st.blackStage = document.body.classList.contains('shot') ? 2 : 0;
+    if (!document.body.classList.contains('shot')) blackTimers = [setTimeout(() => { st.blackStage = 1; paint(); }, cfg.firstDelay*1000), setTimeout(() => { st.blackStage = 2; paint(); }, (cfg.firstDelay+cfg.specialGap)*1000)];
+  }
   if (st.phase === 'timer' && !document.body.classList.contains('shot')) {
     ticker = setInterval(() => {
       st.seconds = Math.max(0, st.seconds - 1);
       if (st.phase !== 'timer') return stopTicker();
+      if (st.seconds === 0) return setPhase('bonusFailed');
       paint();
     }, 1000);
   }
@@ -524,9 +543,12 @@ PV.boot({
     { id: 'earnings', label: '예상 수입 정산', cap: '수수료와 보너스가 합쳐진 예상 수입 시트입니다.' },
     { id: 'offer', label: '표준 콜 알림', cap: '배달 중에 다음 콜이 들어오는 장면입니다.' },
     { id: 'special', label: '특별 콜 알림', cap: '고수익 특별 콜은 앰버 색으로 구분되고 슬라이더도 함께 바뀝니다.' },
-    { id: 'notify', label: '예약 알림 (잠금화면)', cap: 'v10 신규. 예약해 둔 시간에 화면이 꺼져 있어도 잠금화면에 콜 알림이 뜹니다. 알림을 누르면 바로 콜 화면이 열립니다.' },
+    { id: 'notify', label: '검은 화면 · 두 팝업', cap: 'v13. 검은 화면에서 2,800원 → 4,000원 팝업이 나타납니다. 등장 시간은 설정 메뉴에서 선택합니다. 실제 촬영에서는 전원 버튼을 누르지 않습니다.' },
     { id: 'control', label: '촬영 CONTROL 패널', cap: '앱 로고를 0.8초 길게 누르면 열립니다. 장면·타이머·콜 알림·콜 예약을 여기서 한 번에 조작합니다.' },
-    { id: 'settings', label: '촬영 설정', cap: 'v10에서 수수료·보너스·경유지 수·경로 반경까지 촬영 현장에서 직접 바꿀 수 있습니다.' }
+    { id: 'settings', label: '설정 · 숨은 버튼 안내', cap: '숨은 버튼 위치와 기능을 확인하고 검은 화면 촬영 메뉴를 열 수 있습니다.' },
+    { id: 'bonusFailed', label: '보너스 실패', cap: '시간이 끝나면 보너스 실패를 알리고 배달 이어하기를 선택할 수 있습니다.' },
+    { id: 'delivery', label: '배달 이어하기', cap: '보너스 종료 후에도 기존 배달을 계속 수행합니다.' },
+    { id: 'blackSettings', label: '검은 화면 팝업 시간', cap: '첫 팝업은 5·6·7초 중 선택하고 두 번째 팝업 간격은 2·3·5·7·10·15초 중 선택합니다.' }
   ],
   render: scene => {
     stopTicker();

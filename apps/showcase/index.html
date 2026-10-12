@@ -88,23 +88,26 @@ h1{margin:0;font-size:34px;letter-spacing:-.03em}
 <script>
 const APPS = [
   {
-    id: 'rider', name: '달림콜 라이더', meta: 'v10 · 예약 알림 / 긴 경로 · 50.2MB',
-    desc: '배달 라이더 앱. 콜 대기 → 수락 → 도착 보너스 타이머 → 정산까지 촬영 순서대로 흘러가고, 화면이 꺼져 있어도 지정한 시간에 콜 알림이 뜹니다. 지도의 도로·건물·학교 이름은 모두 가상 지명입니다.',
-    preview: '../preview/rider.html', apk: '../dallim-rider-v10-schedule-route.apk', qr: '../qr/dallim-rider-v9-waiting-map.png',
-    note: '앱 로고를 0.8초 길게 누르면 촬영 CONTROL 패널이 열립니다. 예약 알림이 밀리지 않도록 휴대폰 설정에서 배터리 최적화 제외로 두세요.',
+    id: 'rider', name: '달림콜 라이더', meta: 'v13 · 검은 화면 팝업 / 새 보너스 카드 · 50.2MB',
+    desc: '예담손만두 배달 접수부터 보너스·정산까지. 수수료와 보너스 금액을 크게 표시하고, 단순한 지도 경로와 검은 화면의 2,800원 → 4,000원 팝업 촬영을 지원합니다.',
+    preview: '../preview/rider.html#bonus', apk: '../dallim-rider-v13-black-screen.apk', qr: '../qr/dallim-rider-v13-black-screen.png',
+    note: '앱 로고를 0.8초 길게 누르면 촬영 CONTROL이 열립니다. 검은 화면 팝업 촬영에서는 전원 버튼으로 잠그지 않고 화면을 켜둡니다. 하단 빈 공간을 0.8초 길게 누르면 종료됩니다.',
     shots: [
       ['01-waiting', '콜 대기 중', '운행을 시작하면 콜이 올 때까지 대기 화면이 유지됩니다. 오늘 배달 건수·수입·수락률이 함께 표시됩니다.'],
       ['02-call', '콜 수신 · 수락/거절', '콜이 들어오면 수수료와 경로가 시트로 올라옵니다. 초록 슬라이더를 오른쪽 끝까지 밀면 수락, 아래 슬라이더를 왼쪽으로 밀면 거절입니다.'],
       ['03-accepted', '배달 접수 확인', '픽업·전달지와 이동거리·예상시간·배달수단이 한 화면에 정리됩니다.'],
-      ['04-bonus', '도착 보너스 팝업', '접수 완료를 누르면 10분 이내 도착 보너스가 안내되고, 확인과 동시에 타이머가 시작됩니다.'],
-      ['05-timer', '타이머 진행 중', '타이머는 스크롤하지 않아도 지도 바로 아래에 고정되어 첫 화면에서 바로 보입니다.'],
+      ['04-bonus', '새 도착 보너스 카드', '금액과 지급 조건을 정돈한 v13 디자인입니다. 확인을 눌러야 배달 화면으로 넘어갑니다.'],
+      ['05-timer', '큰 금액 · 타이머', '3,000원·2,000원은 34pt로 표시합니다. LIVE 위 빈 공간을 누르면 시간을 수정할 수 있습니다.'],
       ['06-timer-end', '종료 직전 00:10', '숨겨진 버튼으로 1분 전·종료 직전으로 한 번에 점프할 수 있습니다. 긴박한 컷을 여러 번 찍을 때 씁니다.'],
       ['07-earnings', '예상 수입 정산', '수수료와 보너스가 합쳐진 정산 시트입니다. 금액은 설정에서 바꿀 수 있습니다.'],
       ['08-offer', '표준 콜 알림', '배달 중 다음 콜이 들어오는 장면입니다.'],
       ['09-special', '특별 콜 알림', '고수익 특별 콜은 앰버 색으로 구분되고 슬라이더 색도 함께 바뀝니다.'],
-      ['10-lock-notify', '예약 알림 (잠금화면)', 'v10 신규. 예약한 시간이 되면 앱을 닫았거나 화면이 꺼져 있어도 잠금화면에 콜 알림이 뜨고, 누르면 바로 콜 화면이 열립니다.'],
+      ['10-lock-notify', '검은 화면 · 두 팝업', '앱 안의 검은 화면에서 2,800원 요청 뒤 4,000원 특별콜이 나타납니다. 첫 등장 시간과 두 알림 간격을 따로 선택합니다.'],
       ['11-control', '촬영 CONTROL 패널', '장면·타이머·콜 알림·콜 예약을 스태프가 한 화면에서 조작합니다. 같은 Wi-Fi의 배우폰을 원격으로 제어할 수도 있습니다.'],
-      ['12-settings', '촬영 설정', 'v10에서 수수료·보너스·경유지 수·경로 반경까지 현장에서 직접 바꿀 수 있게 되었습니다.']
+      ['12-settings', '설정 · 숨은 버튼 안내', '숨은 버튼 위치와 기능을 확인하고 검은 화면 팝업 촬영 메뉴를 열 수 있습니다.'],
+      ['13-bonus-failed', '보너스 실패', '남은 시간이 끝나면 보너스 실패를 안내하고 배달 이어하기를 선택할 수 있습니다.'],
+      ['14-delivery', '배달 이어하기', '보너스 종료 후에도 기존 배달을 계속 수행합니다.'],
+      ['15-black-settings', '팝업 등장 시간 설정', '첫 요청은 5·6·7초 중 선택하고 특별콜 간격은 2·3·5·7·10·15초 중 선택합니다.']
     ]
   },
   {
@@ -152,7 +155,7 @@ const $ = id => document.getElementById(id);
 $('tabs').innerHTML = APPS.map(a => '<button data-app="' + a.id + '">' + esc(a.name) + '</button>').join('');
 $('tabs').querySelectorAll('button').forEach(b => b.addEventListener('click', () => select(b.dataset.app, 0)));
 
-function shotSrc(i) { return 'shots/' + app.id + '/' + app.shots[i][0] + '.png'; }
+function shotSrc(i) { return 'shots/' + app.id + '/' + app.shots[i][0] + '.png' + (app.id === 'rider' ? '?v=13' : ''); }
 
 function paint() {
   const s = app.shots[index];
@@ -180,7 +183,7 @@ function select(id, at) {
     '<a class="ghost" href="' + app.apk + '" download>APK 내려받기</a>' +
     '<a class="ghost" href="' + app.qr + '" target="_blank">설치 QR</a>';
   $('thumbs').innerHTML = app.shots.map((s, i) =>
-    '<button data-i="' + i + '" title="' + esc(s[1]) + '"><img loading="lazy" src="shots/' + app.id + '/' + s[0] + '.png" alt="' + esc(s[1]) + '"></button>').join('');
+    '<button data-i="' + i + '" title="' + esc(s[1]) + '"><img loading="lazy" src="' + shotSrc(i) + '" alt="' + esc(s[1]) + '"></button>').join('');
   $('thumbs').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { index = Number(b.dataset.i); paint(); }));
   $('list').innerHTML = app.shots.map(s => '<li>' + esc(s[1]) + '</li>').join('');
   $('list').querySelectorAll('li').forEach((li, i) => { li.style.cursor = 'pointer'; li.addEventListener('click', () => { index = i; paint(); }); });
