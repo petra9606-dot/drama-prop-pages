@@ -22,21 +22,27 @@ h1{margin:0;font-size:38px;letter-spacing:-.03em}.sub{color:#7e8ba3;font-size:12
 </head>
 <body><main class="wrap">
 <a class="back" href="../index.html">← 피라밋</a>
-<div class="header"><div><h1>6부</h1><div class="sub">SCENE MATERIALS</div></div><div class="count" id="count">자료 불러오는 중...</div></div>
-<div class="filter"><input id="localSearch" placeholder="이 부에서 씬 / 제목 검색"></div><div id="grid" class="grid"></div>
+<div class="header"><div><h1>6부</h1><div class="sub">SCENE MATERIALS</div></div><div style="display:flex;align-items:center;gap:14px"><span id="dwuBtn"></span><div class="count" id="count">자료 불러오는 중...</div></div></div>
+<div id="dwuStrip"></div><div class="filter"><input id="localSearch" placeholder="이 부에서 씬 / 제목 검색"></div><div id="grid" class="grid"></div>
 </main>
 <script src="/static-items.js"></script>
+<script src="/updates.js"></script>
 <script>
+const PART="6부";
+DW_UPDATES.mountButton(document.getElementById("dwuBtn"));
+DW_UPDATES.mountStrip(document.getElementById("dwuStrip"),{limit:3,filter:x=>x.part===PART});
+document.addEventListener("click",e=>{const c=e.target.closest("#grid .card");if(!c)return;const x=(window.__cards||[])[+c.dataset.i];if(x){DW_UPDATES.markSeen(x);const b=c.querySelector(".dwu-badge");if(b)b.remove();}});
 let staticItems=[];
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 function render(uploaded=[]){
-  const all=[...staticItems.map(x=>({...x,pinned:false})),...uploaded.map(x=>({scene:x.scene,title:x.title||x.filename,filename:x.filename,url:x.url,source:"웹 업로드",pinned:!!x.pinned}))].sort((a,b)=>Number(!!b.pinned)-Number(!!a.pinned));
+  const all=[...staticItems.map(x=>({...x,pinned:false})),...uploaded.map(x=>({...x,scene:x.scene,title:x.title||x.filename,filename:x.filename,url:x.url,source:"웹 업로드",pinned:!!x.pinned}))].sort((a,b)=>(Number(!!b.pinned)-Number(!!a.pinned))||(Number(!!DW_UPDATES.badge(b))-Number(!!DW_UPDATES.badge(a))));
+  window.__cards=all;
   document.getElementById('count').textContent=all.length?`${all.length}개 자료`:'등록된 자료 없음';
   const box=document.getElementById('grid');
   if(!all.length){box.innerHTML='<div class="empty">아직 등록된 씬 자료가 없습니다.</div>';return;}
-  box.innerHTML=all.map(x=>`<a class="card" href="${x.url}" ${x.source==="웹 업로드"?'target="_blank"':''}>
+  box.innerHTML=all.map((x,i)=>`<a class="card" data-i="${i}" href="${x.url}" ${x.source==="웹 업로드"?'target="_blank"':''}>
     <div class="topline"><span class="scene">${esc(x.scene)}${x.pinned?" ★":""}</span><span class="source">${esc(x.source)}</span></div>
-    <div class="title">${esc(x.title)}</div>
+    <div class="title">${esc(x.title)}${DW_UPDATES.badgeHTML(x)}</div>${x.changeNote&&DW_UPDATES.badge(x)?`<div class="filename" style="color:#c9b27a">${esc(x.changeNote)}</div>`:''}
     <div class="filename">${esc(x.filename||'')}</div><div class="open">↗</div>
   </a>`).join('');
 }

@@ -58,9 +58,9 @@ h1{margin:0;font-size:38px;letter-spacing:-.03em}
   <a class="back" href="../index.html">← DisolveWorks</a>
   <div class="header">
     <div><h1>피라밋</h1><div class="sub">PROJECT · EPISODE ARCHIVE</div></div>
-    <div class="count" id="totalCount">씬 자료 불러오는 중...</div>
+    <div style="display:flex;align-items:center;gap:14px"><span id="dwuBtn"></span><div class="count" id="totalCount">씬 자료 불러오는 중...</div></div>
   </div>
-  <form class="searchbox" action="../search/" method="get"><input name="q" placeholder="피라밋 전체 검색"><button>검색</button></form><div class="grid" id="partGrid"></div>
+  <form class="searchbox" action="../search/" method="get"><input name="q" placeholder="피라밋 전체 검색"><button>검색</button></form><div id="dwuStrip"></div><div class="grid" id="partGrid"></div>
   <h2 class="misc-title">기타 · 촬영용 앱</h2>
   <p class="misc-sub">APK 내려받기 · QR로 폰에 설치 · 설치 없이 웹에서 화면 확인<br>
     <a href="../apps/showcase/index.html" style="color:#8fa8ff;text-decoration:none;font-weight:700">▸ 촬영용 앱 화면 모아보기 (설치 없이 주요 장면 전부 보기)</a></p>
@@ -105,7 +105,10 @@ h1{margin:0;font-size:38px;letter-spacing:-.03em}
 </main>
 
 <script src="/static-items.js"></script>
+<script src="/updates.js"></script>
 <script>
+DW_UPDATES.mountButton(document.getElementById("dwuBtn"));
+DW_UPDATES.mountStrip(document.getElementById("dwuStrip"),{limit:4});
 let staticItems = {};
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 
@@ -118,15 +121,16 @@ function render(uploaded=[]){
     const part=i+"부";
     const combined=[
       ...(staticItems[part]||[]).map(x=>({...x,source:"static"})),
-      ...(byPart[part]||[]).map(x=>({scene:x.scene,title:x.title||x.filename,source:"upload"}))
+      ...(byPart[part]||[]).map(x=>({...x,scene:x.scene,title:x.title||x.filename,source:"upload"}))
     ];
+    const fresh=combined.filter(x=>DW_UPDATES.badge(x)).length;
     total+=combined.length;
     const preview=combined.length
-      ? combined.slice(0,3).map(x=>`<div class="scene-row"><span class="scene-badge">${esc(x.scene)}</span><span class="scene-name">${esc(x.title)}</span></div>`).join('')
+      ? combined.slice(0,3).map(x=>`<div class="scene-row"><span class="scene-badge">${esc(x.scene)}</span><span class="scene-name">${esc(x.title)}</span>${DW_UPDATES.badgeHTML(x)}</div>`).join('')
         +(combined.length>3?`<div class="empty">외 ${combined.length-3}개</div>`:'')
       : `<div class="empty">아직 등록된 씬 자료가 없습니다.</div>`;
     html.push(`<a class="card" href="part${i}/index.html">
-      <div class="part-title"><strong>${part}</strong><span class="num">EP ${String(i).padStart(2,'0')}</span></div>
+      <div class="part-title"><strong>${part}${fresh?`<span class="dwu-dot">NEW ${fresh}</span>`:''}</strong><span class="num">EP ${String(i).padStart(2,'0')}</span></div>
       <div class="preview">${preview}</div>
       <div class="footer"><span>${combined.length ? `${combined.length}개 자료` : '등록 전'}</span><span class="arrow">→</span></div>
     </a>`);
@@ -139,7 +143,7 @@ let uploadedItems=[];
 render([]);
 DW_STATIC.then(({scenes,hidden})=>{
   staticItems={};
-  scenes.forEach(x=>(staticItems[x.part]??=[]).push({scene:x.scene,title:x.title}));
+  scenes.forEach(x=>(staticItems[x.part]??=[]).push(x));
   document.querySelectorAll('[data-sid]').forEach(el=>{if(hidden.has(el.dataset.sid))el.remove();});
   render(uploadedItems);
 });

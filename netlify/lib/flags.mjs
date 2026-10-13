@@ -57,3 +57,31 @@ export async function readStaticHidden(store) {
 export async function writeStaticHidden(store, list) {
   await store.setJSON(STATIC_HIDDEN_KEY, list);
 }
+
+// 업데이트 알림(최근 추가 · 수정 · 공지) 기록
+export const UPDATES_KEY = "__meta/updates.json";
+const UPDATES_MAX = 300;
+
+export async function readUpdates(store) {
+  try {
+    const v = await store.get(UPDATES_KEY, { type: "json" });
+    return Array.isArray(v) ? v : [];
+  } catch { return []; }
+}
+
+export async function writeUpdates(store, list) {
+  await store.setJSON(UPDATES_KEY, list.slice(0, UPDATES_MAX));
+}
+
+// entry: { type:"new"|"updated"|"notice", title, part, scene, note, url, key? }
+export async function pushUpdate(store, entry) {
+  const list = await readUpdates(store);
+  const item = { id: crypto.randomUUID(), at: new Date().toISOString(), ...entry };
+  list.unshift(item);
+  await writeUpdates(store, list);
+  return item;
+}
+
+export function cleanNote(v, max = 200) {
+  return String(v || "").replace(/\s+/g, " ").trim().slice(0, max);
+}

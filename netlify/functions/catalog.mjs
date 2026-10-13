@@ -33,6 +33,7 @@ export default async (req) => {
       title:m.title, filename:m.filename, contentType:m.contentType,
       size:m.size, uploadedAt:m.uploadedAt, updatedAt:m.updatedAt,
       pinned:!!m.pinned,
+      changedAt:m.changedAt || null, changeType:m.changeType || null, changeNote:m.changeNote || "",
       url:`/.netlify/functions/file?key=${encodeURIComponent(b.key)}`
     });
   }

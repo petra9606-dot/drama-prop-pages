@@ -18,6 +18,7 @@
 <div id="status" class="sub"></div><div id="results" class="results"></div>
 </main>
 <script src="/static-items.js"></script>
+<script src="/updates.js"></script>
 <script>
 const staticReady=DW_STATIC.then(d=>d.scenes);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -31,7 +32,7 @@ async function run(){
  const stat=(await staticReady).filter(x=>[x.projectName,x.part,x.scene,x.title,x.filename].join(' ').toLowerCase().includes(q));
  const all=[...stat,...uploaded];
  document.getElementById('status').textContent=`${all.length}개 결과`;
- document.getElementById('results').innerHTML=all.length?all.map(x=>`<a class="card" href="${x.url}" target="_blank"><span class="badge">${esc(x.part)} · ${esc(x.scene)}</span>${x.pinned?'<span class="pin">★</span>':''}<div class="title">${esc(x.title)}</div><div class="meta">${esc(x.projectName||'피라밋')} · ${esc(x.filename||'')}</div></a>`).join(''):'<div class="empty">검색 결과가 없습니다.</div>';
+ document.getElementById('results').innerHTML=all.length?all.map(x=>`<a class="card" href="${x.url}" target="_blank"><span class="badge">${esc(x.part)} · ${esc(x.scene)}</span>${x.pinned?'<span class="pin">★</span>':''}${DW_UPDATES.badgeHTML(x)}<div class="title">${esc(x.title)}</div><div class="meta">${esc(x.projectName||'피라밋')} · ${esc(x.filename||'')}</div></a>`).join(''):'<div class="empty">검색 결과가 없습니다.</div>';
 }
 const params=new URLSearchParams(location.search);if(params.get('q')){document.getElementById('q').value=params.get('q');run();}
 </script>

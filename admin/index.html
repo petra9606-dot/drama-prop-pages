@@ -49,13 +49,30 @@ input:focus,select:focus{border-color:#718cff}.filebox{border:1px dashed #3a465e
         <div><label>씬</label><input id="scene" name="scene" placeholder="예: 46" required></div>
         <div><label>화면 제목</label><input id="title" name="title" placeholder="예: 진술서 / 사내메일"></div>
         <div class="full"><label>파일</label><div class="filebox"><input type="file" id="file" name="file" required accept=".html,.htm,.png,.jpg,.jpeg,.webp,.gif,.pdf,.pptx,.xlsx,.docx,.txt,.zip"></div></div>
+        <div class="full"><label>업데이트 메모 (선택 · 방문자에게 보이는 소식)</label><input id="note" placeholder="예: 4부 37씬 PET-CT 화면 추가 / 병원명 수정"></div>
         <div><label class="check"><input type="checkbox" id="visible" checked> 일반 사이트에 공개</label></div>
         <div><label class="check"><input type="checkbox" id="pinned"> 상단 고정</label></div>
+        <div class="full"><label class="check"><input type="checkbox" id="announce" checked> 업데이트 소식으로 알리기 (사이트에 NEW 표시)</label></div>
       </div>
       <div class="actions"><button class="btn" type="submit">업로드</button><span id="uploadStatus" class="status">파일당 최대 4MB</span></div>
     </form>
   </section>
 
+  <section class="panel">
+    <h1 style="font-size:22px">업데이트 소식</h1>
+    <div class="sub" style="margin:3px 0 14px">웹 업로드 · 파일 교체 때는 자동으로 올라갑니다. 깃허브로 올린 자료나 따로 알릴 내용은 여기서 직접 쓰세요. 사이트 첫 화면 · 피라밋 · 각 부 페이지의 <b>업데이트</b> 버튼과 '최근 업데이트'에 보입니다.</div>
+    <div class="grid">
+      <div class="full"><label>자료 선택 (선택 · 깃허브 자료에서 고르면 부 · 씬 · 제목 · 링크가 채워집니다)</label><select id="nSrc"><option value="">직접 입력</option></select></div>
+      <div><label>종류</label><select id="nType"><option value="updated">수정</option><option value="new">새 자료</option><option value="notice">공지</option></select></div>
+      <div><label>부 (선택)</label><select id="nPart"><option value="">없음</option></select></div>
+      <div><label>씬 (선택)</label><input id="nScene" placeholder="예: 37"></div>
+      <div><label>제목</label><input id="nTitle" placeholder="예: PET-CT 판독 화면"></div>
+      <div class="full"><label>내용</label><input id="nNote" placeholder="예: 병원명을 다온대학교병원으로 수정했습니다."></div>
+      <div class="full"><label>링크 (선택)</label><input id="nUrl" placeholder="/pyramid/part4/scene37-petct.html"></div>
+    </div>
+    <div class="actions"><button class="btn" onclick="postNotice()">소식 올리기</button><span id="nStatus" class="status"></span></div>
+    <div id="notices" style="margin-top:14px"></div>
+  </section>
   <section class="panel">
     <div class="toolbar">
       <div><h1 style="font-size:22px">콘텐츠 관리</h1><div class="sub" style="margin:3px 0 0">검색 · 수정 · 교체 · 숨김 · 고정 · 휴지통 · 깃허브 자료 숨김</div></div>
@@ -74,6 +91,7 @@ input:focus,select:focus{border-color:#718cff}.filebox{border:1px dashed #3a465e
       <div><label>부</label><select id="editPart"></select></div>
       <div><label>씬</label><input id="editScene"></div>
       <div class="full"><label>화면 제목</label><input id="editTitle"></div>
+      <div class="full"><label>수정 내용 알리기 (입력하면 사이트에 '수정됨'으로 표시 · 비우면 알리지 않음)</label><input id="editNote" placeholder="예: 제목 오타 수정"></div>
       <div><label class="check"><input type="checkbox" id="editVisible"> 일반 사이트에 공개</label></div>
       <div><label class="check"><input type="checkbox" id="editPinned"> 상단 고정</label></div>
     </div>
@@ -87,6 +105,8 @@ input:focus,select:focus{border-color:#718cff}.filebox{border:1px dashed #3a465e
     <div class="sub" id="replaceName"></div>
     <input type="hidden" id="replaceKey">
     <div class="filebox"><input type="file" id="replaceFile"></div>
+    <div style="margin-top:12px"><label>무엇을 바꿨나요? (선택 · 방문자에게 보이는 소식)</label><input id="replaceNote" placeholder="예: 병원명 다온대학교병원으로 수정"></div>
+    <label class="check" style="margin-top:10px"><input type="checkbox" id="replaceAnnounce" checked> 업데이트 소식으로 알리기 (사이트에 '수정됨' 표시)</label>
     <div class="actions"><button class="btn" onclick="replaceFile()">교체하기</button><button class="btn secondary" onclick="closeModal('replaceModal')">취소</button><span id="replaceStatus" class="status"></span></div>
   </div>
 </div>
@@ -94,12 +114,12 @@ input:focus,select:focus{border-color:#718cff}.filebox{border:1px dashed #3a465e
 <script>
 const $=s=>document.querySelector(s);
 let allItems=[], currentTab='active', staticData={scenes:[],apps:[]}, staticHidden=new Set();
-for(let i=1;i<=12;i++){for(const id of ['part','editPart']){const o=document.createElement('option');o.value=i;o.textContent=i+'부';document.getElementById(id).appendChild(o);}}
+for(let i=1;i<=12;i++){for(const id of ['part','editPart','nPart']){const o=document.createElement('option');o.value=i;o.textContent=i+'부';document.getElementById(id).appendChild(o);}}
 
 async function login(){const r=await fetch('/.netlify/functions/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('#password').value})});const j=await r.json().catch(()=>({}));if(!r.ok){$('#loginStatus').textContent=j.error||'로그인 실패';$('#loginStatus').className='status badtxt';return;}showAdmin();}
 async function logout(){await fetch('/.netlify/functions/admin-logout',{method:'POST'});location.reload();}
-async function checkSession(){const r=await fetch('/.netlify/functions/admin-list');if(r.ok){$('#loginView').style.display='none';$('#adminView').style.display='block';const j=await r.json();allItems=j.items||[];renderItems();loadStatic();}}
-async function showAdmin(){$('#loginView').style.display='none';$('#adminView').style.display='block';await loadItems();}
+async function checkSession(){const r=await fetch('/.netlify/functions/admin-list');if(r.ok){$('#loginView').style.display='none';$('#adminView').style.display='block';const j=await r.json();allItems=j.items||[];renderItems();loadStatic();loadNotices();}}
+async function showAdmin(){$('#loginView').style.display='none';$('#adminView').style.display='block';await loadItems();loadNotices();}
 $('#password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
 
 $('#uploadForm').addEventListener('submit',async e=>{
@@ -107,12 +127,12 @@ $('#uploadForm').addEventListener('submit',async e=>{
   const fd=new FormData(), opt=$('#project').selectedOptions[0];
   fd.append('project',$('#project').value);fd.append('projectName',opt.dataset.name||opt.textContent);
   fd.append('part',$('#part').value);fd.append('scene',$('#scene').value);fd.append('title',$('#title').value);
-  fd.append('visible',$('#visible').checked?'true':'false');fd.append('pinned',$('#pinned').checked?'true':'false');fd.append('file',f);
+  fd.append('visible',$('#visible').checked?'true':'false');fd.append('note',$('#note').value);fd.append('announce',$('#announce').checked?'true':'false');fd.append('pinned',$('#pinned').checked?'true':'false');fd.append('file',f);
   $('#uploadStatus').textContent='업로드 중...';
   const r=await fetch('/.netlify/functions/admin-upload',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));
   if(!r.ok){$('#uploadStatus').textContent=j.error||'업로드 실패';$('#uploadStatus').className='status badtxt';return;}
   $('#uploadStatus').textContent=`업로드 완료 ✓ ${$('#part').value}부 · ${$('#scene').value.replace(/씬$/,'')}씬 · ${$('#title').value||f.name.replace(/\.[^.]+$/,'')}`;
-  $('#uploadStatus').className='status oktxt';$('#file').value='';$('#title').value='';await loadItems();
+  $('#uploadStatus').className='status oktxt';$('#file').value='';$('#title').value='';$('#note').value='';await loadItems();loadNotices();
 });
 
 async function loadItems(){const r=await fetch('/.netlify/functions/admin-list',{cache:'no-store'});if(r.status===401){location.reload();return;}const j=await r.json().catch(()=>({}));if(!r.ok){alert((j&&j.error)?j.error:('목록을 불러오지 못했습니다 ('+r.status+')'));return;}allItems=j.items||[];renderItems();loadStatic();}
@@ -124,7 +144,7 @@ async function loadStatic(){
     fetch('/static-items.json',{cache:'no-cache'}).then(r=>r.json()).catch(()=>({scenes:[],apps:[]})),
     fetch('/.netlify/functions/static-hidden',{cache:'no-store'}).then(r=>r.json()).then(j=>j.hidden||[]).catch(()=>[])
   ]);
-  staticData={scenes:d.scenes||[],apps:d.apps||[]};staticHidden=new Set(h);
+  staticData={scenes:d.scenes||[],apps:d.apps||[]};staticHidden=new Set(h);fillNoticeSources();
   if(currentTab==='static')renderItems();
 }
 async function toggleStatic(id,hide){
@@ -168,11 +188,11 @@ function renderItems(){
   </div>`).join('');
 }
 function itemByKey(k){return allItems.find(x=>x.key===k);}
-function openEdit(k){const x=itemByKey(k);if(!x)return;$('#editKey').value=k;$('#editPart').value=x.partNum||parseInt(x.part);$('#editScene').value=(x.sceneRaw||x.scene||'').replace(/씬$/,'');$('#editTitle').value=x.title||'';$('#editVisible').checked=x.visible!==false;$('#editPinned').checked=!!x.pinned;$('#editModal').classList.add('show');}
-async function saveEdit(){const body={key:$('#editKey').value,partNum:Number($('#editPart').value),sceneRaw:$('#editScene').value,title:$('#editTitle').value,visible:$('#editVisible').checked,pinned:$('#editPinned').checked};const j=await apiPost('/.netlify/functions/admin-update',body);if(!j)return;closeModal('editModal');await loadItems();}
+function openEdit(k){const x=itemByKey(k);if(!x)return;$('#editKey').value=k;$('#editPart').value=x.partNum||parseInt(x.part);$('#editScene').value=(x.sceneRaw||x.scene||'').replace(/씬$/,'');$('#editTitle').value=x.title||'';$('#editVisible').checked=x.visible!==false;$('#editPinned').checked=!!x.pinned;$('#editNote').value='';$('#editModal').classList.add('show');}
+async function saveEdit(){const body={key:$('#editKey').value,partNum:Number($('#editPart').value),sceneRaw:$('#editScene').value,title:$('#editTitle').value,visible:$('#editVisible').checked,pinned:$('#editPinned').checked,note:$('#editNote').value};const j=await apiPost('/.netlify/functions/admin-update',body);if(!j)return;closeModal('editModal');await loadItems();loadNotices();}
 async function quickPin(key,pinned){const j=await apiPost('/.netlify/functions/admin-update',{key,pinned});if(j)loadItems();}
-function openReplace(k){const x=itemByKey(k);$('#replaceKey').value=k;$('#replaceName').textContent=`${x.scene} · ${x.title||x.filename}`;$('#replaceFile').value='';$('#replaceStatus').textContent='';$('#replaceModal').classList.add('show');}
-async function replaceFile(){const f=$('#replaceFile').files[0];if(!f)return alert('교체할 파일을 선택해 주세요.');const fd=new FormData();fd.append('key',$('#replaceKey').value);fd.append('file',f);$('#replaceStatus').textContent='교체 중...';const r=await fetch('/.netlify/functions/admin-replace',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));if(!r.ok){$('#replaceStatus').textContent=j.error||('교체 실패 ('+r.status+')');return;}closeModal('replaceModal');await loadItems();}
+function openReplace(k){const x=itemByKey(k);$('#replaceKey').value=k;$('#replaceName').textContent=`${x.scene} · ${x.title||x.filename}`;$('#replaceFile').value='';$('#replaceNote').value='';$('#replaceAnnounce').checked=true;$('#replaceStatus').textContent='';$('#replaceModal').classList.add('show');}
+async function replaceFile(){const f=$('#replaceFile').files[0];if(!f)return alert('교체할 파일을 선택해 주세요.');const fd=new FormData();fd.append('key',$('#replaceKey').value);fd.append('file',f);fd.append('note',$('#replaceNote').value);fd.append('announce',$('#replaceAnnounce').checked?'true':'false');$('#replaceStatus').textContent='교체 중...';const r=await fetch('/.netlify/functions/admin-replace',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));if(!r.ok){$('#replaceStatus').textContent=j.error||('교체 실패 ('+r.status+')');return;}closeModal('replaceModal');await loadItems();loadNotices();}
 async function apiPost(path,body){
   try{
     const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -194,6 +214,28 @@ async function trashAction(key,action){
 function closeModal(id){document.getElementById(id).classList.remove('show');}
 function fmtSize(n){if(n<1024)return n+' B';if(n<1024*1024)return(n/1024).toFixed(1)+' KB';return(n/1024/1024).toFixed(1)+' MB';}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+const TYPE_LABEL={new:'새 자료',updated:'수정',notice:'공지'};
+async function loadNotices(){
+  const j=await apiPost('/.netlify/functions/admin-notice',{action:'list'});if(!j)return;
+  const list=(j.items||[]).slice(0,30);
+  $('#notices').innerHTML=list.length?list.map(x=>`<div class="item" style="grid-template-columns:82px minmax(220px,1fr) auto">
+    <div class="scene" style="font-size:12px">${esc(TYPE_LABEL[x.type]||'공지')}</div>
+    <div><div class="name" style="font-size:14px">${esc([x.part,x.scene].filter(Boolean).join(' · '))} ${esc(x.title||'')}</div><div class="meta">${esc(x.note||'')} · ${esc(new Date(x.at).toLocaleString('ko-KR'))}</div></div>
+    <div class="item-actions">${x.url?`<a class="btn secondary small" target="_blank" href="${esc(x.url)}">열기</a>`:''}<button class="btn danger small" onclick='delNotice(${JSON.stringify(x.id)})'>소식 지우기</button></div></div>`).join(''):'<div class="status">아직 올린 소식이 없습니다.</div>';
+}
+async function delNotice(id){if(!confirm('이 소식을 사이트에서 지울까요? (자료 파일은 그대로입니다)'))return;const j=await apiPost('/.netlify/functions/admin-notice',{action:'delete',id});if(j)loadNotices();}
+async function postNotice(){
+  const sid=$('#nSrc').value;
+  const body={type:$('#nType').value,partNum:$('#nPart').value,scene:$('#nScene').value,title:$('#nTitle').value,note:$('#nNote').value,url:$('#nUrl').value,sid:sid||undefined};
+  const j=await apiPost('/.netlify/functions/admin-notice',body);if(!j)return;
+  $('#nStatus').textContent='소식을 올렸습니다 ✓';$('#nStatus').className='status oktxt';
+  ['nTitle','nNote','nUrl','nScene'].forEach(id=>$('#'+id).value='');$('#nSrc').value='';$('#nPart').value='';
+  loadNotices();
+}
+function fillNoticeSources(){
+  const sel=$('#nSrc');sel.innerHTML='<option value="">직접 입력</option>'+[...staticData.scenes,...staticData.apps].map(x=>`<option value="${esc(x.id)}">${esc([x.part,x.scene].filter(Boolean).join(' '))} ${esc(x.title)}</option>`).join('');
+}
+$('#nSrc').addEventListener('change',()=>{const x=[...staticData.scenes,...staticData.apps].find(v=>v.id===$('#nSrc').value);if(!x)return;$('#nPart').value=x.partNum||'';$('#nScene').value=(x.scene||'').replace(/씬$/,'');$('#nTitle').value=x.title||'';$('#nUrl').value=x.url||'';});
 checkSession();
 </script>
 </body></html>

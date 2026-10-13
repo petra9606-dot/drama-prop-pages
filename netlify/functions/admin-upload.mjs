@@ -1,5 +1,5 @@
 
-import { uploadsStore } from "../lib/flags.mjs";
+import { uploadsStore, pushUpdate, cleanNote } from "../lib/flags.mjs";
 import { isAdmin } from "../lib/auth.mjs";
 
 const MAX = 4 * 1024 * 1024;
@@ -35,6 +35,8 @@ export default async (req) => {
   const visible = String(form.get("visible")) !== "false";
   const pinned = String(form.get("pinned")) === "true";
   const filename = cleanName(file.name);
+  const note = cleanNote(form.get("note"));
+  const announce = String(form.get("announce")) !== "false";
 
   const id = crypto.randomUUID();
   const key = `${project}/part${partNum}/scene-${sceneRaw}/${Date.now()}-${id}-${filename}`;
@@ -46,9 +48,14 @@ export default async (req) => {
       id, project, projectName, part:`${partNum}부`, partNum, scene, sceneRaw,
       title, filename:file.name, contentType:file.type || "application/octet-stream",
       size:file.size, uploadedAt:now, updatedAt:now, visible, pinned,
+      changedAt: announce ? now : null, changeType: announce ? "new" : null, changeNote: note,
       deleted:false, deletedAt:null
     }
   });
+
+  if (announce && visible) {
+    try { await pushUpdate(store, { type:"new", key, project, part:`${partNum}부`, scene, title, note, url:`/.netlify/functions/file?key=${encodeURIComponent(key)}` }); } catch {}
+  }
 
   return Response.json({ ok:true, key, url:`/.netlify/functions/file?key=${encodeURIComponent(key)}` },
     { headers:{ "Cache-Control":"no-store" }});

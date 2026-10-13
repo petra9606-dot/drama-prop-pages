@@ -1,5 +1,6 @@
 {
   "_설명": "깃허브로 직접 올린 자료 목록. 관리자 페이지의 '깃허브 자료' 탭에서 숨김/표시를 바꿀 수 있습니다. 새 자료는 여기에 한 줄 추가하면 모든 페이지에 반영됩니다.",
+  "_업데이트표시": "새로 넣거나 고친 자료에 changedAt(ISO 시각) · changeType(new|updated) · changeNote(설명)을 넣으면 사이트에 NEW/수정됨 표시와 업데이트 소식이 뜹니다.",
   "scenes": [
     {"id":"p1-4-cheongyak","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"4씬","title":"청약 당첨조회","filename":"cheongyak/index.html","url":"/pyramid/part1/cheongyak/index.html"},
     {"id":"p1-46-statement","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"46씬","title":"진술서","filename":"진술서.html","url":"/pyramid/part1/statement.html"},
@@ -7,8 +8,8 @@
     {"id":"p2-33-police-game","project":"pyramid","projectName":"피라밋","part":"2부","partNum":2,"scene":"33씬","title":"준우 게임기","filename":"police-game.html","url":"/apps/police-game.html"},
     {"id":"p2-40-bitone","project":"pyramid","projectName":"피라밋","part":"2부","partNum":2,"scene":"40씬","title":"비트원 거래소 화면","filename":"bitone.html","url":"/pyramid/part2/bitone.html"},
     {"id":"p4-23-crm","project":"pyramid","projectName":"피라밋","part":"4부","partNum":4,"scene":"23씬","title":"고객상담 CRM 시스템","filename":"고객상담_CRM_시스템.html","url":"/pyramid/part4/crm.html"},
-    {"id":"p4-37-petct","project":"pyramid","projectName":"피라밋","part":"4부","partNum":4,"scene":"37씬","title":"PET-CT 판독 화면 (다온대학교병원)","filename":"scene37-petct.html","url":"/pyramid/part4/scene37-petct.html"},
-    {"id":"p4-38-carbon-console","project":"pyramid","projectName":"피라밋","part":"4부","partNum":4,"scene":"38씬","title":"중입자 치료 조종 화면 (다온대학교병원)","filename":"scene38-carbon-ion-console.html","url":"/pyramid/part4/scene38-carbon-ion-console.html"},
+    {"id":"p4-37-petct","project":"pyramid","projectName":"피라밋","part":"4부","partNum":4,"scene":"37씬","title":"PET-CT 판독 화면 (다온대학교병원)","filename":"scene37-petct.html","url":"/pyramid/part4/scene37-petct.html","changedAt":"2026-10-13T01:48:00Z","changeType":"new","changeNote":"다온대학교병원 4부 촬영용 화면 추가"},
+    {"id":"p4-38-carbon-console","project":"pyramid","projectName":"피라밋","part":"4부","partNum":4,"scene":"38씬","title":"중입자 치료 조종 화면 (다온대학교병원)","filename":"scene38-carbon-ion-console.html","url":"/pyramid/part4/scene38-carbon-ion-console.html","changedAt":"2026-10-13T01:48:00Z","changeType":"new","changeNote":"다온대학교병원 4부 촬영용 화면 추가"},
     {"id":"p5-62-hospital","project":"pyramid","projectName":"피라밋","part":"5부","partNum":5,"scene":"62씬","title":"병원 입원 중간정산 (바른종합병원)","filename":"hospital-interim-payment.html","url":"/pyramid/part5/hospital-interim-payment.html"}
   ],
   "apps": [

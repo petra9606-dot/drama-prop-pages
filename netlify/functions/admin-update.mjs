@@ -1,6 +1,6 @@
 
 import { isAdmin } from "../lib/auth.mjs";
-import { uploadsStore, patchFlags, readFlags, merge } from "../lib/flags.mjs";
+import { uploadsStore, patchFlags, readFlags, merge, pushUpdate, cleanNote } from "../lib/flags.mjs";
 
 function cleanText(v, max=120) { return String(v || "").trim().slice(0,max); }
 
@@ -34,8 +34,14 @@ export default async (req) => {
     }
     if (body.visible !== undefined) patch.visible = !!body.visible;
     if (body.pinned  !== undefined) patch.pinned  = !!body.pinned;
+    const note = cleanNote(body.note);
+    if (note) { patch.changedAt = patch.updatedAt; patch.changeType = "updated"; patch.changeNote = note; }
 
     const state = await patchFlags(store, key, patch);
+    const fin = merge(m, state);
+    if (note && fin.visible !== false && !fin.deleted) {
+      try { await pushUpdate(store, { type:"updated", key, project:fin.project, part:fin.part, scene:fin.scene, title:fin.title || fin.filename, note, url:`/.netlify/functions/file?key=${encodeURIComponent(key)}` }); } catch {}
+    }
     return Response.json({ ok:true, item:{ key, ...merge(m, state) } }, { headers:{ "Cache-Control":"no-store" }});
   } catch (err) {
     return Response.json({ ok:false, error:`서버 오류: ${err && err.message ? err.message : String(err)}` }, { status:500 });
