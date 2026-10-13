@@ -8,7 +8,7 @@
     {"id":"p2-33-police-game","project":"pyramid","projectName":"피라밋","part":"2부","partNum":2,"scene":"33씬","title":"준우 게임기","filename":"police-game.html","url":"/apps/police-game.html"},
     {"id":"p2-40-bitone","project":"pyramid","projectName":"피라밋","part":"2부","partNum":2,"scene":"40씬","title":"비트원 거래소 화면","filename":"bitone.html","url":"/pyramid/part2/bitone.html"},
     {"id":"p4-23-crm","project":"pyramid","projectName":"피라밋","part":"4부","partNum":4,"scene":"23씬","title":"고객상담 CRM 시스템","filename":"고객상담_CRM_시스템.html","url":"/pyramid/part4/crm.html"},
-    {"id":"p4-37-petct","project":"pyramid","projectName":"피라밋","part":"4부","partNum":4,"scene":"37씬","title":"PET-CT 판독 화면 (다온대학교병원)","filename":"scene37-petct.html","url":"/pyramid/part4/scene37-petct.html","changedAt":"2026-10-13T01:48:00Z","changeType":"new","changeNote":"다온대학교병원 4부 촬영용 화면 추가"},
+    {"id":"p4-37-petct","project":"pyramid","projectName":"피라밋","part":"4부","partNum":4,"scene":"37씬","title":"PET-CT 판독 화면 (다온대학교병원)","filename":"scene37-petct.html","url":"/pyramid/part4/scene37-petct.html","changedAt":"2026-10-13T08:17:23Z","changeType":"updated","changeNote":"화면 오른쪽 위 병원·진료과 표시 삭제"},
     {"id":"p4-38-carbon-console","project":"pyramid","projectName":"피라밋","part":"4부","partNum":4,"scene":"38씬","title":"중입자 치료 조종 화면 (다온대학교병원)","filename":"scene38-carbon-ion-console.html","url":"/pyramid/part4/scene38-carbon-ion-console.html","changedAt":"2026-10-13T01:48:00Z","changeType":"new","changeNote":"다온대학교병원 4부 촬영용 화면 추가"},
     {"id":"p5-62-hospital","project":"pyramid","projectName":"피라밋","part":"5부","partNum":5,"scene":"62씬","title":"병원 입원 중간정산 (바른종합병원)","filename":"hospital-interim-payment.html","url":"/pyramid/part5/hospital-interim-payment.html"}
   ],

@@ -8,6 +8,8 @@
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
   };
   const seen = ls.get("dw-seen", {});
+  const MODE = ["normal", "less", "off"].includes(ls.get("dw-feed-mode", "normal")) ? ls.get("dw-feed-mode", "normal") : "normal";
+  if (MODE !== "normal") document.documentElement.classList.add("dwu-" + MODE);
   const ago = (iso) => {
     const t = Date.parse(iso); if (!t) return "";
     const s = (Date.now() - t) / 1000;
@@ -57,6 +59,14 @@
 .dwu-badge{display:inline-block;font-size:9px;font-weight:900;letter-spacing:.06em;border-radius:5px;padding:3px 6px;margin-left:6px;vertical-align:2px}
 .dwu-badge.new{background:#1d9a5f;color:#fff}.dwu-badge.updated{background:#c98a1b;color:#fff}
 .dwu-dot{display:inline-block;font-size:10px;font-weight:900;color:#fff;background:#ff5a64;border-radius:999px;padding:3px 7px;margin-left:8px}
+.dwu-less .dwu-dot,.dwu-less .dwu-badge{background:#2a3347;color:#8d99b3;font-size:8px;padding:2px 5px}
+.dwu-less .dwu-btn b{min-width:7px;width:7px;height:7px;padding:0;font-size:0;background:#7b8aa8}
+.dwu-btn.quiet{opacity:.55;padding:6px 10px}
+.dwu-mode{display:flex;gap:4px;background:#0b111c;border:1px solid #243049;border-radius:9px;padding:3px}
+.dwu-mode button{border:0;background:none;color:#8d99b3;font-size:11px;padding:6px 9px;border-radius:6px;cursor:pointer}
+.dwu-mode button.on{background:#25324f;color:#e3e9ff;font-weight:700}
+.dwu-set{padding:12px 20px;border-top:1px solid #1d2638;font-size:11px;color:#8d99b3;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dwu-set small{display:block;color:#5e6b84;margin-top:3px}
 `;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
@@ -76,6 +86,7 @@
   const itemId = (x) => x.key ? "u:" + x.key : x.id ? "s:" + x.id : "";
   // 카드 배지: 최근 14일 안에 새로 올라왔거나 수정됐고, 이 방문자가 아직 열어 보지 않은 자료
   function badge(x) {
+    if (MODE === "off") return "";
     const at = Date.parse(x.changedAt || ""); if (!at || Date.now() - at > FRESH_DAYS * DAY) return "";
     const id = itemId(x); const s = Date.parse(seen[id] || ""); if (s && s >= at) return "";
     return x.changeType === "new" ? "new" : "updated";
@@ -91,7 +102,7 @@
     const where = [x.part, x.scene].filter(Boolean).join(" · ");
     const open = x.url ? `href="${esc(x.url)}" target="_blank" rel="noopener"` : "";
     return `<a class="dwu-item ${unreadMark && Date.parse(x.at) > readAt() ? "dwu-unread" : ""}" ${open} data-sid="${esc(x.sid || "")}" data-key="${esc(x.key || "")}">
-      <div class="dwu-row"><span class="dwu-tag ${esc(x.type)}">${tag}</span>${where ? `<span class="dwu-where">${esc(where)}</span>` : ""}<span class="dwu-time">${esc(ago(x.at))}</span></div>
+      <div class="dwu-row"><span class="dwu-tag ${esc(x.type)}">${tag}</span>${where ? `<span class="dwu-where">${esc(where)}</span>` : ""}</div>
       <div class="dwu-title">${esc(x.title || "업데이트")}</div>${x.note ? `<div class="dwu-note">${esc(x.note)}</div>` : ""}</a>`;
   }
   function wireClicks(root) {
@@ -104,11 +115,12 @@
     if (panel) return;
     dim = document.createElement("div"); dim.className = "dwu-dim";
     panel = document.createElement("aside"); panel.className = "dwu-panel";
-    panel.innerHTML = `<div class="dwu-head"><div><h3>업데이트 소식</h3><small>새로 올라오거나 수정된 자료를 알려 드립니다.</small></div><button class="dwu-x" aria-label="닫기">×</button></div><div class="dwu-list"><div class="dwu-empty">불러오는 중...</div></div><div class="dwu-foot"><span>최근 60건</span><button type="button" data-read>모두 읽음</button></div>`;
+    panel.innerHTML = `<div class="dwu-head"><div><h3>업데이트 소식</h3><small>새로 올라오거나 수정된 자료를 알려 드립니다.</small></div><button class="dwu-x" aria-label="닫기">×</button></div><div class="dwu-list"><div class="dwu-empty">불러오는 중...</div></div><div class="dwu-set"><div>내 알림 표시<small>이 기기에서만 적용됩니다.</small></div><div class="dwu-mode">${[["normal","보통"],["less","줄이기"],["off","끄기"]].map(([k,l]) => `<button type="button" data-mode="${k}" class="${MODE === k ? "on" : ""}">${l}</button>`).join("")}</div></div><div class="dwu-foot"><span>최근 60건</span><button type="button" data-read>모두 읽음</button></div>`;
     document.body.append(dim, panel);
     const close = () => { panel.classList.remove("show"); dim.classList.remove("show"); };
     dim.onclick = close; panel.querySelector(".dwu-x").onclick = close;
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+    panel.querySelectorAll("[data-mode]").forEach((b) => b.onclick = () => { ls.set("dw-feed-mode", b.dataset.mode); location.reload(); });
     panel.querySelector("[data-read]").onclick = () => { ls.set("dw-feed-read", new Date().toISOString()); feed.then(paintPanel); };
     wireClicks(panel);
   }
@@ -117,7 +129,7 @@
     box.innerHTML = list.length ? list.map((x) => rowHTML(x, true)).join("") : `<div class="dwu-empty">아직 업데이트 소식이 없습니다.</div>`;
     paintButtons(list);
   }
-  function paintButtons(list) { const n = unread(list); btns.forEach((b) => { const c = b.querySelector("b"); c.textContent = n > 99 ? "99+" : n; c.classList.toggle("zero", !n); }); }
+  function paintButtons(list) { const n = MODE === "off" ? 0 : unread(list); btns.forEach((b) => { const c = b.querySelector("b"); c.textContent = n > 99 ? "99+" : n; c.classList.toggle("zero", !n); b.classList.toggle("quiet", MODE === "off"); }); }
   function openPanel() {
     ensurePanel();
     feed.then((list) => { paintPanel(list); setTimeout(() => { ls.set("dw-feed-read", new Date().toISOString()); paintButtons(list); }, 1200); });
@@ -133,7 +145,7 @@
   }
   // 최근 업데이트 몇 건을 페이지 안에 띠로 보여 준다
   function mountStrip(host, { limit = 5, filter } = {}) {
-    if (!host) return;
+    if (!host || MODE !== "normal") return;
     feed.then((list) => {
       const items = (filter ? list.filter(filter) : list).slice(0, limit);
       if (!items.length) { host.innerHTML = ""; return; }
