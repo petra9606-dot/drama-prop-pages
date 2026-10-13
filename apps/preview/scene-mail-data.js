@@ -9,6 +9,8 @@ exports.upsertSceneMail = upsertSceneMail;
 exports.scheduleSceneMail = scheduleSceneMail;
 exports.backgroundMails = backgroundMails;
 exports.receivedMail = receivedMail;
+exports.wrapNoticeText = wrapNoticeText;
+exports.noticeLayout = noticeLayout;
 exports.noticeSvg = noticeSvg;
 exports.PEOPLE = {
     song: { name: '송경필', email: 'song.law@edengroup.kr', color: '#607789', initial: '경' },
@@ -85,15 +87,71 @@ const escapeXml = (text) => text.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 function lines(value, count) {
     return value.split('\n').flatMap(p => { const chars = Array.from(p); return chars.length ? Array.from({ length: Math.ceil(chars.length / count) }, (_, i) => chars.slice(i * count, (i + 1) * count).join('')) : ['']; });
 }
-function noticeSvg(item) {
-    let font = 20;
-    let bodyLines = lines((item.attachmentText || item.body || '').slice(0, 4000), Math.floor(654 / font));
-    while (bodyLines.length * font * 1.65 > 530 && font > 6) {
-        font--;
-        bodyLines = lines((item.attachmentText || item.body || '').slice(0, 4000), Math.floor(654 / font));
-    }
-    const text = bodyLines.map((line, i) => `<text x="72" y="${478 + i * font * 1.65}" font-size="${font}">${escapeXml(line)}</text>`).join('');
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1132"><rect width="800" height="1132" fill="#fff"/><g font-family="sans-serif" fill="#27333e"><text x="72" y="88" font-size="32" font-weight="700" letter-spacing="4">BITONE</text><text x="728" y="83" text-anchor="end" font-size="16" fill="#7b8791">비트원 · 상장심사팀</text><path d="M72 115H728" stroke="#243e52" stroke-width="3"/><text x="72" y="173" font-size="30" font-weight="700">상장 심사 결과 통지서</text><text x="72" y="207" font-size="15" fill="#7b8791">LISTING REVIEW RESULT</text><rect x="72" y="242" width="656" height="170" fill="#f2f5f7"/><g font-size="18"><text x="92" y="278" fill="#77838d">수신</text><text x="234" y="278">${escapeXml((item.to || '').slice(0, 25))}</text><text x="92" y="313" fill="#77838d">심사 대상</text><text x="234" y="313">네옴코인</text><text x="92" y="348" fill="#77838d">통지 일자</text><text x="234" y="348">${escapeXml((item.date || '').slice(0, 25))}</text><text x="92" y="383" fill="#77838d">심사 결과</text><text x="234" y="383" fill="#9b4944" font-weight="700">상장 불가</text></g>${text}<path d="M72 1024H728" stroke="#d8dfe4"/><text x="72" y="1062" font-size="17" font-weight="700">비트원 상장심사팀</text><text x="72" y="1090" font-size="13" fill="#7b8791">${escapeXml((item.fromEmail || '').slice(0, 70))}</text><text x="728" y="1090" text-anchor="end" font-size="13" fill="#7b8791">1 / 1</text></g></svg>`;
+function wrapNoticeText(value, maxWidth, font) {
+    // Prefer spaces between Korean words. Split a word only if it cannot fit on a line.
+    const advance = (char) => /\s/u.test(char) ? .35 : /[\x21-\x7e]/u.test(char) ? .7 : 1;
+    return value.split('\n').flatMap(paragraph => {
+        let chars = Array.from(paragraph);
+        if (!chars.length)
+            return [''];
+        const result = [];
+        while (chars.length) {
+            let width = 0, end = 0;
+            while (end < chars.length && width + advance(chars[end]) * font <= maxWidth) {
+                width += advance(chars[end]) * font;
+                end++;
+            }
+            if (end === chars.length) {
+                result.push(chars.join('').trimEnd());
+                break;
+            }
+            end = Math.max(1, end);
+            let boundary = end;
+            for (let i = end; i > 0; i--) {
+                if (/\s/u.test(chars[i] || '')) {
+                    boundary = i;
+                    break;
+                }
+            }
+            result.push(chars.slice(0, boundary).join('').trimEnd());
+            chars = chars.slice(boundary);
+            while (chars.length && /\s/u.test(chars[0]))
+                chars.shift();
+        }
+        return result;
+    });
+}
+function noticeLayout(item, large = false) {
+    // The mail thumbnail remains a normal document; only the opened attachment uses large type.
+    const width = 800, font = large ? 36 : 20, lineHeight = font * 1.65;
+    const margin = large ? 44 : 72, right = width - margin;
+    const metaFont = large ? 26 : 18, metaStep = large ? 46 : 35;
+    const metaY = large ? 286 : 278, metaValueX = large ? 238 : 234;
+    const body = (item.attachmentText || item.body || '').slice(0, 4000);
+    const bodyLines = large ? wrapNoticeText(body, right - margin, font) : lines(body, 32);
+    const metadata = [
+        { label: '수신', value: (item.to || '').slice(0, 25) },
+        { label: '심사 대상', value: '네옴코인' },
+        { label: '통지 일자', value: (item.date || '').slice(0, 25) },
+    ].map(row => ({ ...row, lines: lines(row.value, Math.floor((right - metaValueX - 20) / metaFont)) }));
+    const metadataHeight = metadata.reduce((height, row) => height + Math.max(1, row.lines.length) * metaStep, 0);
+    const resultY = metaY + metadataHeight, boxBottom = resultY + (large ? 32 : 29);
+    const bodyY = boxBottom + 66;
+    const footerY = Math.max(1024, bodyY + Math.max(0, bodyLines.length - 1) * lineHeight + 72);
+    const emailLines = lines((item.fromEmail || '').slice(0, 70), large ? 40 : 70);
+    const height = Math.max(1132, footerY + (large ? 104 + emailLines.length * 30 : 80 + emailLines.length * 28));
+    return { width, height, font, lineHeight, margin, right, metaFont, metaStep, metaY, metaValueX, bodyLines, metadata, resultY, boxBottom, bodyY, footerY, emailLines };
+}
+function noticeSvg(item, large = false) {
+    const layout = noticeLayout(item, large), { width, height, font, lineHeight, margin, right, metaFont, metaStep, metaY, metaValueX, bodyLines, metadata, resultY, boxBottom, bodyY, footerY, emailLines } = layout;
+    const text = bodyLines.map((line, i) => `<text x="${margin}" y="${bodyY + i * lineHeight}" font-size="${font}" font-weight="400">${escapeXml(line)}</text>`).join('');
+    let rowY = metaY;
+    const fields = metadata.map(row => {
+        const markup = `<text x="${margin + 20}" y="${rowY}" fill="#77838d">${row.label}</text>` + row.lines.map((line, i) => `<text x="${metaValueX}" y="${rowY + i * metaStep}">${escapeXml(line)}</text>`).join('');
+        rowY += Math.max(1, row.lines.length) * metaStep;
+        return markup;
+    }).join('');
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"><rect width="${width}" height="${height}" fill="#fff"/><g font-family="sans-serif" fill="#27333e"><text x="${margin}" y="88" font-size="${large ? 40 : 32}" font-weight="700" letter-spacing="4">BITONE</text><text x="${right}" y="83" text-anchor="end" font-size="${large ? 20 : 16}" fill="#7b8791">비트원 · 상장심사팀</text><path d="M${margin} 115H${right}" stroke="#243e52" stroke-width="3"/><text x="${margin}" y="173" font-size="${large ? 42 : 30}" font-weight="700">상장 심사 결과 통지서</text><text x="${margin}" y="207" font-size="${large ? 18 : 15}" fill="#7b8791">LISTING REVIEW RESULT</text><rect x="${margin}" y="242" width="${right - margin}" height="${boxBottom - 242}" fill="#f2f5f7"/><g font-size="${metaFont}">${fields}<text x="${margin + 20}" y="${resultY}" fill="#77838d">심사 결과</text><text x="${metaValueX}" y="${resultY}" font-size="${large ? 34 : 18}" fill="#9b4944" font-weight="700">상장 불가</text></g>${text}<path d="M${margin} ${footerY}H${right}" stroke="#d8dfe4"/><text x="${margin}" y="${footerY + (large ? 48 : 38)}" font-size="${large ? 26 : 17}" font-weight="700">비트원 상장심사팀</text>${emailLines.map((line, i) => `<text x="${margin}" y="${footerY + (large ? 86 + i * 30 : 66 + i * 28)}" font-size="${large ? 20 : 13}" fill="#7b8791">${escapeXml(line)}</text>`).join('')}</g></svg>`;
 }
 
 window.SceneMailData=exports;})();
