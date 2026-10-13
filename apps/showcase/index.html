@@ -135,15 +135,18 @@ const APPS = [
     ]
   },
   {
-    id: 'mail', name: '레터메일', meta: 'v3 · 원격 제어 · 87.5MB',
-    desc: '받은편지함·메일 열람·편지쓰기를 갖춘 촬영용 메일 앱입니다. 스태프폰에서 배우폰의 화면을 원격으로 넘길 수 있어, 배우가 조작하지 않아도 원하는 순간에 메일이 열립니다.',
-    preview: '../preview/mail.html', apk: '../disolve-mail-remote-v1.apk', qr: '../qr/disolve-mail-remote-v1.png',
-    note: '상대가 보낸 것처럼 보이는 메일을 미리 저장해 둘 수 있고, 표시 날짜·시간과 읽음·중요·별표까지 지정할 수 있습니다.',
+    id: 'mail', name: '편지함 · 피라밋 6부', meta: 'v4 · 경필 / 동재 · 비트원 · 50.3MB',
+    desc: '송경필과 백동재의 받은편지함을 따로 구성한 촬영용 메일 앱입니다. 비트원의 네옴코인 상장 불가 메일을 일반 본문 또는 문서 이미지 첨부 버전으로 수신하고, 원고와 배경 메일을 수정·저장할 수 있습니다.',
+    preview: '../preview/mail.html', apk: '../letter-mail-v4-ep6.apk', qr: '../qr/letter-mail-v4-ep6.png',
+    note: '☰에서 계정·버전을 선택하세요. 받은편지함 왼쪽 아래 빈칸을 누르면 5초 뒤 검은 화면에 알림이 뜹니다. 실제 전원 잠금이 아닌 앱 내부 촬영 모드이며 기존 배우/스태프 원격 기능도 유지합니다.',
     shots: [
-      ['01-inbox', '받은편지함', '읽지 않은 메일은 굵게, 별표는 노란색으로 표시됩니다.'],
-      ['02-detail', '메일 열람', '본문·첨부파일·보낸 주소까지 실제 메일처럼 보입니다.'],
-      ['03-compose', '편지쓰기', '배우가 직접 메일을 쓰는 장면에 쓰는 화면입니다.'],
-      ['04-stage', '촬영용 메일 저장', '상대가 보낸 것처럼 메일을 미리 만들어 두는 화면입니다.']
+      ['01-song-inbox', '경필 · 받은편지함', '법무·그룹 업무 메일 사이에 비트원 심사 결과가 도착합니다.'],
+      ['02-song-detail', '경필 · 일반 본문', 'song.law@edengroup.kr · 대본의 상장 불가 통지를 반영했습니다.'],
+      ['03-baek-inbox', '동재 · 받은편지함', '스핑크스홀딩스 업무 메일과 개인 메일을 섞었습니다.'],
+      ['04-baek-attachment', '동재 · 이미지 첨부', '문서형 상장 심사 결과 통지서가 첨부된 메일입니다.'],
+      ['05-black', '검은 화면 · 메일 미리보기', '숨겨진 버튼을 누른 뒤 5초 후 알림이 나타나며, 누르면 본문을 엽니다.'],
+      ['06-settings', '촬영 설정 · 숨은 버튼 안내', '계정·버전 선택과 원고 수정, 재촬영 준비, 숨은 버튼 안내를 제공합니다.'],
+      ['07-edit', '원고 수정 · 저장', '제목·보낸 사람·주소·본문·표시 시간과 통지서 내용을 수정하여 저장합니다.']
     ]
   }
 ];
@@ -155,7 +158,7 @@ const $ = id => document.getElementById(id);
 $('tabs').innerHTML = APPS.map(a => '<button data-app="' + a.id + '">' + esc(a.name) + '</button>').join('');
 $('tabs').querySelectorAll('button').forEach(b => b.addEventListener('click', () => select(b.dataset.app, 0)));
 
-function shotSrc(i) { return 'shots/' + app.id + '/' + app.shots[i][0] + '.png' + (app.id === 'rider' ? '?v=13' : ''); }
+function shotSrc(i) { return 'shots/' + app.id + '/' + app.shots[i][0] + '.png' + (app.id === 'rider' ? '?v=13' : app.id === 'mail' ? '?v=4' : ''); }
 
 function paint() {
   const s = app.shots[index];
