@@ -2,3 +2,4 @@
 .m .viewer div.scroll{padding:8px}
 .m .viewer .top .grow{font-size:13px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:850px){.pv-main{grid-template-columns:minmax(0,1fr)}}
+.m{font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif}.m h2{font-size:22px;line-height:32px;font-weight:400;word-break:keep-all;overflow-wrap:break-word;text-wrap:balance;letter-spacing:-.02em}.m .body{word-break:keep-all;overflow-wrap:break-word;letter-spacing:-.015em}.m .viewer svg g,.m .paper svg g{font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif}

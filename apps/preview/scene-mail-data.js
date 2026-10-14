@@ -1,8 +1,8 @@
-/* Generated from prop-apps/src/SceneMailData.ts by prepare-mail-v6-site.cjs. */
+/* Generated from prop-apps/src/SceneMailData.ts by prepare-mail-v7-site.cjs. */
 (()=>{const exports={};
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HAVEN_REVIEW_BODY = exports.REJECTION = exports.MAIL_REVIEW_SENDER = exports.MAIL_REVIEW_SUBJECT = exports.MAIL_CONTENT_REVISION = exports.MAIL_DELAY_MS = exports.PEOPLE = void 0;
+exports.NOTICE_PREVIEW_BODY = exports.IMAGE_MAIL_BODY = exports.HAVEN_REVIEW_BODY = exports.REJECTION = exports.displayMailText = exports.MAIL_REVIEW_SENDER = exports.MAIL_REVIEW_SUBJECT = exports.MAIL_CONTENT_REVISION = exports.MAIL_DELAY_MS = exports.PEOPLE = void 0;
 exports.defaultSceneConfig = defaultSceneConfig;
 exports.restoreSceneConfig = restoreSceneConfig;
 exports.scenePersonForMail = scenePersonForMail;
@@ -19,9 +19,12 @@ exports.PEOPLE = {
     baek: { name: '백동재', email: 'baek.dongjae@sphinx-holdings.kr', color: '#77735e', initial: '동' },
 };
 exports.MAIL_DELAY_MS = 5000;
-exports.MAIL_CONTENT_REVISION = 6;
+exports.MAIL_CONTENT_REVISION = 7;
 exports.MAIL_REVIEW_SUBJECT = '[비트원] 해븐코인 거래지원 심사 결과 안내';
 exports.MAIL_REVIEW_SENDER = '비트원 거래지원심사위원회';
+// Keep Korean words together only for display; the saved/editable manuscript stays unchanged.
+const displayMailText = (value = '') => value.replace(/[가-힣]+/g, word => Array.from(word).join('\u2060'));
+exports.displayMailText = displayMailText;
 exports.REJECTION = '그 결과, 해븐코인은 당사의 거래지원 심사기준을 충족하지 못한 것으로 판단되어 신규 거래지원이 불가함을 공식 통보드립니다.';
 exports.HAVEN_REVIEW_BODY = `안녕하십니까. 비트원 거래지원심사위원회입니다.
 귀사가 신청하신 해븐코인의 신규 거래지원(상장)과 관련하여 제출 자료 및 추가 소명 내용을 바탕으로 내부 심사를 진행하였습니다.
@@ -59,10 +62,22 @@ exports.HAVEN_REVIEW_BODY = `안녕하십니까. 비트원 거래지원심사위
 거래지원심사위원회
 Digital Asset Listing Review Committee
 본 메일은 거래지원 심사 결과에 관한 공식 통지이며, 사전 승인 없는 외부 공개 및 제3자 제공을 제한합니다.`;
+exports.IMAGE_MAIL_BODY = `파라오 님, 안녕하세요.
+비트원 거래지원심사위원회입니다.
+
+해븐코인의 신규 거래지원 심사 결과 통지서를 첨부하여 보내드립니다.
+첨부된 통지서를 확인해 주시기 바랍니다.`;
+exports.NOTICE_PREVIEW_BODY = `코인의 신뢰성과 영속성을 확인할 수 없어, 상장 불가 의견을 통보합니다.
+
+제출 자료를 검토한 결과, 프로젝트의 신뢰성과 지속적인 운영을 뒷받침할 수 있는 근거가 충분히 확인되지 않았습니다. 현 단계에서는 상장 요건을 충족하지 못한 것으로 판단합니다.
+
+위 사유에 따라 해븐코인의 신규 거래지원 신청에 대해 거래지원 불가 결정을 통지합니다.
+
+본 통지서에 관한 문의는 비트원 거래지원심사위원회로 회신하여 주시기 바랍니다.`;
 function template(person, image) {
     return { from: exports.MAIL_REVIEW_SENDER, fromEmail: 'listing@bitone.co.kr', to: '파라오', toEmail: exports.PEOPLE[person].email,
         subject: exports.MAIL_REVIEW_SUBJECT, date: '2026-08-22', time: '오전 10:24',
-        body: exports.HAVEN_REVIEW_BODY, attachmentName: '해븐코인_거래지원심사결과.svg', attachmentText: exports.HAVEN_REVIEW_BODY };
+        body: image ? exports.IMAGE_MAIL_BODY : exports.HAVEN_REVIEW_BODY, attachmentName: '해븐코인_거래지원심사결과.svg', attachmentText: exports.HAVEN_REVIEW_BODY, ...(image ? { attachmentPreviewText: exports.NOTICE_PREVIEW_BODY } : {}) };
 }
 function defaultSceneConfig() {
     return { person: 'song', format: 'text', contentRevision: exports.MAIL_CONTENT_REVISION, templates: { song: { text: template('song', false), image: template('song', true) }, baek: { text: template('baek', false), image: template('baek', true) } } };
@@ -71,11 +86,16 @@ function restoreSceneConfig(value) {
     const defaults = defaultSceneConfig();
     if (!value || typeof value !== 'object')
         return defaults;
-    const upgrade = value.contentRevision !== exports.MAIL_CONTENT_REVISION;
+    const upgradeManuscript = !value.contentRevision || value.contentRevision < 6;
+    const upgradePreview = !value.contentRevision || value.contentRevision < exports.MAIL_CONTENT_REVISION;
     const restore = (person, format) => {
         const base = defaults.templates[person][format], saved = value.templates?.[person]?.[format];
         const merged = { ...base, ...saved };
-        return upgrade ? { ...merged, from: base.from, to: base.to, subject: base.subject, body: base.body, attachmentName: base.attachmentName, attachmentText: base.attachmentText } : merged;
+        if (upgradeManuscript)
+            return { ...merged, from: base.from, to: base.to, subject: base.subject, body: base.body, attachmentName: base.attachmentName, attachmentText: base.attachmentText, attachmentPreviewText: base.attachmentPreviewText };
+        if (upgradePreview && format === 'image')
+            return { ...merged, body: merged.body === exports.HAVEN_REVIEW_BODY ? base.body : merged.body, attachmentPreviewText: saved?.attachmentPreviewText ?? base.attachmentPreviewText };
+        return merged;
     };
     return { ...defaults, person: value.person === 'baek' ? 'baek' : 'song', format: value.format === 'image' ? 'image' : 'text', templates: {
             song: { text: restore('song', 'text'), image: restore('song', 'image') },
@@ -180,6 +200,21 @@ function wrapNoticeText(value, maxWidth, font) {
             while (chars.length && /\s/u.test(chars[0]))
                 chars.shift();
         }
+        // Avoid leaving a tiny final line (e.g. 제목의 "안내" alone), without breaking a word.
+        if (result.length > 1) {
+            const last = result.length - 1;
+            const measure = (text) => Array.from(text).reduce((sum, char) => sum + advance(char) * font, 0);
+            while (measure(result[last]) < maxWidth * .32) {
+                const previous = result[last - 1].split(/\s+/);
+                if (previous.length < 2)
+                    break;
+                const word = previous.pop(), combined = `${word} ${result[last]}`;
+                if (measure(combined) > maxWidth)
+                    break;
+                result[last - 1] = previous.join(' ');
+                result[last] = combined;
+            }
+        }
         return result;
     });
 }
@@ -189,15 +224,16 @@ function noticeLayout(item, large = false) {
     const margin = large ? 44 : 72, right = width - margin;
     const metaFont = large ? 26 : 18, metaStep = large ? 46 : 35;
     const metaY = large ? 286 : 278, metaValueX = large ? 238 : 234;
-    const body = (item.attachmentText || item.body || '').slice(0, 4000);
-    const bodyLines = large ? wrapNoticeText(body, right - margin, font) : lines(body, 32);
+    const body = (!large && item.attachmentPreviewText !== undefined ? item.attachmentPreviewText : item.attachmentText || item.body || '').slice(0, 4000);
+    const bodyRows = body.split('\n').flatMap(paragraph => wrapNoticeText(paragraph, right - margin, font).map(text => ({ text, weight: /^(?:[1-5]\. |주요 심사 결과|최종 심사 결과:)/.test(paragraph) ? '600' : '400' })));
+    const bodyLines = bodyRows.map(row => row.text);
     const metadata = [
         { label: '수신', value: (item.to || '').slice(0, 25) },
         { label: '발신', value: (item.from || exports.MAIL_REVIEW_SENDER).slice(0, 60) },
         { label: '제목', value: (item.subject || exports.MAIL_REVIEW_SUBJECT).slice(0, 120) },
         { label: '심사 대상', value: '해븐코인' },
         { label: '통지 일자', value: (item.date || '').slice(0, 25) },
-    ].map(row => ({ ...row, lines: lines(row.value, Math.floor((right - metaValueX - 20) / metaFont)) }));
+    ].map(row => ({ ...row, lines: wrapNoticeText(row.value, right - metaValueX - 20, metaFont) }));
     const metadataHeight = metadata.reduce((height, row) => height + Math.max(1, row.lines.length) * metaStep, 0);
     const resultFont = large ? 28 : 18;
     const resultLines = wrapNoticeText('신규 거래지원 불가 (REJECTED)', right - metaValueX - 20, resultFont);
@@ -206,11 +242,11 @@ function noticeLayout(item, large = false) {
     const footerY = Math.max(1024, bodyY + Math.max(0, bodyLines.length - 1) * lineHeight + 72);
     const emailLines = lines((item.fromEmail || '').slice(0, 70), large ? 40 : 70);
     const height = Math.max(1132, footerY + (large ? 104 + emailLines.length * 30 : 80 + emailLines.length * 28));
-    return { width, height, font, lineHeight, margin, right, metaFont, metaStep, metaY, metaValueX, bodyLines, metadata, resultFont, resultLines, resultY, boxBottom, bodyY, footerY, emailLines };
+    return { width, height, font, lineHeight, margin, right, metaFont, metaStep, metaY, metaValueX, bodyLines, bodyRows, metadata, resultFont, resultLines, resultY, boxBottom, bodyY, footerY, emailLines };
 }
 function noticeSvg(item, large = false) {
-    const layout = noticeLayout(item, large), { width, height, font, lineHeight, margin, right, metaFont, metaStep, metaY, metaValueX, bodyLines, metadata, resultFont, resultLines, resultY, boxBottom, bodyY, footerY, emailLines } = layout;
-    const text = bodyLines.map((line, i) => `<text x="${margin}" y="${bodyY + i * lineHeight}" font-size="${font}" font-weight="400">${escapeXml(line)}</text>`).join('');
+    const layout = noticeLayout(item, large), { width, height, font, lineHeight, margin, right, metaFont, metaStep, metaY, metaValueX, bodyRows, metadata, resultFont, resultLines, resultY, boxBottom, bodyY, footerY, emailLines } = layout;
+    const text = bodyRows.map((row, i) => `<text x="${margin}" y="${bodyY + i * lineHeight}" font-size="${font}" font-weight="${row.weight}">${escapeXml(row.text)}</text>`).join('');
     let rowY = metaY;
     const fields = metadata.map(row => {
         const markup = `<text x="${margin + 20}" y="${rowY}" fill="#77838d">${row.label}</text>` + row.lines.map((line, i) => `<text x="${metaValueX}" y="${rowY + i * metaStep}">${escapeXml(line)}</text>`).join('');
