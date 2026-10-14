@@ -1,6 +1,7 @@
 // 소품별 메모 — 촬영팀이 소품 카드마다 메모를 남기고 완료 체크를 할 수 있다.
 import { getStore } from "@netlify/blobs";
 import { createHash } from "node:crypto";
+import { isAdmin } from "../lib/auth.mjs";
 
 const INDEX_KEY = "__index.json";
 const store = () => getStore({ name: "disolveworks-memos", consistency: "strong" });
@@ -39,6 +40,15 @@ export default async (req) => {
 
   if (req.method === "GET") {
     if (url.searchParams.get("counts")) return json({ ok: true, counts: await readIndex(s) });
+    if (url.searchParams.get("all")) {
+      // 관리자: 모든 소품의 메모를 한 번에
+      if (!isAdmin(req)) return json({ ok: false, error: "로그인이 필요합니다." }, 401);
+      const { blobs } = await s.list({ prefix: "m/" });
+      const docs = (await Promise.all(blobs.map((b) => s.get(b.key, { type: "json" }).catch(() => null))))
+        .filter((d) => d && Array.isArray(d.memos) && d.memos.length)
+        .map((d) => ({ id: d.id, title: d.title, memos: publicMemos(d, url.searchParams.get("tok")) }));
+      return json({ ok: true, docs });
+    }
     const id = url.searchParams.get("id");
     if (!validId(id)) return json({ ok: false, error: "bad id" }, 400);
     const doc = await readDoc(s, id);
@@ -70,7 +80,7 @@ export default async (req) => {
   } else if (b.action === "del") {
     const i = doc.memos.findIndex((x) => x.mid === b.mid);
     if (i < 0) return json({ ok: false, error: "not found" }, 404);
-    if (!tok || doc.memos[i].tokHash !== sha(tok)) return json({ ok: false, error: "본인이 쓴 메모만 지울 수 있습니다." }, 403);
+    if (!isAdmin(req) && (!tok || doc.memos[i].tokHash !== sha(tok))) return json({ ok: false, error: "본인이 쓴 메모만 지울 수 있습니다." }, 403);
     doc.memos.splice(i, 1);
   } else return json({ ok: false, error: "bad action" }, 400);
 

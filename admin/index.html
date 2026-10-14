@@ -1,27 +1,158 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>DisolveWorks Admin</title>
+<meta name="theme-color" content="#080a10">
 <style>
-:root{--bg:#080a10;--panel:#10141e;--panel2:#151b28;--line:#273147;--text:#f6f7fb;--muted:#8b96ab;--accent:#8fa8ff;--ok:#65d6a3;--bad:#ff7b7b;--warn:#f0be65}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 18% 0,rgba(72,96,180,.17),transparent 32%),var(--bg);color:var(--text);font-family:Inter,"Segoe UI","Malgun Gothic",sans-serif}
-.wrap{max-width:1180px;margin:auto;padding:34px 24px 70px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:35px}
-.brand{font-weight:900;letter-spacing:.14em}.brand span{color:var(--accent)}a{color:#9fb5ff;text-decoration:none}
+:root{--bg:#080a10;--panel:#10141e;--panel2:#151b28;--line:#273147;--text:#f6f7fb;--muted:#8b96ab;--accent:#8fa8ff;--accent2:#7590ff;--ok:#65d6a3;--bad:#ff7b7b;--warn:#f0be65}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:radial-gradient(circle at 18% 0,rgba(72,96,180,.17),transparent 32%),var(--bg);color:var(--text);font-family:Inter,"Segoe UI","Malgun Gothic",sans-serif;min-height:100vh}
+a{color:#9fb5ff;text-decoration:none}
+.wrap{max-width:1180px;margin:auto;padding:0 24px 80px}
+.brand{font-weight:900;letter-spacing:.14em}.brand span{color:var(--accent)}
 .panel{background:rgba(16,20,30,.94);border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:16px}
-.login{max-width:460px;margin:110px auto}h1{font-size:28px;margin:0 0 7px}.sub{color:var(--muted);font-size:12px;margin-bottom:20px}
+.login{max-width:460px;margin:110px auto}
+h1{font-size:28px;margin:0 0 7px}h2{font-size:20px;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:12px;margin-bottom:18px;line-height:1.55}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.full{grid-column:1/-1}
-label{font-size:11px;color:#909bb0;display:block;margin:0 0 7px}input,select{width:100%;border:1px solid #303b51;background:#0b0f17;color:#f5f7fb;border-radius:10px;padding:11px 12px;outline:none}
-input:focus,select:focus{border-color:#718cff}.filebox{border:1px dashed #3a465e;padding:14px;border-radius:12px;background:#0b0f17}
-.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;background:#7590ff;color:white}.btn.secondary{background:#20283a;color:#dce3f5}.btn.danger{background:#44242a;color:#ffb3b3}.btn.warn{background:#443a21;color:#f5d892}.btn.ok{background:#214437;color:#9fe7c8}.btn.small{font-size:11px;padding:7px 9px}
-.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:15px}.status{font-size:12px;color:var(--muted)}.oktxt{color:var(--ok)}.badtxt{color:var(--bad)}
-.toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.toolbar .search{max-width:430px}.tabs{display:flex;gap:8px;margin:18px 0 8px}
-.tab{padding:8px 12px;border-radius:999px;border:1px solid #2d3850;background:#121826;color:#97a4ba;cursor:pointer;font-size:11px}.tab.active{background:#253354;color:#dce5ff;border-color:#4a63a4}
-.item{display:grid;grid-template-columns:82px minmax(220px,1fr) auto;gap:14px;align-items:center;padding:15px 0;border-bottom:1px solid #202738}.item:last-child{border-bottom:0}
-.scene{font-weight:900;font-size:14px}.name{font-weight:800;font-size:15px}.meta{font-size:11px;color:#7e899f;margin-top:5px}.flags{font-size:10px;margin-top:5px}.pin{color:#f0be65}.hidden{color:#9a87d7}.trash{color:#d77a7a}.group-title{font-size:12px;font-weight:900;color:#9fb5ff;letter-spacing:.06em;margin:18px 0 2px}.static-note{font-size:11px;color:#7e899f;line-height:1.6;background:#0d121b;border:1px solid #232c3f;border-radius:10px;padding:10px 12px;margin:6px 0 4px}.item.off .name,.item.off .scene{opacity:.45}.item-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.check{display:flex;align-items:center;gap:8px;color:#b6c0d3;font-size:12px}.check input{width:auto}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal.show{display:flex}.modal-card{width:min(560px,100%);background:#10151f;border:1px solid #2b3750;border-radius:18px;padding:22px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.x{background:none;border:0;color:#9aa7bc;font-size:22px;cursor:pointer}
-@media(max-width:760px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.item{grid-template-columns:70px 1fr}.item-actions{grid-column:1/-1;justify-content:flex-start}.top{align-items:flex-start}.wrap{padding:25px 15px}}
+label{font-size:11px;color:#909bb0;display:block;margin:0 0 7px}
+input,select,textarea{width:100%;border:1px solid #303b51;background:#0b0f17;color:#f5f7fb;border-radius:10px;padding:11px 12px;outline:none;font:inherit;font-size:14px}
+input:focus,select:focus,textarea:focus{border-color:#718cff}
+.btn{border:0;border-radius:10px;padding:10px 14px;font:800 13px/1.1 inherit;cursor:pointer;background:var(--accent2);color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.secondary{background:#20283a;color:#dce3f5}.btn.danger{background:#44242a;color:#ffb3b3}.btn.warn{background:#443a21;color:#f5d892}.btn.ok{background:#214437;color:#9fe7c8}.btn.small{font-size:11px;padding:7px 9px}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:15px}
+.status{font-size:12px;color:var(--muted)}.oktxt{color:var(--ok)}.badtxt{color:var(--bad)}
+.check{display:flex;align-items:center;gap:8px;color:#b6c0d3;font-size:12px;margin:0}.check input{width:auto}
+
+/* 상단 · 탭 */
+.top{display:flex;justify-content:space-between;align-items:center;padding:26px 0 18px}
+.top .links{font-size:13px;display:flex;gap:14px}
+.nav{position:sticky;top:0;z-index:15;display:flex;gap:6px;padding:10px 0 14px;background:linear-gradient(var(--bg) 80%,rgba(8,10,16,0));margin-bottom:6px}
+.nav button{position:relative;display:inline-flex;align-items:center;gap:7px;border:1px solid #2a3550;background:#111725;color:#a6b2c9;border-radius:999px;padding:9px 15px;font:700 13px/1 inherit;cursor:pointer}
+.nav button svg{width:16px;height:16px}
+.nav button.on{background:#223055;border-color:#4a63a4;color:#fff}
+.nav .cnt{min-width:18px;height:18px;border-radius:9px;background:#ff5a64;color:#fff;font-size:10px;display:inline-grid;place-items:center;padding:0 5px}
+.nav .cnt:empty{display:none}
+.view{display:none}.view.on{display:block}
+
+/* 현황판 */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.stat{background:rgba(16,20,30,.94);border:1px solid var(--line);border-radius:16px;padding:16px 18px;cursor:pointer;transition:.15s}
+.stat:hover{border-color:#4a63a4}
+.stat .k{font-size:12px;color:var(--muted);font-weight:700}
+.stat .v{font-size:30px;font-weight:900;margin-top:6px;letter-spacing:-.02em}
+.stat .s{font-size:11px;color:#6f7b92;margin-top:2px}
+.stat.alert .v{color:#ffb06b}
+.cols{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+.bars{display:grid;gap:7px;margin-top:6px}
+.bar{display:grid;grid-template-columns:42px 1fr 38px;gap:10px;align-items:center;font-size:12px;color:#aab5ca;cursor:pointer}
+.bar .t{height:12px;background:#151c2b;border-radius:6px;overflow:hidden;display:flex}
+.bar .t i{display:block;height:100%}
+.bar .t i.a{background:#7590ff}.bar .t i.b{background:#3d4f7c}
+.bar b{text-align:right;color:#dfe6f6}
+.legend{display:flex;gap:14px;font-size:11px;color:var(--muted);margin-top:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.mini{display:grid;gap:2px}
+.mini a,.mini div.row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 4px;border-bottom:1px solid #1d2435;color:var(--text)}
+.mini a:last-child{border-bottom:0}
+.mini .tag{font-size:11px;font-weight:800;color:#a9b9ff;background:#1a2340;border-radius:6px;padding:4px 7px;white-space:nowrap}
+.mini .nm{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini .tm{font-size:11px;color:#6f7b92;white-space:nowrap}
+.mini .tx{font-size:12px;color:#97a3ba;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}
+
+/* 업로드 */
+.drop{border:2px dashed #34415d;border-radius:16px;background:#0b0f17;padding:34px 18px;text-align:center;cursor:pointer;transition:.15s}
+.drop:hover,.drop.over{border-color:#7590ff;background:#101833}
+.drop svg{width:38px;height:38px;color:#7590ff}
+.drop b{display:block;font-size:16px;margin-top:10px}
+.drop span{display:block;font-size:12px;color:var(--muted);margin-top:6px}
+.defaults{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0 6px;align-items:end}
+.queue{margin-top:14px;display:grid;gap:8px}
+.q{display:grid;grid-template-columns:76px 86px minmax(0,1fr) auto 34px;gap:8px;align-items:center;background:#0d121c;border:1px solid #222c41;border-radius:12px;padding:10px}
+.q input,.q select{padding:9px 10px;font-size:13px}
+.q .fn{grid-column:1/-1;font-size:11px;color:#7e899f;display:flex;gap:8px;align-items:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.q .fn .sz{color:#5f6b82}
+.q .st{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;min-width:64px;text-align:right}
+.q .st.ok{color:var(--ok)}.q .st.bad{color:var(--bad)}
+.q .rm{width:34px;height:34px;border-radius:8px;border:0;background:#1a2133;color:#97a3ba;cursor:pointer;font-size:18px}
+.q.err{border-color:#5a2b33}
+.q.done{opacity:.6}
+
+/* 자료 관리 */
+.toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.toolbar .search{max-width:360px}
+.tabs{display:flex;gap:8px;margin:16px 0 8px;flex-wrap:wrap}
+.tab{padding:8px 12px;border-radius:999px;border:1px solid #2d3850;background:#121826;color:#97a4ba;cursor:pointer;font:600 12px/1 inherit}
+.tab.active{background:#253354;color:#dce5ff;border-color:#4a63a4}
+.tip{font-size:11px;color:#7e899f;background:#0d121b;border:1px solid #232c3f;border-radius:10px;padding:9px 12px;margin:6px 0 4px;line-height:1.6}
+.item{display:grid;grid-template-columns:72px minmax(200px,1fr) auto;gap:14px;align-items:center;padding:14px 10px;border-bottom:1px solid #202738;border-radius:12px;position:relative;transition:background .12s}
+.item:last-child{border-bottom:0}
+.item.dropok{background:#14204a;outline:2px dashed #7590ff;outline-offset:-2px}
+.item.dropok::after{content:"여기에 놓으면 이 자료의 파일이 교체됩니다";position:absolute;right:14px;top:50%;transform:translateY(-50%);background:#7590ff;color:#fff;font-size:12px;font-weight:800;padding:8px 12px;border-radius:8px;pointer-events:none}
+.scene{font-weight:900;font-size:14px}.name{font-weight:800;font-size:15px}
+.meta{font-size:11px;color:#7e899f;margin-top:5px}.flags{font-size:10px;margin-top:5px}
+.pin{color:#f0be65}.hidden{color:#9a87d7}.trash{color:#d77a7a}.memo-flag{color:#ffb06b}
+.group-title{font-size:12px;font-weight:900;color:#9fb5ff;letter-spacing:.06em;margin:18px 0 2px}
+.item.off .name,.item.off .scene{opacity:.45}
+.item-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+
+/* 메모 */
+.mgroup{border:1px solid #222c41;border-radius:14px;background:#0d121c;margin-bottom:12px;overflow:hidden}
+.mhead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #1d2537;background:#111827}
+.mhead b{font-size:14px}.mhead .meta{margin:3px 0 0}
+.mm{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px;border-bottom:1px solid #182033}
+.mm:last-of-type{border-bottom:0}
+.mm .h{font-size:12px;margin-bottom:5px}.mm .h b{color:#c9d6ff}.mm .h span{color:#64748b;font-size:11px;margin-left:6px}
+.mm .t{font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.mm.done{opacity:.5}.mm.done .t{text-decoration:line-through}
+.mm .a{display:flex;gap:6px;align-items:flex-start}
+.reply{display:flex;gap:8px;padding:10px 14px;background:#0b1019;border-top:1px solid #1d2537}
+.reply input{padding:9px 11px;font-size:13px}
+
+/* 모달 */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;padding:18px;z-index:30}
+.modal.show{display:flex}
+.modal-card{width:min(560px,100%);max-height:calc(100vh - 36px);overflow:auto;background:#10151f;border:1px solid #2b3750;border-radius:18px;padding:22px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.x{background:none;border:0;color:#9aa7bc;font-size:24px;cursor:pointer;width:36px;height:36px}
+.rdrop{border:2px dashed #34415d;border-radius:12px;padding:20px;text-align:center;cursor:pointer;background:#0b0f17;font-size:13px;color:#aab5ca}
+.rdrop.over{border-color:#7590ff;background:#101833}
+.rdrop b{color:#fff}
+
+/* 페이지 전체에 파일을 끌어 왔을 때 */
+.dragcover{position:fixed;inset:0;z-index:25;background:rgba(10,16,40,.55);border:3px dashed #7590ff;display:none;align-items:center;justify-content:center;pointer-events:none}
+.dragcover.on{display:flex}
+.dragcover div{background:#7590ff;color:#fff;font-weight:900;padding:14px 20px;border-radius:12px;font-size:15px}
+.drop .tt{display:none}.drop i{font-style:normal}
+@media(hover:none){.droptip{display:none}.drop .dt{display:none}.drop .tt{display:block}}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);opacity:0;background:#1f2a45;border:1px solid #3a4d78;color:#fff;padding:11px 16px;border-radius:10px;font-size:13px;font-weight:700;z-index:40;transition:.2s;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+@media(max-width:860px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.cols{grid-template-columns:1fr}.defaults{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+  .wrap{padding:0 14px calc(92px + env(safe-area-inset-bottom))}
+  .top{padding:18px 0 12px}.top .links{font-size:12px}
+  .panel{padding:16px;border-radius:16px}
+  h1{font-size:24px}
+  .grid{grid-template-columns:1fr}.full{grid-column:auto}
+  .nav{position:fixed;top:auto;bottom:0;left:0;right:0;margin:0;padding:6px 6px calc(6px + env(safe-area-inset-bottom));background:rgba(12,15,24,.97);border-top:1px solid #222c41;backdrop-filter:blur(8px);gap:2px;justify-content:space-around}
+  .nav button{flex:1;flex-direction:column;gap:4px;border:0;background:transparent;border-radius:10px;padding:8px 2px;font-size:10.5px}
+  .nav button svg{width:21px;height:21px}
+  .nav button.on{background:#1b2440}
+  .nav .cnt{position:absolute;top:3px;left:calc(50% + 6px)}
+  .stat{padding:13px 14px}.stat .v{font-size:25px}
+  .q{grid-template-columns:70px 1fr 34px}
+  .q .ti{grid-column:1/-1;order:5}
+  .q .st{grid-column:1/-1;order:6;text-align:left}
+  .item{grid-template-columns:56px 1fr;padding:13px 4px}
+  .item-actions{grid-column:1/-1;justify-content:flex-start}
+  .item-actions .btn.small{padding:9px 11px;font-size:12px}
+  .toolbar .search{max-width:none}
+  .mm{grid-template-columns:1fr}
+  .drop{padding:26px 14px}
+}
 </style>
 <!-- DW-SITE --><meta name="robots" content="noindex,nofollow,noarchive"><!-- DW-GA-OWNER --><script>try{localStorage.setItem('dw-noga','1');}catch(e){}</script>
 </head>
@@ -31,56 +162,110 @@ input:focus,select:focus{border-color:#718cff}.filebox{border:1px dashed #3a465e
     <div class="brand">DISOLVE<span>WORKS</span></div>
     <h1 style="margin-top:26px">관리자 로그인</h1>
     <div class="sub">관리자 비밀번호로 로그인하세요.</div>
-    <input id="password" type="password" placeholder="관리자 비밀번호">
+    <input id="password" type="password" placeholder="관리자 비밀번호" autocomplete="current-password">
     <div class="actions"><button class="btn" onclick="login()">로그인</button><span id="loginStatus" class="status"></span></div>
   </div>
 </div>
 
 <div id="adminView" class="wrap" style="display:none">
   <div class="top"><div><div class="brand">DISOLVE<span>WORKS</span></div><div class="sub" style="margin:6px 0 0">CONTENT ADMIN</div></div>
-  <div><a href="../">사이트 보기</a> · <a href="#" onclick="logout();return false;">로그아웃</a></div></div>
+  <div class="links"><a href="../" target="_blank">사이트 보기</a><a href="#" onclick="logout();return false;">로그아웃</a></div></div>
 
-  <section class="panel">
-    <h1>새 파일 업로드</h1>
-    <div class="sub">사이트에는 <b>씬 번호 + 화면 제목</b>으로 표시됩니다.</div>
-    <form id="uploadForm">
-      <div class="grid">
-        <div><label>프로젝트</label><select id="project" name="project"><option value="pyramid" data-name="피라밋">피라밋</option></select></div>
-        <div><label>부</label><select id="part" name="part"></select></div>
-        <div><label>씬</label><input id="scene" name="scene" placeholder="예: 46" required></div>
-        <div><label>화면 제목</label><input id="title" name="title" placeholder="예: 진술서 / 사내메일"></div>
-        <div class="full"><label>파일</label><div class="filebox"><input type="file" id="file" name="file" required accept=".html,.htm,.png,.jpg,.jpeg,.webp,.gif,.pdf,.pptx,.xlsx,.docx,.txt,.zip"></div></div>
-        <div class="full"><label>업데이트 메모 (선택 · 방문자에게 보이는 소식)</label><input id="note" placeholder="예: 4부 37씬 PET-CT 화면 추가 / 병원명 수정"></div>
-        <div><label class="check"><input type="checkbox" id="visible" checked> 일반 사이트에 공개</label></div>
-        <div><label class="check"><input type="checkbox" id="pinned"> 상단 고정</label></div>
-        <div class="full"><label class="check"><input type="checkbox" id="announce" checked> 업데이트 소식으로 알리기 (사이트에 NEW 표시)</label></div>
+  <nav class="nav" id="nav">
+    <button data-v="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>현황</button>
+    <button data-v="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg>업로드</button>
+    <button data-v="items"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>자료 관리</button>
+    <button data-v="memo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>메모<span class="cnt" id="memoCnt"></span></button>
+    <button data-v="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>소식</button>
+  </nav>
+
+  <!-- 현황 -->
+  <section class="view" id="v-dash">
+    <div class="stats">
+      <div class="stat" data-go="items:active"><div class="k">웹 업로드 자료</div><div class="v" id="stUp">–</div><div class="s" id="stUpSub"></div></div>
+      <div class="stat" data-go="items:static"><div class="k">깃허브 자료</div><div class="v" id="stGh">–</div><div class="s" id="stGhSub"></div></div>
+      <div class="stat" data-go="memo"><div class="k">처리할 메모</div><div class="v" id="stMemo">–</div><div class="s" id="stMemoSub"></div></div>
+      <div class="stat" data-go="items:trash"><div class="k">휴지통</div><div class="v" id="stTrash">–</div><div class="s">눌러서 복구 · 완전삭제</div></div>
+    </div>
+    <div class="cols">
+      <div class="panel">
+        <h2>부별 자료</h2><div class="sub" style="margin-bottom:10px">막대를 누르면 그 부의 자료만 볼 수 있어요.</div>
+        <div class="bars" id="bars"></div>
+        <div class="legend"><span><i style="background:#7590ff"></i>웹 업로드</span><span><i style="background:#3d4f7c"></i>깃허브</span></div>
       </div>
-      <div class="actions"><button class="btn" type="submit">업로드</button><span id="uploadStatus" class="status">파일당 최대 4MB</span></div>
-    </form>
+      <div>
+        <div class="panel"><h2>처리할 메모</h2><div class="sub" style="margin-bottom:6px">완료 체크가 안 된 메모 최근 순</div><div class="mini" id="dashMemos"></div></div>
+        <div class="panel"><h2>최근 올린 자료</h2><div class="sub" style="margin-bottom:6px">웹 업로드 · 교체 최근 순</div><div class="mini" id="dashRecent"></div></div>
+      </div>
+    </div>
   </section>
 
-  <section class="panel">
-    <h1 style="font-size:22px">업데이트 소식</h1>
-    <div class="sub" style="margin:3px 0 14px">웹 업로드 · 파일 교체 때는 자동으로 올라갑니다. 깃허브로 올린 자료나 따로 알릴 내용은 여기서 직접 쓰세요. 사이트 첫 화면 · 피라밋 · 각 부 페이지의 <b>업데이트</b> 버튼과 '최근 업데이트'에 보입니다.</div>
-    <div class="grid">
-      <div class="full"><label>자료 선택 (선택 · 깃허브 자료에서 고르면 부 · 씬 · 제목 · 링크가 채워집니다)</label><select id="nSrc"><option value="">직접 입력</option></select></div>
-      <div><label>종류</label><select id="nType"><option value="updated">수정</option><option value="new">새 자료</option><option value="notice">공지</option></select></div>
-      <div><label>부 (선택)</label><select id="nPart"><option value="">없음</option></select></div>
-      <div><label>씬 (선택)</label><input id="nScene" placeholder="예: 37"></div>
-      <div><label>제목</label><input id="nTitle" placeholder="예: PET-CT 판독 화면"></div>
-      <div class="full"><label>내용</label><input id="nNote" placeholder="예: 병원명을 다온대학교병원으로 수정했습니다."></div>
-      <div class="full"><label>링크 (선택)</label><input id="nUrl" placeholder="/pyramid/part4/scene37-petct.html"></div>
+  <!-- 업로드 -->
+  <section class="view" id="v-upload">
+    <div class="panel">
+      <h1>파일 업로드</h1>
+      <div class="sub">여러 파일을 한 번에 끌어다 놓거나 골라 주세요. 파일 이름에 <b>4부</b>, <b>37씬</b> 같은 표시가 있으면 자동으로 채워집니다. 사이트에는 <b>씬 번호 + 화면 제목</b>으로 표시돼요.</div>
+      <div class="drop" id="drop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></svg>
+        <b class="dt">파일을 여기로 끌어다 놓기</b><b class="tt">눌러서 파일 선택</b><span><i class="dt">또는 눌러서 선택 · </i>여러 개 가능 · 파일당 최대 4MB</span>
+      </div>
+      <input type="file" id="files" multiple hidden accept=".html,.htm,.png,.jpg,.jpeg,.webp,.gif,.pdf,.pptx,.xlsx,.docx,.txt,.zip">
+      <div class="defaults">
+        <div><label>프로젝트</label><select id="project"><option value="pyramid" data-name="피라밋">피라밋</option></select></div>
+        <div><label>기본 부 (이름에 없을 때)</label><select id="part"></select></div>
+        <div class="full" style="grid-column:span 2"><label>업데이트 메모 (선택 · 방문자에게 보이는 소식)</label><input id="note" placeholder="예: 4부 37씬 PET-CT 화면 추가"></div>
+      </div>
+      <div class="actions" style="margin-top:8px">
+        <label class="check"><input type="checkbox" id="visible" checked> 일반 사이트에 공개</label>
+        <label class="check"><input type="checkbox" id="pinned"> 상단 고정</label>
+        <label class="check"><input type="checkbox" id="announce" checked> 업데이트 소식으로 알리기 (NEW 표시)</label>
+      </div>
+      <div class="queue" id="queue"></div>
+      <div class="actions" id="qActions" style="display:none"><button class="btn" id="upAll">모두 업로드</button><button class="btn secondary" id="qClear">목록 비우기</button><span class="status" id="uploadStatus"></span></div>
     </div>
-    <div class="actions"><button class="btn" onclick="postNotice()">소식 올리기</button><span id="nStatus" class="status"></span></div>
-    <div id="notices" style="margin-top:14px"></div>
   </section>
-  <section class="panel">
-    <div class="toolbar">
-      <div><h1 style="font-size:22px">콘텐츠 관리</h1><div class="sub" style="margin:3px 0 0">검색 · 수정 · 교체 · 숨김 · 고정 · 휴지통 · 깃허브 자료 숨김</div></div>
-      <input id="adminSearch" class="search" placeholder="씬, 제목, 파일명, 부 검색">
+
+  <!-- 자료 관리 -->
+  <section class="view" id="v-items">
+    <div class="panel">
+      <div class="toolbar">
+        <div><h1 style="font-size:22px">자료 관리</h1><div class="sub" style="margin:3px 0 0">검색 · 수정 · 교체 · 숨김 · 고정 · 휴지통</div></div>
+        <input id="adminSearch" class="search" placeholder="씬, 제목, 파일명, 부 검색" type="search">
+      </div>
+      <div class="tabs"><button class="tab active" data-tab="active">활성 파일</button><button class="tab" data-tab="trash">휴지통</button><button class="tab" data-tab="static">깃허브 자료</button><select id="partFilter" style="width:auto;padding:7px 10px;font-size:12px;border-radius:999px"><option value="">전체 부</option></select></div>
+      <div id="items"><div class="status">불러오는 중...</div></div>
     </div>
-    <div class="tabs"><button class="tab active" data-tab="active" onclick="setTab('active')">활성 파일</button><button class="tab" data-tab="trash" onclick="setTab('trash')">휴지통</button><button class="tab" data-tab="static" onclick="setTab('static')">깃허브 자료</button></div>
-    <div id="items"><div class="status">불러오는 중...</div></div>
+  </section>
+
+  <!-- 메모 -->
+  <section class="view" id="v-memo">
+    <div class="panel">
+      <div class="toolbar">
+        <div><h1 style="font-size:22px">메모</h1><div class="sub" style="margin:3px 0 0">사이트 소품 카드에 남겨진 메모를 한곳에서 보고 처리합니다.</div></div>
+        <div style="display:flex;gap:8px;align-items:center"><button class="btn secondary small" id="memoReload">새로고침</button></div>
+      </div>
+      <div class="tabs"><button class="tab active" data-mf="open">처리할 메모</button><button class="tab" data-mf="all">전체</button></div>
+      <div id="memos"><div class="status">불러오는 중...</div></div>
+    </div>
+  </section>
+
+  <!-- 소식 -->
+  <section class="view" id="v-notice">
+    <div class="panel">
+      <h1 style="font-size:22px">업데이트 소식</h1>
+      <div class="sub" style="margin:3px 0 14px">웹 업로드 · 파일 교체 때는 자동으로 올라갑니다. 깃허브로 올린 자료나 따로 알릴 내용은 여기서 직접 쓰세요. 사이트의 <b>업데이트</b> 버튼과 '최근 업데이트'에 보입니다.</div>
+      <div class="grid">
+        <div class="full"><label>자료 선택 (선택 · 깃허브 자료에서 고르면 부 · 씬 · 제목 · 링크가 채워집니다)</label><select id="nSrc"><option value="">직접 입력</option></select></div>
+        <div><label>종류</label><select id="nType"><option value="updated">수정</option><option value="new">새 자료</option><option value="notice">공지</option></select></div>
+        <div><label>부 (선택)</label><select id="nPart"><option value="">없음</option></select></div>
+        <div><label>씬 (선택)</label><input id="nScene" placeholder="예: 37"></div>
+        <div><label>제목</label><input id="nTitle" placeholder="예: PET-CT 판독 화면"></div>
+        <div class="full"><label>내용</label><input id="nNote" placeholder="예: 병원명을 다온대학교병원으로 수정했습니다."></div>
+        <div class="full"><label>링크 (선택)</label><input id="nUrl" placeholder="/pyramid/part4/scene37-petct.html"></div>
+      </div>
+      <div class="actions"><button class="btn" onclick="postNotice()">소식 올리기</button><span id="nStatus" class="status"></span></div>
+      <div id="notices" style="margin-top:14px"></div>
+    </div>
   </section>
 </div>
 
@@ -105,95 +290,264 @@ input:focus,select:focus{border-color:#718cff}.filebox{border:1px dashed #3a465e
     <div class="modal-head"><h1 style="font-size:21px">파일 교체</h1><button class="x" onclick="closeModal('replaceModal')">×</button></div>
     <div class="sub" id="replaceName"></div>
     <input type="hidden" id="replaceKey">
-    <div class="filebox"><input type="file" id="replaceFile"></div>
+    <div class="rdrop" id="rdrop">새 파일을 <b>여기로 끌어다 놓거나</b> 눌러서 선택</div>
+    <input type="file" id="replaceFile" hidden>
     <div style="margin-top:12px"><label>무엇을 바꿨나요? (선택 · 방문자에게 보이는 소식)</label><input id="replaceNote" placeholder="예: 병원명 다온대학교병원으로 수정"></div>
     <label class="check" style="margin-top:10px"><input type="checkbox" id="replaceAnnounce" checked> 업데이트 소식으로 알리기 (사이트에 '수정됨' 표시)</label>
-    <div class="actions"><button class="btn" onclick="replaceFile()">교체하기</button><button class="btn secondary" onclick="closeModal('replaceModal')">취소</button><span id="replaceStatus" class="status"></span></div>
+    <div class="actions"><button class="btn" id="replaceBtn" onclick="replaceFile()">교체하기</button><button class="btn secondary" onclick="closeModal('replaceModal')">취소</button><span id="replaceStatus" class="status"></span></div>
   </div>
 </div>
 
+<div class="dragcover" id="dragcover"><div>놓으면 업로드 목록에 추가됩니다</div></div>
+<div class="toast" id="toast"></div>
+
 <script>
 const $=s=>document.querySelector(s);
-let allItems=[], currentTab='active', staticData={scenes:[],apps:[]}, staticHidden=new Set();
-for(let i=1;i<=12;i++){for(const id of ['part','editPart','nPart']){const o=document.createElement('option');o.value=i;o.textContent=i+'부';document.getElementById(id).appendChild(o);}}
+const MAX=4*1024*1024;
+const ALLOWED=new Set(["html","htm","png","jpg","jpeg","webp","gif","pdf","pptx","xlsx","docx","txt","zip"]);
+const MEMO_API='/.netlify/functions/memo';
+let allItems=[], currentTab='active', staticData={scenes:[],apps:[]}, staticHidden=new Set(), memoDocs=[], memoFilter='open', view='dash';
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+let memoTok=ls.get('dw-memo-tok','');if(!memoTok){memoTok=Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join('');ls.set('dw-memo-tok',memoTok);}
+for(let i=1;i<=12;i++){for(const id of ['part','editPart','nPart','partFilter']){const o=document.createElement('option');o.value=i;o.textContent=i+'부';document.getElementById(id).appendChild(o);}}
+$('#part').value=ls.get('dw-admin-part','1');
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+function fmtSize(n){if(n<1024)return n+' B';if(n<1024*1024)return(n/1024).toFixed(1)+' KB';return(n/1024/1024).toFixed(1)+' MB';}
+function ago(iso){const t=Date.parse(iso);if(!t)return'';const s=(Date.now()-t)/1000;if(s<60)return'방금 전';if(s<3600)return Math.floor(s/60)+'분 전';if(s<86400)return Math.floor(s/3600)+'시간 전';if(s<86400*7)return Math.floor(s/86400)+'일 전';const d=new Date(t);return`${d.getMonth()+1}월 ${d.getDate()}일`;}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200);}
+const partNumOf=x=>Number(x.partNum)||parseInt(x.part)||0;
 
+/* ── 로그인 ── */
 async function login(){const r=await fetch('/.netlify/functions/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('#password').value})});const j=await r.json().catch(()=>({}));if(!r.ok){$('#loginStatus').textContent=j.error||'로그인 실패';$('#loginStatus').className='status badtxt';return;}showAdmin();}
 async function logout(){await fetch('/.netlify/functions/admin-logout',{method:'POST'});location.reload();}
-async function checkSession(){const r=await fetch('/.netlify/functions/admin-list');if(r.ok){$('#loginView').style.display='none';$('#adminView').style.display='block';const j=await r.json();allItems=j.items||[];renderItems();loadStatic();loadNotices();}}
-async function showAdmin(){$('#loginView').style.display='none';$('#adminView').style.display='block';await loadItems();loadNotices();}
+async function checkSession(){const r=await fetch('/.netlify/functions/admin-list',{cache:'no-store'});if(r.ok){const j=await r.json();allItems=j.items||[];enter();}}
+async function showAdmin(){await loadItems();enter();}
+function enter(){$('#loginView').style.display='none';$('#adminView').style.display='block';go((location.hash||'').slice(1)||'dash');renderAll();loadStatic();loadNotices();loadMemos();}
 $('#password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
 
-$('#uploadForm').addEventListener('submit',async e=>{
-  e.preventDefault(); const f=$('#file').files[0]; if(!f)return;
-  const fd=new FormData(), opt=$('#project').selectedOptions[0];
-  fd.append('project',$('#project').value);fd.append('projectName',opt.dataset.name||opt.textContent);
-  fd.append('part',$('#part').value);fd.append('scene',$('#scene').value);fd.append('title',$('#title').value);
-  fd.append('visible',$('#visible').checked?'true':'false');fd.append('note',$('#note').value);fd.append('announce',$('#announce').checked?'true':'false');fd.append('pinned',$('#pinned').checked?'true':'false');fd.append('file',f);
-  $('#uploadStatus').textContent='업로드 중...';
-  const r=await fetch('/.netlify/functions/admin-upload',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));
-  if(!r.ok){$('#uploadStatus').textContent=j.error||'업로드 실패';$('#uploadStatus').className='status badtxt';return;}
-  $('#uploadStatus').textContent=`업로드 완료 ✓ ${$('#part').value}부 · ${$('#scene').value.replace(/씬$/,'')}씬 · ${$('#title').value||f.name.replace(/\.[^.]+$/,'')}`;
-  $('#uploadStatus').className='status oktxt';$('#file').value='';$('#title').value='';$('#note').value='';await loadItems();loadNotices();
-});
+/* ── 화면 전환 ── */
+function go(v){
+  let tab=null;if(v.includes(':'))[v,tab]=v.split(':');
+  if(!document.getElementById('v-'+v))v='dash';
+  view=v;document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  if(tab)setTab(tab);
+  history.replaceState(null,'','#'+v);window.scrollTo({top:0});
+  if(v==='memo')loadMemos();
+}
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(b)go(b.dataset.v);});
+document.querySelectorAll('.stat[data-go]').forEach(s=>s.addEventListener('click',()=>go(s.dataset.go)));
 
-async function loadItems(){const r=await fetch('/.netlify/functions/admin-list',{cache:'no-store'});if(r.status===401){location.reload();return;}const j=await r.json().catch(()=>({}));if(!r.ok){alert((j&&j.error)?j.error:('목록을 불러오지 못했습니다 ('+r.status+')'));return;}allItems=j.items||[];renderItems();loadStatic();}
-function setTab(t){currentTab=t;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));renderItems();}
-$('#adminSearch').addEventListener('input',renderItems);
-
+/* ── 데이터 ── */
+async function loadItems(){const r=await fetch('/.netlify/functions/admin-list',{cache:'no-store'});if(r.status===401){location.reload();return;}const j=await r.json().catch(()=>({}));if(!r.ok){alert((j&&j.error)?j.error:('목록을 불러오지 못했습니다 ('+r.status+')'));return;}allItems=j.items||[];renderAll();}
 async function loadStatic(){
   const [d,h]=await Promise.all([
     fetch('/static-items.json',{cache:'no-cache'}).then(r=>r.json()).catch(()=>({scenes:[],apps:[]})),
     fetch('/.netlify/functions/static-hidden',{cache:'no-store'}).then(r=>r.json()).then(j=>j.hidden||[]).catch(()=>[])
   ]);
-  staticData={scenes:d.scenes||[],apps:d.apps||[]};staticHidden=new Set(h);fillNoticeSources();
-  if(currentTab==='static')renderItems();
+  staticData={scenes:d.scenes||[],apps:d.apps||[]};staticHidden=new Set(h);fillNoticeSources();renderAll();
 }
+async function loadMemos(){
+  try{const r=await fetch(`${MEMO_API}?all=1&tok=${memoTok}`,{cache:'no-store'});const j=await r.json();if(j.ok){memoDocs=j.docs||[];renderMemos();renderDash();}}
+  catch{$('#memos').innerHTML='<div class="status">메모를 불러오지 못했습니다.</div>';}
+}
+function renderAll(){renderItems();renderDash();}
+
+/* ── 현황판 ── */
+function renderDash(){
+  const act=allItems.filter(x=>!x.deleted), trash=allItems.filter(x=>x.deleted);
+  const ghVis=staticData.scenes.filter(x=>!staticHidden.has(x.id));
+  $('#stUp').textContent=act.length;$('#stUpSub').textContent=`숨김 ${act.filter(x=>x.visible===false).length} · 고정 ${act.filter(x=>x.pinned).length}`;
+  $('#stGh').textContent=staticData.scenes.length+staticData.apps.length;$('#stGhSub').textContent=`씬 ${staticData.scenes.length} · 앱 ${staticData.apps.length} · 숨김 ${staticHidden.size}`;
+  $('#stTrash').textContent=trash.length;
+  const openList=[];memoDocs.forEach(d=>d.memos.forEach(m=>{if(!m.done)openList.push({d,m});}));
+  const total=memoDocs.reduce((a,d)=>a+d.memos.length,0);
+  $('#stMemo').textContent=openList.length;$('#stMemoSub').textContent=`전체 ${total}개 · ${memoDocs.length}개 소품`;
+  $('#stMemo').parentNode.classList.toggle('alert',openList.length>0);
+  $('#memoCnt').textContent=openList.length||'';
+  // 부별
+  const cnt=Array.from({length:12},()=>({a:0,b:0}));
+  act.forEach(x=>{const p=partNumOf(x);if(p>=1&&p<=12)cnt[p-1].a++;});
+  ghVis.forEach(x=>{const p=partNumOf(x);if(p>=1&&p<=12)cnt[p-1].b++;});
+  const mx=Math.max(1,...cnt.map(c=>c.a+c.b));
+  $('#bars').innerHTML=cnt.map((c,i)=>`<div class="bar" data-p="${i+1}"><span>${i+1}부</span><div class="t"><i class="a" style="width:${c.a/mx*100}%"></i><i class="b" style="width:${c.b/mx*100}%"></i></div><b>${c.a+c.b}</b></div>`).join('');
+  // 메모
+  openList.sort((x,y)=>String(y.m.at).localeCompare(String(x.m.at)));
+  $('#dashMemos').innerHTML=openList.length?openList.slice(0,5).map(({d,m})=>`<a href="#" data-gomemo="1"><span class="tag">${esc(m.name)}</span><span class="nm">${esc(d.title||d.id)}<div class="tx">${esc(m.text)}</div></span><span class="tm">${esc(ago(m.at))}</span></a>`).join(''):'<div class="status" style="padding:10px 4px">처리할 메모가 없습니다 ✓</div>';
+  // 최근
+  const rec=[...act].sort((a,b)=>String(b.updatedAt||b.uploadedAt||'').localeCompare(String(a.updatedAt||a.uploadedAt||''))).slice(0,6);
+  $('#dashRecent').innerHTML=rec.length?rec.map(x=>`<a href="${esc(x.url)}" target="_blank"><span class="tag">${esc(x.part||'')} ${esc(x.scene||'')}</span><span class="nm">${esc(x.title||x.filename)}</span><span class="tm">${esc(ago(x.updatedAt||x.uploadedAt))}</span></a>`).join(''):'<div class="status" style="padding:10px 4px">아직 웹으로 올린 자료가 없습니다.</div>';
+}
+$('#bars').addEventListener('click',e=>{const b=e.target.closest('.bar');if(!b)return;$('#partFilter').value=b.dataset.p;go('items');renderItems();});
+$('#dashMemos').addEventListener('click',e=>{if(e.target.closest('[data-gomemo]')){e.preventDefault();go('memo');}});
+
+/* ── 업로드 (여러 파일) ── */
+let queue=[];let qid=0;
+function parseName(name){
+  const base=name.replace(/\.[^.]+$/,'');let s=base,part='',scene='';
+  let m=s.match(/(\d{1,2})\s*부/)||s.match(/part[\s_-]?(\d{1,2})/i)||s.match(/ep[\s_-]?(\d{1,2})/i);
+  if(m){part=m[1];s=s.replace(m[0],' ');}
+  m=s.match(/(\d{1,3})\s*씬/)||s.match(/scene[\s_-]?(\d{1,3})/i)||s.match(/(?:^|[\s_-])s(\d{1,3})(?=[\s_-]|$)/i)||s.match(/^(\d{1,3})(?=[\s_.-])/);
+  if(m){scene=m[1];s=s.replace(m[0],' ');}
+  const title=s.replace(/[_]+/g,' ').replace(/\s+-\s+/g,' ').replace(/^[\s._-]+|[\s._-]+$/g,'').replace(/\s{2,}/g,' ').trim()||base;
+  return {part,scene,title};
+}
+function addFiles(list){
+  const files=[...list];if(!files.length)return;
+  const defPart=$('#part').value;
+  for(const f of files){
+    const p=parseName(f.name);const ext=(f.name.split('.').pop()||'').toLowerCase();
+    let err='';if(!ALLOWED.has(ext))err=`지원하지 않는 형식 (.${ext})`;else if(f.size>MAX)err='4MB 초과';
+    queue.push({id:++qid,file:f,part:(+p.part>=1&&+p.part<=12)?p.part:defPart,scene:p.scene,title:p.title,state:err?'err':'ready',msg:err});
+  }
+  renderQueue();go('upload');
+}
+function renderQueue(){
+  $('#qActions').style.display=queue.length?'flex':'none';
+  $('#queue').innerHTML=queue.map(q=>`<div class="q ${q.state==='err'?'err':''} ${q.state==='done'?'done':''}" data-q="${q.id}">
+    <div class="fn"><span>${esc(q.file.name)}</span><span class="sz">${fmtSize(q.file.size)}</span></div>
+    <select data-f="part" ${q.state==='done'?'disabled':''}>${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${String(i+1)===String(q.part)?'selected':''}>${i+1}부</option>`).join('')}</select>
+    <input data-f="scene" placeholder="씬" value="${esc(q.scene)}" inputmode="numeric" ${q.state==='done'?'disabled':''}>
+    <input class="ti" data-f="title" placeholder="화면 제목" value="${esc(q.title)}" ${q.state==='done'?'disabled':''}>
+    <span class="st ${q.state==='done'?'ok':q.state==='err'?'bad':''}">${esc(q.msg||(q.state==='ready'?'대기':''))}</span>
+    <button class="rm" title="목록에서 빼기">×</button></div>`).join('');
+  const ready=queue.filter(q=>q.state==='ready').length;
+  $('#upAll').textContent=ready?`${ready}개 업로드`:'업로드할 파일 없음';$('#upAll').disabled=!ready;
+}
+$('#queue').addEventListener('input',e=>{const row=e.target.closest('.q');const q=queue.find(x=>x.id==row.dataset.q);if(q&&e.target.dataset.f)q[e.target.dataset.f]=e.target.value;});
+$('#queue').addEventListener('change',e=>{const row=e.target.closest('.q');const q=queue.find(x=>x.id==row.dataset.q);if(q&&e.target.dataset.f)q[e.target.dataset.f]=e.target.value;});
+$('#queue').addEventListener('click',e=>{if(!e.target.closest('.rm'))return;const id=e.target.closest('.q').dataset.q;queue=queue.filter(x=>x.id!=id);renderQueue();});
+$('#qClear').onclick=()=>{queue=queue.filter(q=>q.state==='uploading');renderQueue();$('#uploadStatus').textContent='';};
+$('#part').addEventListener('change',()=>ls.set('dw-admin-part',$('#part').value));
+$('#drop').onclick=()=>$('#files').click();
+$('#files').onchange=()=>{addFiles($('#files').files);$('#files').value='';};
+$('#upAll').onclick=async()=>{
+  const todo=queue.filter(q=>q.state==='ready');
+  const miss=todo.filter(q=>!String(q.scene).trim());
+  if(miss.length){miss.forEach(q=>{q.msg='씬 번호를 입력하세요';});renderQueue();document.querySelector(`.q[data-q="${miss[0].id}"] input[data-f=scene]`)?.focus();return;}
+  $('#upAll').disabled=true;let ok=0,fail=0;
+  const opt=$('#project').selectedOptions[0];
+  for(const q of todo){
+    q.state='uploading';q.msg='올리는 중…';renderQueue();
+    const fd=new FormData();
+    fd.append('project',$('#project').value);fd.append('projectName',opt.dataset.name||opt.textContent);
+    fd.append('part',q.part);fd.append('scene',q.scene);fd.append('title',q.title);
+    fd.append('visible',$('#visible').checked?'true':'false');fd.append('note',$('#note').value);fd.append('announce',$('#announce').checked?'true':'false');fd.append('pinned',$('#pinned').checked?'true':'false');fd.append('file',q.file);
+    try{
+      const r=await fetch('/.netlify/functions/admin-upload',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));
+      if(r.status===401){alert('로그인이 풀렸습니다. 다시 로그인해 주세요.');location.reload();return;}
+      if(!r.ok)throw new Error(j.error||('실패 '+r.status));
+      q.state='done';q.msg='완료 ✓';ok++;
+    }catch(err){q.state='err';q.msg=err.message||'실패';fail++;}
+    renderQueue();
+  }
+  $('#uploadStatus').textContent=fail?`${ok}개 완료 · ${fail}개 실패`:`${ok}개 모두 올렸습니다 ✓`;$('#uploadStatus').className='status '+(fail?'badtxt':'oktxt');
+  if(ok){$('#note').value='';await loadItems();loadNotices();toast(`${ok}개 업로드 완료`);}
+};
+
+/* ── 끌어다 놓기: 페이지 전체 / 자료 행(교체) ── */
+let dragDepth=0;
+const hasFiles=e=>[...(e.dataTransfer?.types||[])].includes('Files');
+window.addEventListener('dragenter',e=>{if(!hasFiles(e)||$('#adminView').style.display==='none')return;e.preventDefault();dragDepth++;updateCover(e);});
+window.addEventListener('dragleave',e=>{if(!hasFiles(e))return;dragDepth=Math.max(0,dragDepth-1);if(!dragDepth){$('#dragcover').classList.remove('on');clearRowDrop();}});
+window.addEventListener('dragover',e=>{if(!hasFiles(e))return;e.preventDefault();updateCover(e);});
+window.addEventListener('drop',e=>{
+  if(!hasFiles(e))return;e.preventDefault();dragDepth=0;$('#dragcover').classList.remove('on');
+  const row=rowTarget(e);clearRowDrop();
+  if(e.target.closest('#rdrop')||$('#replaceModal').classList.contains('show')){setReplaceFile(e.dataTransfer.files[0]);return;}
+  if(row){openReplace(row.dataset.key,e.dataTransfer.files[0]);return;}
+  if($('#adminView').style.display!=='none')addFiles(e.dataTransfer.files);
+});
+function rowTarget(e){return view==='items'&&currentTab==='active'?e.target.closest?.('.item[data-key]'):null;}
+function clearRowDrop(){document.querySelectorAll('.item.dropok').forEach(r=>r.classList.remove('dropok'));$('#drop').classList.remove('over');$('#rdrop').classList.remove('over');}
+function updateCover(e){
+  clearRowDrop();
+  if($('#replaceModal').classList.contains('show')){$('#rdrop').classList.add('over');$('#dragcover').classList.remove('on');return;}
+  const row=rowTarget(e);
+  if(row){row.classList.add('dropok');$('#dragcover').classList.remove('on');return;}
+  if(e.target.closest?.('#drop')){$('#drop').classList.add('over');$('#dragcover').classList.remove('on');return;}
+  $('#dragcover').classList.add('on');
+}
+
+/* ── 자료 관리 ── */
+function setTab(t){currentTab=t;document.querySelectorAll('#v-items .tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));renderItems();}
+document.querySelectorAll('#v-items .tab').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
+$('#adminSearch').addEventListener('input',renderItems);$('#partFilter').addEventListener('change',renderItems);
+function memoCountFor(url){try{const u=new URL(url,location.origin);const id=u.pathname+u.search;const d=memoDocs.find(x=>x.id===id);return d?d.memos.filter(m=>!m.done).length:0;}catch{return 0}}
 async function toggleStatic(id,hide){
   if(hide&&!confirm('사이트에서 숨길까요? (파일은 남아 있고, 여기서 다시 표시할 수 있습니다)'))return;
   const j=await apiPost('/.netlify/functions/admin-static',{id,hidden:hide});
-  if(!j)return;staticHidden=new Set(j.hidden||[]);renderItems();
+  if(!j)return;staticHidden=new Set(j.hidden||[]);renderAll();toast(hide?'사이트에서 숨겼습니다':'다시 표시합니다');
 }
-function renderStatic(q){
-  const match=x=>!q||[x.part,x.scene,x.title,x.filename].join(' ').toLowerCase().includes(q);
-  const row=(x,label)=>{const off=staticHidden.has(x.id);return `<div class="item${off?' off':''}">
+function renderStatic(q,pf){
+  const match=x=>(!q||[x.part,x.scene,x.title,x.filename].join(' ').toLowerCase().includes(q))&&(!pf||partNumOf(x)==pf);
+  const row=(x,label)=>{const off=staticHidden.has(x.id);const mc=memoCountFor(x.url);return `<div class="item${off?' off':''}">
     <div class="scene">${esc(label)}</div>
     <div><div class="name">${esc(x.title)}</div><div class="meta">${esc(x.part?x.part+' · ':'')}${esc(x.filename||'')} · 깃허브</div>
-    <div class="flags">${off?'<span class="hidden">● 사이트에서 숨김</span>':''}</div></div>
+    <div class="flags">${off?'<span class="hidden">● 사이트에서 숨김</span> ':''}${mc?`<span class="memo-flag">● 메모 ${mc}</span>`:''}</div></div>
     <div class="item-actions"><a class="btn secondary small" target="_blank" href="${esc(x.url)}">열기</a>${off
-      ?`<button class="btn ok small" onclick='toggleStatic(${JSON.stringify(x.id)},false)'>다시 표시</button>`
-      :`<button class="btn danger small" onclick='toggleStatic(${JSON.stringify(x.id)},true)'>사이트에서 숨김</button>`}</div>
+      ?`<button class="btn ok small" data-act="static-show" data-id="${esc(x.id)}">다시 표시</button>`
+      :`<button class="btn danger small" data-act="static-hide" data-id="${esc(x.id)}">사이트에서 숨김</button>`}</div>
   </div>`;};
   const sc=staticData.scenes.filter(match).sort((a,b)=>(a.partNum-b.partNum)||String(a.scene).localeCompare(String(b.scene),'ko',{numeric:true}));
-  const ap=staticData.apps.filter(match);
-  return `<div class="static-note">깃허브로 직접 올린 자료입니다. <b>사이트에서 숨김</b>을 누르면 사이트 목록·검색·메인 카드에서 바로 사라지고, 언제든 <b>다시 표시</b>할 수 있습니다. 파일 자체는 지워지지 않습니다.</div>`
+  const ap=pf?[]:staticData.apps.filter(match);
+  return `<div class="tip">깃허브로 직접 올린 자료입니다. 파일 교체는 깃허브로 해야 하고, 여기서는 사이트에 <b>숨김 / 다시 표시</b>만 할 수 있어요.</div>`
     +(sc.length?`<div class="group-title">씬 자료</div>`+sc.map(x=>row(x,x.scene)).join(''):'')
     +(ap.length?`<div class="group-title">기타 · 촬영용 앱</div>`+ap.map(x=>row(x,'APP')).join(''):'')
     +(!sc.length&&!ap.length?'<div class="status" style="padding:20px 0">표시할 자료가 없습니다.</div>':'');
 }
 function renderItems(){
-  const q=$('#adminSearch').value.trim().toLowerCase();
-  if(currentTab==='static'){$('#items').innerHTML=renderStatic(q);return;}
+  const q=$('#adminSearch').value.trim().toLowerCase(), pf=$('#partFilter').value;
+  if(currentTab==='static'){$('#items').innerHTML=renderStatic(q,pf);return;}
   let items=allItems.filter(x=>currentTab==='trash'?!!x.deleted:!x.deleted);
   if(q)items=items.filter(x=>[x.part,x.scene,x.title,x.filename].join(' ').toLowerCase().includes(q));
+  if(pf)items=items.filter(x=>partNumOf(x)==pf);
   const box=$('#items');
-  if(!items.length){box.innerHTML='<div class="status" style="padding:20px 0">표시할 파일이 없습니다.</div>';return;}
-  box.innerHTML=items.map(x=>`<div class="item">
+  const tip=currentTab==='active'?'<div class="tip droptip">💡 새 파일을 목록의 자료 위로 <b>끌어다 놓으면</b> 그 자료의 파일이 바로 교체됩니다.</div>':'';
+  if(!items.length){box.innerHTML=tip+'<div class="status" style="padding:20px 0">표시할 파일이 없습니다.</div>';return;}
+  box.innerHTML=tip+items.map(x=>{const mc=memoCountFor(x.url);const k=esc(x.key);return `<div class="item" data-key="${k}">
     <div class="scene">${esc(x.scene||'')}</div>
-    <div><div class="name">${esc(x.title||x.filename||'')}</div><div class="meta">${esc(x.part||'')} · ${esc(x.filename||'')} · ${fmtSize(Number(x.size||0))}</div>
-    <div class="flags">${x.pinned?'<span class="pin">★ 상단 고정</span> ':''}${x.visible===false?'<span class="hidden">● 숨김</span> ':''}${x.deleted?'<span class="trash">● 휴지통</span>':''}</div></div>
+    <div><div class="name">${esc(x.title||x.filename||'')}</div><div class="meta">${esc(x.part||'')} · ${esc(x.filename||'')} · ${fmtSize(Number(x.size||0))} · ${esc(ago(x.updatedAt||x.uploadedAt))}</div>
+    <div class="flags">${x.pinned?'<span class="pin">★ 상단 고정</span> ':''}${x.visible===false?'<span class="hidden">● 숨김</span> ':''}${x.deleted?'<span class="trash">● 휴지통</span> ':''}${mc?`<span class="memo-flag">● 메모 ${mc}</span>`:''}</div></div>
     <div class="item-actions">
       ${x.deleted
-       ? `<button class="btn ok small" onclick='trashAction(${JSON.stringify(x.key)},"restore")'>복구</button><button class="btn danger small" onclick='trashAction(${JSON.stringify(x.key)},"purge")'>완전삭제</button>`
-       : `<a class="btn secondary small" target="_blank" href="${x.url}">열기</a><button class="btn secondary small" onclick='openEdit(${JSON.stringify(x.key)})'>수정</button><button class="btn secondary small" onclick='openReplace(${JSON.stringify(x.key)})'>파일교체</button><button class="btn warn small" onclick='quickPin(${JSON.stringify(x.key)},${!x.pinned})'>${x.pinned?'고정해제':'고정'}</button><button class="btn danger small" onclick='trashAction(${JSON.stringify(x.key)},"trash")'>휴지통</button>`}
-    </div>
-  </div>`).join('');
+       ? `<button class="btn ok small" data-act="restore">복구</button><button class="btn danger small" data-act="purge">완전삭제</button>`
+       : `<a class="btn secondary small" target="_blank" href="${esc(x.url)}">열기</a><button class="btn secondary small" data-act="edit">수정</button><button class="btn secondary small" data-act="replace">파일교체</button><button class="btn warn small" data-act="pin">${x.pinned?'고정해제':'고정'}</button><button class="btn danger small" data-act="trash">휴지통</button>`}
+    </div></div>`;}).join('');
 }
+$('#items').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act]');if(!b)return;
+  const act=b.dataset.act;
+  if(act==='static-hide')return toggleStatic(b.dataset.id,true);
+  if(act==='static-show')return toggleStatic(b.dataset.id,false);
+  const key=b.closest('.item')?.dataset.key;if(!key)return;
+  if(act==='edit')openEdit(key);else if(act==='replace')openReplace(key);
+  else if(act==='pin'){const x=itemByKey(key);quickPin(key,!x.pinned);}
+  else trashAction(key,act);
+});
 function itemByKey(k){return allItems.find(x=>x.key===k);}
 function openEdit(k){const x=itemByKey(k);if(!x)return;$('#editKey').value=k;$('#editPart').value=x.partNum||parseInt(x.part);$('#editScene').value=(x.sceneRaw||x.scene||'').replace(/씬$/,'');$('#editTitle').value=x.title||'';$('#editVisible').checked=x.visible!==false;$('#editPinned').checked=!!x.pinned;$('#editNote').value='';$('#editModal').classList.add('show');}
-async function saveEdit(){const body={key:$('#editKey').value,partNum:Number($('#editPart').value),sceneRaw:$('#editScene').value,title:$('#editTitle').value,visible:$('#editVisible').checked,pinned:$('#editPinned').checked,note:$('#editNote').value};const j=await apiPost('/.netlify/functions/admin-update',body);if(!j)return;closeModal('editModal');await loadItems();loadNotices();}
-async function quickPin(key,pinned){const j=await apiPost('/.netlify/functions/admin-update',{key,pinned});if(j)loadItems();}
-function openReplace(k){const x=itemByKey(k);$('#replaceKey').value=k;$('#replaceName').textContent=`${x.scene} · ${x.title||x.filename}`;$('#replaceFile').value='';$('#replaceNote').value='';$('#replaceAnnounce').checked=true;$('#replaceStatus').textContent='';$('#replaceModal').classList.add('show');}
-async function replaceFile(){const f=$('#replaceFile').files[0];if(!f)return alert('교체할 파일을 선택해 주세요.');const fd=new FormData();fd.append('key',$('#replaceKey').value);fd.append('file',f);fd.append('note',$('#replaceNote').value);fd.append('announce',$('#replaceAnnounce').checked?'true':'false');$('#replaceStatus').textContent='교체 중...';const r=await fetch('/.netlify/functions/admin-replace',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));if(!r.ok){$('#replaceStatus').textContent=j.error||('교체 실패 ('+r.status+')');return;}closeModal('replaceModal');await loadItems();loadNotices();}
+async function saveEdit(){const body={key:$('#editKey').value,partNum:Number($('#editPart').value),sceneRaw:$('#editScene').value,title:$('#editTitle').value,visible:$('#editVisible').checked,pinned:$('#editPinned').checked,note:$('#editNote').value};const j=await apiPost('/.netlify/functions/admin-update',body);if(!j)return;closeModal('editModal');await loadItems();loadNotices();toast('저장했습니다');}
+async function quickPin(key,pinned){const j=await apiPost('/.netlify/functions/admin-update',{key,pinned});if(j){loadItems();toast(pinned?'상단에 고정했습니다':'고정을 풀었습니다');}}
+let replacePicked=null;
+function setReplaceFile(f){
+  replacePicked=f||null;
+  if(!f){$('#rdrop').innerHTML='새 파일을 <b>여기로 끌어다 놓거나</b> 눌러서 선택';return;}
+  const big=f.size>MAX;
+  $('#rdrop').innerHTML=`<b>${esc(f.name)}</b> · ${fmtSize(f.size)}${big?' <span class="badtxt">· 4MB 초과</span>':''}<br><span class="status">다른 파일로 바꾸려면 다시 끌어다 놓거나 누르세요</span>`;
+}
+function openReplace(k,file){const x=itemByKey(k);if(!x)return;$('#replaceKey').value=k;$('#replaceName').textContent=`${x.part} · ${x.scene} · ${x.title||x.filename}`;$('#replaceFile').value='';setReplaceFile(file);$('#replaceNote').value='';$('#replaceAnnounce').checked=true;$('#replaceStatus').textContent='';$('#replaceBtn').disabled=false;$('#replaceModal').classList.add('show');}
+$('#rdrop').onclick=()=>$('#replaceFile').click();
+$('#replaceFile').onchange=()=>setReplaceFile($('#replaceFile').files[0]);
+async function replaceFile(){
+  const f=replacePicked;if(!f)return alert('교체할 파일을 선택해 주세요.');
+  if(f.size>MAX)return alert('파일당 4MB까지 올릴 수 있습니다.');
+  const fd=new FormData();fd.append('key',$('#replaceKey').value);fd.append('file',f);fd.append('note',$('#replaceNote').value);fd.append('announce',$('#replaceAnnounce').checked?'true':'false');
+  $('#replaceStatus').textContent='교체 중...';$('#replaceBtn').disabled=true;
+  const r=await fetch('/.netlify/functions/admin-replace',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));
+  if(!r.ok){$('#replaceStatus').textContent=j.error||('교체 실패 ('+r.status+')');$('#replaceBtn').disabled=false;return;}
+  closeModal('replaceModal');await loadItems();loadNotices();toast('파일을 교체했습니다');
+}
 async function apiPost(path,body){
   try{
     const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -211,20 +565,59 @@ async function trashAction(key,action){
   await loadItems();
   const still=allItems.find(x=>x.key===key);
   if(action==='trash'&&still&&!still.deleted){alert('서버에는 반영됐지만 목록이 아직 예전 상태입니다. 잠시 후 새로고침해 주세요.');}
+  else toast(action==='trash'?'휴지통으로 옮겼습니다':action==='restore'?'복구했습니다':'완전히 삭제했습니다');
 }
 function closeModal(id){document.getElementById(id).classList.remove('show');}
-function fmtSize(n){if(n<1024)return n+' B';if(n<1024*1024)return(n/1024).toFixed(1)+' KB';return(n/1024/1024).toFixed(1)+' MB';}
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'));});
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');}));
+
+/* ── 메모 ── */
+document.querySelectorAll('#v-memo .tab').forEach(b=>b.addEventListener('click',()=>{memoFilter=b.dataset.mf;document.querySelectorAll('#v-memo .tab').forEach(x=>x.classList.toggle('active',x===b));renderMemos();}));
+$('#memoReload').onclick=()=>loadMemos();
+function renderMemos(){
+  const docs=memoDocs.map(d=>({...d,show:memoFilter==='open'?d.memos.filter(m=>!m.done):d.memos})).filter(d=>d.show.length)
+    .sort((a,b)=>String(b.show.reduce((x,m)=>m.at>x?m.at:x,'')).localeCompare(String(a.show.reduce((x,m)=>m.at>x?m.at:x,''))));
+  if(!docs.length){$('#memos').innerHTML=`<div class="status" style="padding:24px 0">${memoFilter==='open'?'처리할 메모가 없습니다 ✓':'아직 남겨진 메모가 없습니다.'}</div>`;return;}
+  const name=esc(ls.get('dw-memo-name','')||'관리자');
+  $('#memos').innerHTML=docs.map(d=>`<div class="mgroup" data-id="${esc(d.id)}">
+    <div class="mhead"><div><b>${esc(d.title||d.id)}</b><div class="meta">${esc(decodeURIComponent(d.id).slice(0,80))}</div></div><a class="btn secondary small" href="${esc(d.id)}" target="_blank">열기</a></div>
+    ${d.show.map(m=>`<div class="mm ${m.done?'done':''}" data-mid="${esc(m.mid)}"><div><div class="h"><b>${esc(m.name)}</b><span>${esc(ago(m.at))}</span></div><div class="t">${esc(m.text)}</div></div>
+      <div class="a"><button class="btn ${m.done?'ok':'secondary'} small" data-mact="done" data-done="${m.done?0:1}">${m.done?'✓ 완료됨':'완료'}</button><button class="btn danger small" data-mact="del">삭제</button></div></div>`).join('')}
+    <form class="reply"><input placeholder="답글 남기기 (${name} 이름으로)" maxlength="1000"><button class="btn small" type="submit">등록</button></form>
+  </div>`).join('');
+}
+async function memoPost(body){
+  try{const r=await fetch(MEMO_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,tok:memoTok})});const j=await r.json();if(!j.ok)throw new Error(j.error||'실패');return j;}
+  catch(e){alert('메모 처리 실패: '+e.message);return null;}
+}
+function applyMemoResult(id,memos){const d=memoDocs.find(x=>x.id===id);if(d)d.memos=memos;memoDocs=memoDocs.filter(x=>x.memos.length);renderMemos();renderDash();renderItems();}
+$('#memos').addEventListener('click',async e=>{
+  const b=e.target.closest('button[data-mact]');if(!b)return;
+  const g=b.closest('.mgroup'),mid=b.closest('.mm').dataset.mid,id=g.dataset.id;
+  if(b.dataset.mact==='del'&&!confirm('이 메모를 삭제할까요?'))return;
+  b.disabled=true;
+  const j=await memoPost(b.dataset.mact==='del'?{action:'del',id,mid}:{action:'done',id,mid,done:b.dataset.done==='1'});
+  if(j){applyMemoResult(id,j.memos);toast(b.dataset.mact==='del'?'삭제했습니다':'처리했습니다');}else b.disabled=false;
+});
+$('#memos').addEventListener('submit',async e=>{
+  e.preventDefault();const f=e.target,inp=f.querySelector('input'),text=inp.value.trim();if(!text)return;
+  const g=f.closest('.mgroup'),id=g.dataset.id,d=memoDocs.find(x=>x.id===id);
+  const j=await memoPost({action:'add',id,title:d?.title||'',name:ls.get('dw-memo-name','')||'관리자',text});
+  if(j){applyMemoResult(id,j.memos);toast('답글을 남겼습니다');}
+});
+
+/* ── 소식 ── */
 const TYPE_LABEL={new:'새 자료',updated:'수정',notice:'공지'};
 async function loadNotices(){
   const j=await apiPost('/.netlify/functions/admin-notice',{action:'list'});if(!j)return;
   const list=(j.items||[]).slice(0,30);
-  $('#notices').innerHTML=list.length?list.map(x=>`<div class="item" style="grid-template-columns:82px minmax(220px,1fr) auto">
+  $('#notices').innerHTML=list.length?list.map(x=>`<div class="item">
     <div class="scene" style="font-size:12px">${esc(TYPE_LABEL[x.type]||'공지')}</div>
     <div><div class="name" style="font-size:14px">${esc([x.part,x.scene].filter(Boolean).join(' · '))} ${esc(x.title||'')}</div><div class="meta">${esc(x.note||'')} · ${esc(new Date(x.at).toLocaleString('ko-KR'))}</div></div>
-    <div class="item-actions">${x.url?`<a class="btn secondary small" target="_blank" href="${esc(x.url)}">열기</a>`:''}<button class="btn danger small" onclick='delNotice(${JSON.stringify(x.id)})'>소식 지우기</button></div></div>`).join(''):'<div class="status">아직 올린 소식이 없습니다.</div>';
+    <div class="item-actions">${x.url?`<a class="btn secondary small" target="_blank" href="${esc(x.url)}">열기</a>`:''}<button class="btn danger small" data-nid="${esc(x.id)}">소식 지우기</button></div></div>`).join(''):'<div class="status">아직 올린 소식이 없습니다.</div>';
 }
-async function delNotice(id){if(!confirm('이 소식을 사이트에서 지울까요? (자료 파일은 그대로입니다)'))return;const j=await apiPost('/.netlify/functions/admin-notice',{action:'delete',id});if(j)loadNotices();}
+$('#notices').addEventListener('click',e=>{const b=e.target.closest('[data-nid]');if(b)delNotice(b.dataset.nid);});
+async function delNotice(id){if(!confirm('이 소식을 사이트에서 지울까요? (자료 파일은 그대로입니다)'))return;const j=await apiPost('/.netlify/functions/admin-notice',{action:'delete',id});if(j){loadNotices();toast('소식을 지웠습니다');}}
 async function postNotice(){
   const sid=$('#nSrc').value;
   const body={type:$('#nType').value,partNum:$('#nPart').value,scene:$('#nScene').value,title:$('#nTitle').value,note:$('#nNote').value,url:$('#nUrl').value,sid:sid||undefined};
