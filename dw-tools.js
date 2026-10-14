@@ -25,6 +25,7 @@
     qr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>',
     memo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>',
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    zip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M10 13h4"/></svg>',
     dl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>'
   };
 
@@ -73,6 +74,7 @@
 .dwt-off{display:inline-flex;align-items:center;gap:6px;border:1px solid #2c3a57;background:#111a2b;color:#cfd9ff;border-radius:999px;padding:7px 13px;font:700 12px/1 'Segoe UI','Malgun Gothic',sans-serif;cursor:pointer;white-space:nowrap}
 .dwt-off:hover{border-color:#5b7de7;background:#16223a}.dwt-off svg{width:14px;height:14px}
 .dwt-off.ok{color:#59d39a;border-color:#2c5a46}
+.dwt-off,.dwu-btn{flex-shrink:0;white-space:nowrap}
 `;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
@@ -257,15 +259,113 @@
   }
   function mountOffline() {
     const count = document.getElementById("count");
-    if (!count || !document.getElementById("grid") || document.querySelector(".dwt-off")) return;
-    const b = document.createElement("button"); b.className = "dwt-off"; b.type = "button";
+    if (!count || !document.getElementById("grid") || document.querySelector(".dwt-offline")) return;
+    const b = document.createElement("button"); b.className = "dwt-off dwt-offline"; b.type = "button";
     b.title = "이 부의 자료를 기기에 저장해서 인터넷 없이도 열 수 있게 합니다";
     b.innerHTML = `${I.dl}<span>오프라인 저장</span>`;
     b.onclick = () => saveOffline(b);
     count.parentNode.insertBefore(b, count);
   }
 
+
+  /* ZIP 다운로드 (피라밋 전체 / 부별) — 부 · 씬별 폴더로 정리 */
+  const JSZIP_URL = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+  let zipLib;
+  const loadZip = () => zipLib || (zipLib = new Promise((ok, no) => {
+    if (window.JSZip) return ok(window.JSZip);
+    const s = document.createElement("script"); s.src = JSZIP_URL;
+    s.onload = () => (window.JSZip ? ok(window.JSZip) : no()); s.onerror = () => { zipLib = null; no(); };
+    document.head.appendChild(s);
+  }));
+  const safeName = (s) => String(s || "").replace(/[\\/:*?"<>|\r\n\t]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 80) || "자료";
+  const partNo = (x) => Number(x.partNum) || parseInt(x.part) || 0;
+  async function gatherItems(onlyPart) {
+    const [st, up] = await Promise.all([
+      (window.DW_STATIC || Promise.resolve({ scenes: [] })).catch(() => ({ scenes: [] })),
+      fetch("/.netlify/functions/catalog?project=pyramid", { cache: "no-store" }).then((r) => r.json()).then((j) => j.items || []).catch(() => [])
+    ]);
+    let all = [...(st.scenes || []), ...up.map((x) => ({ ...x, uploaded: true }))];
+    if (onlyPart) all = all.filter((x) => partNo(x) === onlyPart);
+    // 같은 파일을 여러 화면으로 쓰는 자료(예: ?screen=)는 한 번만 담는다
+    const byFile = new Map();
+    for (const x of all) {
+      const u = new URL(x.url, location.href);
+      const k = x.uploaded ? u.href : u.pathname;
+      if (byFile.has(k)) { byFile.get(k).titles.push(x.title); continue; }
+      byFile.set(k, { ...x, abs: x.uploaded ? u.href : u.origin + u.pathname, titles: [x.title] });
+    }
+    return [...byFile.values()].sort((a, b) => partNo(a) - partNo(b) || (parseInt(a.scene) || 0) - (parseInt(b.scene) || 0));
+  }
+  // 사이트 전용 코드(검색 차단 · 오프라인 · 방문 통계 · 목록 도구)는 빼고, 같은 서버의 CSS/JS 는 파일 안에 넣어 혼자 열리게 한다
+  async function standaloneHTML(html, base) {
+    html = html.replace(/<!-- DW-(?:SITE|GA|GA-OWNER) -->(?:<meta[^>]*>)?(?:<script[^>]*>[\s\S]*?<\/script>)*/g, "");
+    const origin = location.origin;
+    const grab = async (href) => { try { const u = new URL(href, base); if (u.origin !== origin) return null; const r = await fetch(u.href); return r.ok ? await r.text() : null; } catch { return null; } };
+    for (const m of [...html.matchAll(/<link\b[^>]*rel=["']?stylesheet["']?[^>]*>/gi)]) {
+      const href = (m[0].match(/href=["']([^"']+)["']/i) || [])[1]; if (!href) continue;
+      const css = await grab(href); if (css == null) continue;
+      html = html.replace(m[0], () => `<style>\n${css}\n</style>`);
+    }
+    for (const m of [...html.matchAll(/<script\b([^>]*)\bsrc=["']([^"']+)["']([^>]*)><\/script>/gi)]) {
+      const js = await grab(m[2]); if (js == null) continue;
+      const attrs = (m[1] + m[3]).replace(/\s(defer|async)\b/gi, "");
+      html = html.replace(m[0], () => `<script${attrs}>\n${js.replace(/<\/script/gi, "<\\/script")}\n</script>`);
+    }
+    return html;
+  }
+  async function downloadZip(btn, onlyPart) {
+    const label = btn.querySelector("span"), orig = label.textContent;
+    btn.disabled = true; label.textContent = "준비 중…";
+    try {
+      const [JSZip, items] = await Promise.all([loadZip(), gatherItems(onlyPart)]);
+      if (!items.length) { label.textContent = "받을 자료가 없습니다"; return; }
+      const zip = new JSZip(), used = new Set(); let fail = 0;
+      for (let i = 0; i < items.length; i++) {
+        const x = items[i];
+        label.textContent = `모으는 중 ${i + 1}/${items.length}`;
+        try {
+          const r = await fetch(x.abs); if (!r.ok) throw 0;
+          const type = r.headers.get("content-type") || "";
+          let ext = ((x.uploaded ? x.filename : new URL(x.abs).pathname).match(/\.([A-Za-z0-9]{1,5})$/) || [])[1] || (type.includes("html") ? "html" : "bin");
+          const title = x.titles.length > 1 ? `${x.titles[0]} 외 ${x.titles.length - 1}개 화면` : x.title;
+          let name = `${safeName(x.part || "기타")}/${safeName(x.scene)}_${safeName(title)}`, n = 2;
+          while (used.has(name + "." + ext)) name = name.replace(/ \(\d+\)$/, "") + ` (${n++})`;
+          used.add(name + "." + ext);
+          if (type.includes("text/html") || /^html?$/i.test(ext)) zip.file(`${name}.${ext}`, await standaloneHTML(await r.text(), x.abs));
+          else zip.file(`${name}.${ext}`, await r.arrayBuffer());
+        } catch { fail++; }
+      }
+      label.textContent = "압축 중…";
+      const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+      const d = new Date(), ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = `피라밋_${onlyPart ? onlyPart + "부" : "전체"}_${ymd}.zip`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+      label.textContent = fail ? `다운로드 완료 (${fail}개 실패)` : `다운로드 완료 · ${items.length}개`;
+      btn.classList.toggle("ok", !fail);
+      setTimeout(() => { label.textContent = orig; btn.classList.remove("ok"); }, 6000);
+    } catch {
+      label.textContent = "다운로드 실패 · 인터넷 확인";
+      setTimeout(() => { label.textContent = orig; }, 5000);
+    } finally { btn.disabled = false; }
+  }
+  function mountZip() {
+    const m = location.pathname.match(/^\/pyramid\/part(\d+)\//);
+    const onPyramid = /^\/pyramid\/(index\.html)?$/.test(location.pathname);
+    if (!m && !onPyramid) return;
+    const anchor = document.getElementById(m ? "count" : "totalCount");
+    if (!anchor || document.querySelector(".dwt-zip")) return;
+    const b = document.createElement("button"); b.type = "button"; b.className = "dwt-off dwt-zip";
+    b.title = m ? "이 부의 자료를 씬별로 정리해 ZIP 파일로 받습니다" : "피라밋 전체 자료를 부 · 씬별로 정리해 ZIP 파일로 받습니다";
+    b.innerHTML = `${I.zip}<span>${m ? "이 부 다운로드" : "전체 다운로드"}</span>`;
+    b.onclick = () => downloadZip(b, m ? +m[1] : 0);
+    anchor.parentNode.insertBefore(b, anchor);
+    anchor.parentNode.style.flexWrap = "wrap"; anchor.parentNode.style.rowGap = "10px";
+  }
+
   function boot() {
+    mountZip();
     const root = document.getElementById("grid") || document.getElementById("results");
     if (!root) return;
     let raf = 0;
