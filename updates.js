@@ -84,6 +84,12 @@
 .dwu-item .dwu-time{margin-left:auto}
 .dwu-pdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff5a64;margin-left:9px;vertical-align:4px}
 .dwu-less .dwu-pdot{background:#4a5672}
+
+/* 카드 안의 수정 내용 줄은 목록 패널에서만 보여 준다 */
+#grid .card .filename[style*="c9b27a"]{display:none}
+/* 피라밋 페이지 부 카드의 'NEW n' 표시는 작은 점으로 */
+.part-title .dwu-dot{font-size:0;width:8px;height:8px;padding:0;margin-left:9px;vertical-align:4px;border-radius:50%}
+.dwu-less .part-title .dwu-dot{background:#4a5672}
 `;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
