@@ -298,6 +298,14 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
   </div>
 </div>
 
+<div id="versionsModal" class="modal">
+  <div class="modal-card">
+    <div class="modal-head"><h1 style="font-size:21px">이전 버전 · 7일 보관</h1><button class="x" onclick="closeModal('versionsModal')">×</button></div>
+    <div class="sub" id="versionsName"></div>
+    <div id="versionsList" style="margin-top:14px"></div>
+  </div>
+</div>
+
 <div class="dragcover" id="dragcover"><div>놓으면 업로드 목록에 추가됩니다</div></div>
 <div class="toast" id="toast"></div>
 
@@ -512,7 +520,7 @@ function renderItems(){
     <div class="item-actions">
       ${x.deleted
        ? `<button class="btn ok small" data-act="restore">복구</button><button class="btn danger small" data-act="purge">완전삭제</button>`
-       : `<a class="btn secondary small" target="_blank" href="${esc(x.url)}">열기</a><button class="btn secondary small" data-act="edit">수정</button><button class="btn secondary small" data-act="replace">파일교체</button><button class="btn warn small" data-act="pin">${x.pinned?'고정해제':'고정'}</button><button class="btn danger small" data-act="trash">휴지통</button>`}
+       : `<a class="btn secondary small" target="_blank" href="${esc(x.url)}">열기</a><button class="btn secondary small" data-act="edit">수정</button><button class="btn secondary small" data-act="replace">파일교체</button><button class="btn secondary small" data-act="versions">이전버전</button><button class="btn warn small" data-act="pin">${x.pinned?'고정해제':'고정'}</button><button class="btn danger small" data-act="trash">휴지통</button>`}
     </div></div>`;}).join('');
 }
 $('#items').addEventListener('click',e=>{
@@ -521,7 +529,7 @@ $('#items').addEventListener('click',e=>{
   if(act==='static-hide')return toggleStatic(b.dataset.id,true);
   if(act==='static-show')return toggleStatic(b.dataset.id,false);
   const key=b.closest('.item')?.dataset.key;if(!key)return;
-  if(act==='edit')openEdit(key);else if(act==='replace')openReplace(key);
+  if(act==='edit')openEdit(key);else if(act==='replace')openReplace(key);else if(act==='versions')openVersions(key);
   else if(act==='pin'){const x=itemByKey(key);quickPin(key,!x.pinned);}
   else trashAction(key,act);
 });
@@ -547,6 +555,25 @@ async function replaceFile(){
   const r=await fetch('/.netlify/functions/admin-replace',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));
   if(!r.ok){$('#replaceStatus').textContent=j.error||('교체 실패 ('+r.status+')');$('#replaceBtn').disabled=false;return;}
   closeModal('replaceModal');await loadItems();loadNotices();toast('파일을 교체했습니다');
+}
+async function openVersions(key){
+  const x=itemByKey(key);if(!x)return;
+  $('#versionsName').textContent=`${x.part} · ${x.scene} · ${x.title||x.filename}`;
+  $('#versionsList').innerHTML='<div class="status">불러오는 중...</div>';
+  $('#versionsModal').classList.add('show');
+  const r=await fetch(`/.netlify/functions/admin-versions?key=${encodeURIComponent(key)}`,{cache:'no-store'});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){$('#versionsList').innerHTML=`<div class="status badtxt">${esc(j.error||'이전 버전을 불러오지 못했습니다.')}</div>`;return;}
+  if(!j.versions?.length){$('#versionsList').innerHTML='<div class="status">아직 저장된 이전 버전이 없습니다.<br>다음 파일 교체부터 7일 동안 보관됩니다.</div>';return;}
+  $('#versionsList').innerHTML=j.versions.map(v=>`<div class="item" data-version="${esc(v.id)}" style="grid-template-columns:1fr auto">
+    <div><div class="name">${esc(v.filename||'이전 파일')}</div><div class="meta">${fmtSize(Number(v.size||0))} · ${new Date(v.createdAt).toLocaleString('ko-KR')} 백업 · ${new Date(v.expiresAt).toLocaleString('ko-KR')}까지</div></div>
+    <div class="item-actions"><a class="btn secondary small" target="_blank" href="/.netlify/functions/admin-version-file?key=${encodeURIComponent(key)}&id=${encodeURIComponent(v.id)}">미리보기</a><button class="btn ok small" onclick="restoreVersion('${esc(key)}','${esc(v.id)}')">복원</button></div>
+  </div>`).join('');
+}
+async function restoreVersion(key,id){
+  if(!confirm('이 버전으로 복원할까요? 현재 파일도 복원 전에 자동 백업됩니다.'))return;
+  const j=await apiPost('/.netlify/functions/admin-versions',{key,id});if(!j)return;
+  closeModal('versionsModal');await loadItems();loadNotices();toast('이전 버전으로 복원했습니다');
 }
 async function apiPost(path,body){
   try{

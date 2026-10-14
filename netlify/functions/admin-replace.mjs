@@ -1,6 +1,7 @@
 
 import { isAdmin } from "../lib/auth.mjs";
 import { uploadsStore, patchFlags, readFlags, merge, pushUpdate, cleanNote } from "../lib/flags.mjs";
+import { createBackup, cleanupExpiredBackups } from "../lib/backups.mjs";
 
 const MAX = 4 * 1024 * 1024;
 const ALLOWED = new Set(["html","htm","png","jpg","jpeg","webp","gif","pdf","pptx","xlsx","docx","txt","zip"]);
@@ -26,8 +27,10 @@ export default async (req) => {
     if (!entry) return Response.json({ ok:false, error:"교체할 파일을 찾을 수 없습니다." }, { status:404 });
 
     const flags = await readFlags(store);
+    const currentMeta = merge(entry.metadata, flags[key]);
+    await createBackup(store, key, currentMeta);
     const meta = {
-      ...merge(entry.metadata, flags[key]),
+      ...currentMeta,
       filename:file.name,
       contentType:file.type || "application/octet-stream",
       size:file.size,
@@ -35,6 +38,7 @@ export default async (req) => {
     };
     if (announce) { meta.changedAt = meta.updatedAt; meta.changeType = "updated"; meta.changeNote = note; }
     await store.set(key, file, { metadata:meta });
+    cleanupExpiredBackups(store).catch(()=>{});
     await patchFlags(store, key, {
       filename:meta.filename, contentType:meta.contentType, size:meta.size, updatedAt:meta.updatedAt,
       ...(announce ? { changedAt:meta.changedAt, changeType:"updated", changeNote:note } : {})
