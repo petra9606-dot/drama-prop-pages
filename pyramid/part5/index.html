@@ -18,12 +18,29 @@ h1{margin:0;font-size:38px;letter-spacing:-.03em}.sub{color:#7e8ba3;font-size:12
 @media(max-width:580px){.wrap{padding:30px 16px 50px}.header{align-items:flex-start;flex-direction:column}h1{font-size:32px}}
 
 .filter{margin:0 0 20px}.filter input{width:100%;background:#0d121b;border:1px solid #28344b;border-radius:12px;color:#fff;padding:12px 13px;outline:none}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+.chip{border:1px solid #2a3650;background:#0f1522;color:#c9d4ee;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.chip i{font-style:normal;font-size:11px;color:#7d8aa5;font-weight:600}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--c,#6b7fd6)}
+.chip.on{background:#1b2540;border-color:#5b7de7;color:#fff}
+.group{margin:0 0 34px}
+.group .grid{grid-template-columns:repeat(auto-fill,minmax(235px,1fr))}
+.ghead{display:flex;align-items:center;gap:12px;margin:0 0 14px;position:sticky;top:0;z-index:2;padding:10px 0;background:linear-gradient(#0b0f19 75%,rgba(11,15,25,0))}
+.gscene{font-size:20px;font-weight:900;color:#fff;display:flex;align-items:center;gap:10px;letter-spacing:-.02em}
+.gscene::before{content:"";width:6px;height:24px;border-radius:3px;background:var(--c)}
+.gcount{font-size:12px;color:#7d8aa5}
+.gline{flex:1;height:1px;background:linear-gradient(90deg,var(--c),transparent);opacity:.45}
+.group .card{border-left:4px solid var(--c);min-height:118px;padding:18px 20px}
+.group .card:hover{border-color:var(--c);border-left-width:4px}
+.group .scene{color:var(--c);background:transparent;border-color:var(--c)}
+.group .title{font-size:19px;margin-top:12px}
 </style>
 </head>
 <body><main class="wrap">
 <a class="back" href="../index.html">← 피라밋</a>
 <div class="header"><div><h1>5부</h1><div class="sub">SCENE MATERIALS</div></div><div style="display:flex;align-items:center;gap:14px"><span id="dwuBtn"></span><div class="count" id="count">자료 불러오는 중...</div></div></div>
-<div id="dwuStrip"></div><div class="filter"><input id="localSearch" placeholder="이 부에서 씬 / 제목 검색"></div><div id="grid" class="grid"></div>
+<div id="dwuStrip"></div><div class="filter"><input id="localSearch" placeholder="이 부에서 씬 / 제목 검색"></div><div class="chips" id="chips"></div><div id="grid"></div>
 </main>
 <script src="/static-items.js"></script>
 <script src="/updates.js"></script>
@@ -34,21 +51,43 @@ DW_UPDATES.mountStrip(document.getElementById("dwuStrip"),{limit:3,filter:x=>x.p
 document.addEventListener("click",e=>{const c=e.target.closest("#grid .card");if(!c)return;const x=(window.__cards||[])[+c.dataset.i];if(x){DW_UPDATES.markSeen(x);const b=c.querySelector(".dwu-badge");if(b)b.remove();}});
 let staticItems=[];
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const PALETTE=["#5b8cff","#f2a93b","#3fc68a","#e8618c","#a77bff","#37c4d6","#e2d04a","#ff7b52","#7fa3c9","#c58cff"];
+const sceneNo=s=>{const m=String(s||'').match(/\d+/);return m?+m[0]:9999;};
+let curScene="all";
 function render(uploaded=[]){
-  const all=[...staticItems.map(x=>({...x,pinned:false})),...uploaded.map(x=>({...x,scene:x.scene,title:x.title||x.filename,filename:x.filename,url:x.url,source:"웹 업로드",pinned:!!x.pinned}))].sort((a,b)=>(Number(!!b.pinned)-Number(!!a.pinned))||(Number(!!DW_UPDATES.badge(b))-Number(!!DW_UPDATES.badge(a))));
+  const all=[...staticItems.map(x=>({...x,pinned:false})),...uploaded.map(x=>({...x,scene:x.scene,title:x.title||x.filename,filename:x.filename,url:x.url,source:"웹 업로드",pinned:!!x.pinned}))]
+    .sort((a,b)=>(sceneNo(a.scene)-sceneNo(b.scene))||(Number(!!b.pinned)-Number(!!a.pinned))||String(a.title).localeCompare(String(b.title),'ko',{numeric:true}));
   window.__cards=all;
   document.getElementById('count').textContent=all.length?`${all.length}개 자료`:'등록된 자료 없음';
-  const box=document.getElementById('grid');
-  if(!all.length){box.innerHTML='<div class="empty">아직 등록된 씬 자료가 없습니다.</div>';return;}
-  box.innerHTML=all.map((x,i)=>`<a class="card" data-i="${i}" href="${x.url}" ${x.source==="웹 업로드"?'target="_blank"':''}>
-    <div class="topline"><span class="scene">${esc(x.scene)}${x.pinned?" ★":""}</span><span class="source">${esc(x.source)}</span></div>
-    <div class="title">${esc(x.title)}${DW_UPDATES.badgeHTML(x)}</div>${x.changeNote&&DW_UPDATES.badge(x)?`<div class="filename" style="color:#c9b27a">${esc(x.changeNote)}</div>`:''}
-    <div class="filename">${esc(x.filename||'')}</div><div class="open">↗</div>
-  </a>`).join('');
+  const box=document.getElementById('grid'), chips=document.getElementById('chips');
+  if(!all.length){box.innerHTML='<div class="grid"><div class="empty">아직 등록된 씬 자료가 없습니다.</div></div>';chips.innerHTML='';return;}
+  const groups=[];const idx={};
+  all.forEach((x,i)=>{const k=sceneNo(x.scene)===9999?'기타':`${sceneNo(x.scene)}씬`;if(!(k in idx)){idx[k]=groups.length;groups.push({k,items:[]});}groups[idx[k]].items.push([x,i]);});
+  groups.forEach((g,gi)=>g.c=g.k==='기타'?'#7fa3c9':PALETTE[gi%PALETTE.length]);
+  if(curScene!=="all"&&!(curScene in idx))curScene="all";
+  chips.innerHTML=`<button class="chip ${curScene==='all'?'on':''}" data-s="all">전체 <i>${all.length}</i></button>`+groups.map(g=>`<button class="chip ${curScene===g.k?'on':''}" data-s="${esc(g.k)}" style="--c:${g.c}"><span class="dot"></span>${esc(g.k)} <i>${g.items.length}</i></button>`).join('');
+  box.innerHTML=groups.map(g=>`<section class="group" data-g="${esc(g.k)}" style="--c:${g.c}">
+    <div class="ghead"><div class="gscene">${esc(g.k)}</div><span class="gcount">${g.items.length}개</span><div class="gline"></div></div>
+    <div class="grid">${g.items.map(([x,i])=>`<a class="card" data-i="${i}" href="${x.url}" ${x.source==="웹 업로드"?'target="_blank"':''}>
+      <div class="topline"><span class="scene">${esc(x.scene)}${x.pinned?" ★":""}</span><span class="source">${esc(x.source)}</span></div>
+      <div class="title">${esc(x.title)}${DW_UPDATES.badgeHTML(x)}</div>${x.changeNote&&DW_UPDATES.badge(x)?`<div class="filename" style="color:#c9b27a">${esc(x.changeNote)}</div>`:''}
+      <div class="filename">${esc(x.filename||'')}</div><div class="open">↗</div>
+    </a>`).join('')}</div></section>`).join('');
+  applyFilter();
 }
+function applyFilter(){
+  const q=(document.getElementById('localSearch').value||'').toLowerCase();
+  document.querySelectorAll('#grid .group').forEach(g=>{
+    let n=0;const sceneOk=curScene==='all'||g.dataset.g===curScene;
+    g.querySelectorAll('.card').forEach(c=>{const ok=sceneOk&&c.innerText.toLowerCase().includes(q);c.style.display=ok?'block':'none';if(ok)n++;});
+    g.style.display=n?'':'none';
+  });
+  document.querySelectorAll('#chips .chip').forEach(c=>c.classList.toggle('on',c.dataset.s===curScene));
+}
+document.getElementById('chips').addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;curScene=c.dataset.s;applyFilter();});
 let uploadedItems=[];
 render([]);
 DW_STATIC.then(({scenes})=>{staticItems=scenes.filter(x=>x.part==='5부').map(x=>({...x,source:'기존'}));render(uploadedItems);});
 fetch('/.netlify/functions/catalog?project=pyramid&part=5부').then(r=>r.json()).then(({items=[]})=>{uploadedItems=items;render(items);}).catch(()=>render(uploadedItems));
-document.getElementById('localSearch').addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('#grid .card').forEach(c=>c.style.display=c.innerText.toLowerCase().includes(q)?'block':'none');});
+document.getElementById('localSearch').addEventListener('input',applyFilter);
 </script></body></html>
