@@ -1,8 +1,8 @@
-/* Generated from prop-apps/src/SceneMailData.ts by prepare-mail-v7-site.cjs. */
+/* Generated from prop-apps/src/SceneMailData.ts by prepare-mail-v8-site.cjs. */
 (()=>{const exports={};
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NOTICE_PREVIEW_BODY = exports.IMAGE_MAIL_BODY = exports.HAVEN_REVIEW_BODY = exports.REJECTION = exports.displayMailText = exports.MAIL_REVIEW_SENDER = exports.MAIL_REVIEW_SUBJECT = exports.MAIL_CONTENT_REVISION = exports.MAIL_DELAY_MS = exports.PEOPLE = void 0;
+exports.FORMAL_NOTICE_CSS = exports.NOTICE_PREVIEW_BODY = exports.IMAGE_MAIL_BODY = exports.HAVEN_REVIEW_BODY = exports.REJECTION = exports.displayMailText = exports.MAIL_REVIEW_SENDER = exports.MAIL_REVIEW_SUBJECT = exports.MAIL_CONTENT_REVISION = exports.MAIL_DELAY_MS = exports.PEOPLE = void 0;
 exports.defaultSceneConfig = defaultSceneConfig;
 exports.restoreSceneConfig = restoreSceneConfig;
 exports.scenePersonForMail = scenePersonForMail;
@@ -14,6 +14,8 @@ exports.receivedMail = receivedMail;
 exports.wrapNoticeText = wrapNoticeText;
 exports.noticeLayout = noticeLayout;
 exports.noticeSvg = noticeSvg;
+exports.formalNoticeMarkup = formalNoticeMarkup;
+exports.formalNoticeHtml = formalNoticeHtml;
 exports.PEOPLE = {
     song: { name: '송경필', email: 'song.law@edengroup.kr', color: '#607789', initial: '경' },
     baek: { name: '백동재', email: 'baek.dongjae@sphinx-holdings.kr', color: '#77735e', initial: '동' },
@@ -255,6 +257,67 @@ function noticeSvg(item, large = false) {
     }).join('');
     const result = resultLines.map((line, i) => `<text x="${metaValueX}" y="${resultY + i * metaStep}" font-size="${resultFont}" fill="#9b4944" font-weight="700">${escapeXml(line)}</text>`).join('');
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"><rect width="${width}" height="${height}" fill="#fff"/><g font-family="sans-serif" fill="#27333e"><text x="${margin}" y="88" font-size="${large ? 40 : 32}" font-weight="700" letter-spacing="4">BITONE</text><text x="${right}" y="83" text-anchor="end" font-size="${large ? 20 : 16}" fill="#7b8791">비트원 · 거래지원심사위원회</text><path d="M${margin} 115H${right}" stroke="#243e52" stroke-width="3"/><text x="${margin}" y="173" font-size="${large ? 42 : 30}" font-weight="700">거래지원 심사 결과 통지서</text><text x="${margin}" y="207" font-size="${large ? 18 : 15}" fill="#7b8791">LISTING REVIEW RESULT</text><rect x="${margin}" y="242" width="${right - margin}" height="${boxBottom - 242}" fill="#f2f5f7"/><g font-size="${metaFont}">${fields}<text x="${margin + 20}" y="${resultY}" fill="#77838d">최종 결과</text>${result}</g>${text}<path d="M${margin} ${footerY}H${right}" stroke="#d8dfe4"/><text x="${margin}" y="${footerY + (large ? 48 : 38)}" font-size="${large ? 26 : 17}" font-weight="700">${exports.MAIL_REVIEW_SENDER}</text>${emailLines.map((line, i) => `<text x="${margin}" y="${footerY + (large ? 86 + i * 30 : 66 + i * 28)}" font-size="${large ? 20 : 13}" fill="#7b8791">${escapeXml(line)}</text>`).join('')}</g></svg>`;
+}
+// The opened attachment uses the approved formal HTML layout, not estimated SVG line widths.
+// Keep noticeSvg for the unchanged, compact attachment thumbnail.
+exports.FORMAL_NOTICE_CSS = `
+.formal-notice{box-sizing:border-box;min-width:0;background:#fff;color:#25323d;padding:28px 24px 26px;font:400 18px/1.5 "Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;text-align:left;word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty;line-break:strict;letter-spacing:0;font-synthesis:none}
+.formal-notice *{box-sizing:border-box}
+.formal-notice .notice-brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:17px;border-bottom:2px solid #344652}
+.formal-notice .brand-name{font-size:23px;font-weight:500;letter-spacing:2px;line-height:1.2}
+.formal-notice .brand-team{font-size:11px;color:#6f7b85;text-align:right;line-height:1.4}
+.formal-notice .notice-title{text-align:center;margin:25px 0 6px;font-size:21px;line-height:1.4;font-weight:500;text-wrap:balance;color:#202e39;letter-spacing:0}
+.formal-notice .notice-subtitle{text-align:center;margin:0 0 24px;font-size:11px;line-height:1.4;color:#77838c;letter-spacing:.5px}
+.formal-notice .notice-meta{margin:0;padding:13px 0;background:#fff;display:grid;grid-template-columns:66px minmax(0,1fr);gap:10px 12px;font-size:13px;line-height:1.55;border-top:1px solid #cbd3d9;border-bottom:1px solid #cbd3d9}
+.formal-notice .notice-meta dt{margin:0;color:#717e88;font-weight:400}
+.formal-notice .notice-meta dd{margin:0;min-width:0;color:#263640}
+.formal-notice .notice-decision{background:#f6f3f2;padding:13px 15px;margin:18px 0 23px}
+.formal-notice .decision-label{font-size:12px;color:#717e88;margin-bottom:6px;line-height:1.5}
+.formal-notice .decision-value{font-size:19px;color:#92473f;font-weight:500;line-height:1.4;letter-spacing:-.2px}
+.formal-notice .decision-en{font-size:11px;font-weight:400;margin-left:6px;white-space:nowrap}
+.formal-notice .notice-content p{margin:0 0 14px;padding:0;line-height:inherit;font-size:inherit;white-space:normal}
+.formal-notice .notice-content p.continuous-copy{word-break:normal;overflow-wrap:break-word;text-wrap:wrap;white-space:normal;text-align:left}
+.formal-notice .review-section{margin:26px 0}
+.formal-notice .review-heading{display:grid;grid-template-columns:25px minmax(0,1fr);gap:5px;margin:0 0 12px;padding-bottom:9px;border-bottom:1px solid #e2e6e9;font-size:inherit;line-height:1.5;font-weight:500;color:#202e39;letter-spacing:0}
+.formal-notice .review-number{font-variant-numeric:tabular-nums}
+.formal-notice .final-heading{margin:28px 0 13px;font-size:inherit;font-weight:500;line-height:1.55}
+.formal-notice .notice-signature{margin-top:26px;font-size:inherit;font-weight:500;line-height:1.55}
+.formal-notice .signature-en{font-size:12px;font-weight:400;color:#687782;margin-top:7px;line-height:1.55;overflow-wrap:normal}
+.formal-notice .notice-confidential{font-size:12px;line-height:1.65;margin-top:23px;color:#76828c}
+.formal-notice .notice-footer{border-top:1px solid #e2e6e9;padding-top:16px;margin-top:32px;color:#6c7a84;font-size:11px;line-height:1.65}
+.formal-notice .notice-footer strong{display:block;font-weight:500;color:#40515f;font-size:12px;margin-bottom:4px}
+@media(max-width:360px){.formal-notice{padding-left:16px;padding-right:16px;font-size:16px}.formal-notice .notice-meta{grid-template-columns:52px minmax(0,1fr);padding:12px;gap:7px 9px;font-size:12px}.formal-notice .decision-value{font-size:17px}.formal-notice .decision-en{display:block;margin:4px 0 0}}
+`;
+function formalNoticeMarkup(item) {
+    const escape = escapeXml;
+    const paragraph = (text, continuous = false) => `<p${continuous ? ' class="continuous-copy"' : ''}>${escape(text)}</p>`;
+    const body = (item.attachmentText || item.body || '').slice(0, 4000).replace(/\r\n?/g, '\n');
+    const content = body.split(/\n\s*\n/).map(block => {
+        const rows = block.split('\n').map(row => row.trim()).filter(Boolean);
+        if (!rows.length)
+            return '';
+        const review = /^([1-5])\.\s+(.+)$/.exec(rows[0]);
+        if (review)
+            return `<section class="review-section"><h2 class="review-heading"><span class="review-number">${review[1]}.</span><span>${escape(review[2])}</span></h2>${paragraph(rows.slice(1).join(' '))}</section>`;
+        if (rows[0].startsWith('안녕하십니까.') && rows.some(row => row.startsWith('귀사가 신청하신'))) {
+            const rejectionIndex = rows.findIndex(row => row.startsWith('그 결과,'));
+            const middleEnd = rejectionIndex < 0 ? rows.length : rejectionIndex;
+            return paragraph(rows[0]) + paragraph(rows.slice(1, middleEnd).join(' '), true) + (rejectionIndex < 0 ? '' : paragraph(rows.slice(rejectionIndex).join(' ')));
+        }
+        if (rows[0].startsWith('최종 심사 결과:')) {
+            const following = rows.slice(1), future = following.findIndex(row => row.startsWith('향후 관련'));
+            const split = future < 0 ? following.length : future;
+            return `<h2 class="final-heading">${escape(rows[0])}</h2>` + paragraph(following.slice(0, split).join(' ')) + (future < 0 ? '' : paragraph(following[future]) + paragraph(following.slice(future + 1).join(' ')));
+        }
+        if (rows[0] === '비트원' && rows[1] === '거래지원심사위원회') {
+            return `<div class="notice-signature">${escape(rows[0])}<br>${escape(rows[1])}<div class="signature-en">${escape(rows[2] || '')}</div></div>` + (rows.length > 3 ? `<div class="notice-confidential">${escape(rows.slice(3).join(' '))}</div>` : '');
+        }
+        return paragraph(rows.join(' '), rows.some(row => row.includes('추가 소명 내용을 바탕으로')));
+    }).join('');
+    return `<article class="formal-notice" lang="ko" aria-label="공문 정렬형 통지서"><header><div class="notice-brand"><span class="brand-name">BITONE</span><span class="brand-team">거래지원심사위원회</span></div><h1 class="notice-title">거래지원 심사 결과 통지서</h1><div class="notice-subtitle">LISTING REVIEW RESULT</div></header><dl class="notice-meta"><dt>수신</dt><dd>${escape(item.to || '')}</dd><dt>심사 대상</dt><dd>해븐코인</dd><dt>통지 일자</dt><dd>${escape(item.date || '')}</dd><dt>발신</dt><dd>${escape(item.from || exports.MAIL_REVIEW_SENDER)}</dd></dl><div class="notice-decision"><div class="decision-label">최종 심사 결과</div><div class="decision-value">신규 거래지원 불가 <span class="decision-en">REJECTED</span></div></div><div class="notice-content">${content}</div><footer class="notice-footer"><strong>${escape(item.from || exports.MAIL_REVIEW_SENDER)}</strong>${escape(item.fromEmail || '')}</footer></article>`;
+}
+function formalNoticeHtml(item) {
+    return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'"><style>html,body{margin:0;background:#26313c}body{padding:12px 10px 20px;-webkit-text-size-adjust:100%;overflow-wrap:break-word}${exports.FORMAL_NOTICE_CSS}</style></head><body>${formalNoticeMarkup(item)}</body></html>`;
 }
 
 window.SceneMailData=exports;})();

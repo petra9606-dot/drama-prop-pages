@@ -136,10 +136,10 @@ const APPS = [
     ]
   },
   {
-    id: 'mail', name: '편지함 · 피라밋 6부', meta: 'v7 · 경필 / 동재 · 비트원 · 50.3MB',
+    id: 'mail', name: '편지함 · 피라밋 6부', meta: 'v8 · 경필 / 동재 · 비트원 · 50.3MB',
     desc: '송경필과 백동재의 받은편지함을 따로 구성한 촬영용 메일 앱입니다. 파라오에게 보내는 비트원의 해븐코인 거래지원 불가 공식 통지를 일반 본문 또는 문서 이미지 첨부 버전으로 수신하고, 원고와 배경 메일을 수정·저장할 수 있습니다.',
-    preview: '../preview/mail.html', apk: '../letter-mail-v7-short-preview.apk', qr: '../qr/letter-mail-v7-short-preview.png',
-    note: '이미지 첨부 메일은 짧은 안내문과 요약 통지서로 보이고, 클릭하면 전체 원고가 촬영용 큰 글씨로 열립니다. 단어 단위 줄바꿈과 기존 줄간격 비율을 유지합니다. ☰에서 계정·버전을 선택하세요. 받은편지함 왼쪽 아래 빈칸을 누르면 5초 뒤 검은 화면에 알림이 뜹니다. 기존 배우/스태프 원격 기능도 유지합니다.',
+    preview: '../preview/mail.html', apk: '../letter-mail-v8-formal-notice.apk', qr: '../qr/letter-mail-v8-formal-notice.png',
+    note: '이미지 첨부 메일은 짧은 안내문과 요약 통지서로 보이고, 클릭하면 전체 원고가 촬영용 큰 글씨로 열립니다. 확정한 공문 정렬형과 1.5배 줄간격을 적용하고, 긴 도입 문단은 줄 끝의 빈칸 없이 자연스럽게 이어집니다. ☰에서 계정·버전을 선택하세요. 받은편지함 왼쪽 아래 빈칸을 누르면 5초 뒤 검은 화면에 알림이 뜹니다. 기존 배우/스태프 원격 기능도 유지합니다.',
     shots: [
       ['01-song-inbox', '경필 · 받은편지함', '법무·그룹 업무 메일 사이에 비트원 심사 결과가 도착합니다.'],
       ['02-song-detail', '경필 · 일반 본문', 'song.law@edengroup.kr · 해븐코인 거래지원 불가 공식 통지 전체 원고입니다.'],
@@ -147,7 +147,8 @@ const APPS = [
       ['04-baek-attachment', '동재 · 이미지 첨부', '짧은 안내문과 요약 통지서가 보이고, 첨부를 누르면 전체 원고가 큰 글씨로 열립니다.'],
       ['05-black', '검은 화면 · 메일 미리보기', '숨겨진 버튼을 누른 뒤 5초 후 알림이 나타나며, 누르면 본문을 엽니다.'],
       ['06-settings', '촬영 설정 · 숨은 버튼 안내', '계정·버전 선택과 원고 수정, 재촬영 준비, 숨은 버튼 안내를 제공합니다.'],
-      ['07-edit', '원고 수정 · 저장', '제목·보낸 사람·주소·본문·표시 시간과 통지서 내용을 수정하여 저장합니다.']
+      ['07-edit', '원고 수정 · 저장', '제목·보낸 사람·주소·본문·표시 시간과 통지서 내용을 수정하여 저장합니다.'],
+      ['08-formal-notice', '공문 정렬형 · 전체 통지서', '가운데 제목과 정돈된 정보란, 1.5배 줄간격, 도입 문단의 자연스러운 줄바꿈을 적용했습니다.']
     ]
   }
 ];
@@ -159,7 +160,7 @@ const $ = id => document.getElementById(id);
 $('tabs').innerHTML = APPS.map(a => '<button data-app="' + a.id + '">' + esc(a.name) + '</button>').join('');
 $('tabs').querySelectorAll('button').forEach(b => b.addEventListener('click', () => select(b.dataset.app, 0)));
 
-function shotSrc(i) { return 'shots/' + app.id + '/' + app.shots[i][0] + '.png' + (app.id === 'rider' ? '?v=16' : app.id === 'mail' ? '?v=7' : ''); }
+function shotSrc(i) { return 'shots/' + app.id + '/' + app.shots[i][0] + '.png' + (app.id === 'rider' ? '?v=16' : app.id === 'mail' ? '?v=8' : ''); }
 
 function paint() {
   const s = app.shots[index];

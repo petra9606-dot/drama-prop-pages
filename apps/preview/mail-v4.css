@@ -3,3 +3,34 @@
 .m .viewer .top .grow{font-size:13px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:850px){.pv-main{grid-template-columns:minmax(0,1fr)}}
 .m{font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif}.m h2{font-size:22px;line-height:32px;font-weight:400;word-break:keep-all;overflow-wrap:break-word;text-wrap:balance;letter-spacing:-.02em}.m .body{word-break:keep-all;overflow-wrap:break-word;letter-spacing:-.015em}.m .viewer svg g,.m .paper svg g{font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+
+/* Formal notice v8 */
+
+.formal-notice{box-sizing:border-box;min-width:0;background:#fff;color:#25323d;padding:28px 24px 26px;font:400 18px/1.5 "Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;text-align:left;word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty;line-break:strict;letter-spacing:0;font-synthesis:none}
+.formal-notice *{box-sizing:border-box}
+.formal-notice .notice-brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:17px;border-bottom:2px solid #344652}
+.formal-notice .brand-name{font-size:23px;font-weight:500;letter-spacing:2px;line-height:1.2}
+.formal-notice .brand-team{font-size:11px;color:#6f7b85;text-align:right;line-height:1.4}
+.formal-notice .notice-title{text-align:center;margin:25px 0 6px;font-size:21px;line-height:1.4;font-weight:500;text-wrap:balance;color:#202e39;letter-spacing:0}
+.formal-notice .notice-subtitle{text-align:center;margin:0 0 24px;font-size:11px;line-height:1.4;color:#77838c;letter-spacing:.5px}
+.formal-notice .notice-meta{margin:0;padding:13px 0;background:#fff;display:grid;grid-template-columns:66px minmax(0,1fr);gap:10px 12px;font-size:13px;line-height:1.55;border-top:1px solid #cbd3d9;border-bottom:1px solid #cbd3d9}
+.formal-notice .notice-meta dt{margin:0;color:#717e88;font-weight:400}
+.formal-notice .notice-meta dd{margin:0;min-width:0;color:#263640}
+.formal-notice .notice-decision{background:#f6f3f2;padding:13px 15px;margin:18px 0 23px}
+.formal-notice .decision-label{font-size:12px;color:#717e88;margin-bottom:6px;line-height:1.5}
+.formal-notice .decision-value{font-size:19px;color:#92473f;font-weight:500;line-height:1.4;letter-spacing:-.2px}
+.formal-notice .decision-en{font-size:11px;font-weight:400;margin-left:6px;white-space:nowrap}
+.formal-notice .notice-content p{margin:0 0 14px;padding:0;line-height:inherit;font-size:inherit;white-space:normal}
+.formal-notice .notice-content p.continuous-copy{word-break:normal;overflow-wrap:break-word;text-wrap:wrap;white-space:normal;text-align:left}
+.formal-notice .review-section{margin:26px 0}
+.formal-notice .review-heading{display:grid;grid-template-columns:25px minmax(0,1fr);gap:5px;margin:0 0 12px;padding-bottom:9px;border-bottom:1px solid #e2e6e9;font-size:inherit;line-height:1.5;font-weight:500;color:#202e39;letter-spacing:0}
+.formal-notice .review-number{font-variant-numeric:tabular-nums}
+.formal-notice .final-heading{margin:28px 0 13px;font-size:inherit;font-weight:500;line-height:1.55}
+.formal-notice .notice-signature{margin-top:26px;font-size:inherit;font-weight:500;line-height:1.55}
+.formal-notice .signature-en{font-size:12px;font-weight:400;color:#687782;margin-top:7px;line-height:1.55;overflow-wrap:normal}
+.formal-notice .notice-confidential{font-size:12px;line-height:1.65;margin-top:23px;color:#76828c}
+.formal-notice .notice-footer{border-top:1px solid #e2e6e9;padding-top:16px;margin-top:32px;color:#6c7a84;font-size:11px;line-height:1.65}
+.formal-notice .notice-footer strong{display:block;font-weight:500;color:#40515f;font-size:12px;margin-bottom:4px}
+@media(max-width:360px){.formal-notice{padding-left:16px;padding-right:16px;font-size:16px}.formal-notice .notice-meta{grid-template-columns:52px minmax(0,1fr);padding:12px;gap:7px 9px;font-size:12px}.formal-notice .decision-value{font-size:17px}.formal-notice .decision-en{display:block;margin:4px 0 0}}
+
+.m .viewer .scroll{padding:12px 10px 20px}
