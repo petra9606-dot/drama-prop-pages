@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>달림콜 라이더 v15 · 화면 미리보기</title>
+<title>달림콜 라이더 v16 · 화면 미리보기</title>
 <link rel="stylesheet" href="phone.css">
 <link rel="stylesheet" href="rider-v13.css">
 <style>
@@ -196,14 +196,15 @@
 .r .newtag{display:inline-block;background:var(--teal);color:#fff;font-size:9px;font-weight:900;border-radius:5px;padding:2px 5px;margin-left:6px;vertical-align:2px}
 </style>
 <link rel="stylesheet" href="rider-v15.css?v=15">
+<link rel="stylesheet" href="rider-v16.css?v=16">
 </head>
 <body class="rider-preview">
 <header class="pv-top">
   <a class="pv-back" href="../showcase/index.html">← 촬영용 앱 화면</a>
-  <div class="pv-title">달림콜 라이더 <span>v15 · 시간 즉시 변경 / 보너스 실패 강조</span></div>
+  <div class="pv-title">달림콜 라이더 <span>v16 · 상단 경고 바 / 시간 즉시 변경</span></div>
   <div class="pv-links">
     <a href="../showcase/index.html">화면 캡처 보기</a>
-    <a class="solid" href="../dallim-rider-v15-direct-timer.apk" download>v15 APK 내려받기</a>
+    <a class="solid" href="../dallim-rider-v16-failure-banner.apk" download>v16 APK 내려받기</a>
   </div>
 </header>
 <main class="pv-main">
@@ -379,7 +380,7 @@ function mainScreen() {
 
   if (st.phase === 'bonus') html += `<div class="veil mid"><div class="arrival-bonus"><div class="arrival-head">도착 보너스<span class="arrival-badge">추가 지급</span></div><div class="arrival-title">10분 안에 도착하면</div><div class="arrival-subtitle">이번 배달에 보너스가 더해집니다</div><div class="arrival-amount-box"><div class="arrival-amount">+${PV.money(cfg.bonus)}<i>원</i></div><div class="arrival-rule"><i></i>10분 이내 전달 완료</div></div><div class="arrival-summary"><span>배달 수수료</span><b>${PV.money(cfg.callFee)}원</b></div><div class="arrival-summary total"><span>보너스 포함 수입</span><b>${PV.money(total)}원</b></div><div class="arrival-note">접수 시점부터 남은 시간이 계산됩니다.</div><button class="arrival-confirm" data-go="timer">확인</button></div></div>`;
 
-  if (st.phase === 'bonusFailed') html += `<div class="veil mid failed-backdrop"><div class="failed"><div class="between"><div class="failed-mark">!</div><div class="failed-tag">시간 종료</div></div><div class="ptitle">도착 보너스 실패</div><div class="failed-amount">+${PV.money(cfg.bonus)}원 보너스 미적용</div><div class="psub">보너스 시간이 종료됐어요.<br>현재 배달은 그대로 이어갈 수 있어요.</div><div class="continue-wrap"><button class="primary" data-go="delivery">배달 이어하기</button></div></div></div>`;
+  if (st.phase === 'bonusFailed') html += `<div class="veil mid failed-backdrop failure-banner-mode"><div class="failure-warning"><span class="failure-clock-icon">◷</span><span>시간 초과</span><b>00:00</b></div><div class="failed"><div class="failure-eyebrow">도착 보너스 종료</div><div class="ptitle">도착 보너스 실패</div><div class="failure-receipt"><div><span>도착 보너스</span><b class="failure-cross">+${PV.money(cfg.bonus)}원</b></div><div><span>배달 수수료</span><b>${PV.money(cfg.callFee)}원</b></div></div><div class="psub">보너스 없이 배달을 이어합니다.</div><div class="continue-wrap"><button class="primary" data-go="delivery">배달 이어하기</button></div></div></div>`;
 
   if (st.phase === 'earnings') html += `<div class="veil"><div class="sheet settle"><div class="handle"></div>
     <div class="kick">배달 예상 수입</div>
@@ -580,7 +581,7 @@ PV.boot({
     { id: 'notify', label: '검은 화면 · 두 팝업', cap: '검은 화면에서 2,800원 → 4,000원 팝업이 나타납니다. 등장 시간은 설정 메뉴에서 선택합니다. 실제 촬영에서는 전원 버튼을 누르지 않습니다.' },
     { id: 'control', label: '촬영 CONTROL 패널', cap: '앱 로고를 0.8초 길게 누르면 열립니다. 장면·타이머·콜 알림·콜 예약을 여기서 한 번에 조작합니다.' },
     { id: 'settings', label: '설정 · 숨은 버튼 안내', cap: '숨은 버튼 위치와 기능을 확인하고 검은 화면 촬영 메뉴를 열 수 있습니다.' },
-    { id: 'bonusFailed', label: '보너스 실패 · 강조', cap: '큰 실패 문구와 미적용 금액을 표시하고, 배달 이어하기 버튼의 테두리와 빛이 반짝입니다.' },
+    { id: 'bonusFailed', label: '보너스 실패 · 상단 경고 바', cap: '4번째 후보 적용: 상단 시간 초과 바에 빛이 지나갑니다. 하단에 보너스 미적용·유지되는 수수료와 반짝이는 배달 이어하기 버튼을 표시합니다.' },
     { id: 'delivery', label: '배달 이어하기', cap: '보너스 종료 후에도 기존 배달을 계속 수행합니다.' },
     { id: 'blackSettings', label: '검은 화면 팝업 시간', cap: '첫 팝업은 5·6·7초 중 선택하고 두 번째 팝업 간격은 2·3·5·7·10·15초 중 선택합니다.' },
     { id: 'cueGuide', label: '숨은 버튼 사용법', cap: '별도 화면에서 9개 숨은 조작의 위치와 누르는 방법을 확인합니다.' }

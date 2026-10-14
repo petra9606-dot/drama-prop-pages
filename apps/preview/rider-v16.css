@@ -1,0 +1,15 @@
+.r .veil.mid.failure-banner-mode{padding:132px 0 0;align-items:flex-end;justify-content:flex-start;background:#07191fdb;z-index:100}
+.r .failure-warning{position:absolute;top:62px;left:0;right:0;min-height:54px;background:#d94b45;color:#fff;display:flex;align-items:center;gap:10px;padding:12px 18px;font-size:19px;font-weight:900;overflow:hidden;z-index:1}
+.r .failure-warning b{margin-left:auto;font-size:24px;font-variant-numeric:tabular-nums}.r .failure-clock-icon{font-size:26px}
+.r .failure-warning:after{content:'';position:absolute;top:-30px;bottom:-30px;left:0;width:100px;background:#ffffff2e;transform:translateX(-140px) rotate(-18deg);animation:failureWarningShine 2.5s ease-in-out infinite;pointer-events:none}
+@keyframes failureWarningShine{0%{transform:translateX(-140px) rotate(-18deg)}72%,100%{transform:translateX(560px) rotate(-18deg)}}
+.r .failure-banner-mode .failed{max-height:100%;overflow-y:auto;border:0;border-radius:24px 24px 0 0;padding:24px 24px 30px;width:100%;box-shadow:0 -12px 36px #0003;animation:failureSheetIn .26s ease-out}
+@keyframes failureSheetIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.r .failure-eyebrow{color:#ba332e;font-size:12px;font-weight:900;letter-spacing:.6px}
+.r .failure-banner-mode .failed .ptitle{font-size:32px;line-height:42px;margin-top:10px;word-break:keep-all}
+.r .failure-receipt{margin-top:19px;border-top:1px solid #e2eae6;border-bottom:1px solid #e2eae6;padding:11px 0}
+.r .failure-receipt>div{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;font-size:13px;color:#61716c}
+.r .failure-receipt b{font-size:20px;line-height:28px;font-weight:800;color:#132a32;white-space:nowrap}.r .failure-receipt .failure-cross{color:#ba332e;text-decoration:line-through;text-decoration-thickness:2px}
+.r .failure-banner-mode .failed .psub{font-size:16px;line-height:26px;margin-top:15px}
+@media(max-width:350px){.r .failure-banner-mode .failed .ptitle{font-size:28px}}
+@media(prefers-reduced-motion:reduce){.r .failure-warning:after,.r .failure-banner-mode .failed{animation:none}}

@@ -88,9 +88,9 @@ h1{margin:0;font-size:34px;letter-spacing:-.03em}
 <script>
 const APPS = [
   {
-    id: 'rider', name: '달림콜 라이더', meta: 'v15 · 시간 즉시 변경 / 보너스 실패 강조 · 50.3MB',
-    desc: '예담손만두 배달 접수부터 보너스·정산까지. 선택창 없이 타이머를 순서대로 바꾸고, 크게 강조된 보너스 실패 안내와 반짝이는 배달 이어하기 버튼을 촬영할 수 있습니다.',
-    preview: '../preview/rider.html?v=15#bonusFailed', apk: '../dallim-rider-v15-direct-timer.apk', qr: '../qr/dallim-rider-v15-direct-timer.png',
+    id: 'rider', name: '달림콜 라이더', meta: 'v16 · 상단 경고 바 / 시간 즉시 변경 · 50.3MB',
+    desc: '예담손만두 배달 접수부터 보너스·정산까지. 4번째 상단 경고 바 후보를 적용했습니다. 시간 초과 바의 빛 효과, 보너스 미적용 금액과 유지되는 배달 수수료, 반짝이는 배달 이어하기 버튼을 표시합니다.',
+    preview: '../preview/rider.html?v=16#bonusFailed', apk: '../dallim-rider-v16-failure-banner.apk', qr: '../qr/dallim-rider-v16-failure-banner.png',
     note: 'LIVE 바로 위 빈칸을 누를 때마다 5분 → 4분 → 3분 → 2분 → 1분 → 30초 → 10초로 즉시 변경됩니다. 설정 또는 CONTROL의 숨은 버튼 사용법에서 모든 위치를 확인하세요. 검은 화면 촬영은 화면을 켜둔 채 사용합니다.',
     shots: [
       ['01-waiting', '콜 대기 중', '운행을 시작하면 콜이 올 때까지 대기 화면이 유지됩니다. 오늘 배달 건수·수입·수락률이 함께 표시됩니다.'],
@@ -105,7 +105,7 @@ const APPS = [
       ['10-lock-notify', '검은 화면 · 두 팝업', '앱 안의 검은 화면에서 2,800원 요청 뒤 4,000원 특별콜이 나타납니다. 첫 등장 시간과 두 알림 간격을 따로 선택합니다.'],
       ['11-control', '촬영 CONTROL 패널', '장면·타이머·콜 알림·콜 예약을 스태프가 한 화면에서 조작합니다. 같은 Wi-Fi의 배우폰을 원격으로 제어할 수도 있습니다.'],
       ['12-settings', '설정 · 숨은 버튼 안내', '숨은 버튼 위치와 기능을 확인하고 검은 화면 팝업 촬영 메뉴를 열 수 있습니다.'],
-      ['13-bonus-failed', '보너스 실패 · 강조', '큰 실패 문구와 미적용 금액을 표시합니다. 초록색 배달 이어하기 버튼의 테두리와 빛이 반짝입니다.'],
+      ['13-bonus-failed', '보너스 실패 · 상단 경고 바', '4번째 후보 적용: 시간 초과 · 00:00 상단바에 빛이 지나갑니다. 하단 보너스 금액에는 취소선을 표시하고 배달 수수료는 유지합니다.'],
       ['14-delivery', '배달 이어하기', '보너스 종료 후에도 기존 배달을 계속 수행합니다.'],
       ['15-black-settings', '팝업 등장 시간 설정', '첫 요청은 5·6·7초 중 선택하고 특별콜 간격은 2·3·5·7·10·15초 중 선택합니다.'],
       ['16-cue-guide', '숨은 버튼 사용법', '별도 화면에서 9개 숨은 조작의 위치·누르는 시간·기능을 확인합니다. 안내를 읽는 동안 타이머는 멈춥니다.']
@@ -159,7 +159,7 @@ const $ = id => document.getElementById(id);
 $('tabs').innerHTML = APPS.map(a => '<button data-app="' + a.id + '">' + esc(a.name) + '</button>').join('');
 $('tabs').querySelectorAll('button').forEach(b => b.addEventListener('click', () => select(b.dataset.app, 0)));
 
-function shotSrc(i) { return 'shots/' + app.id + '/' + app.shots[i][0] + '.png' + (app.id === 'rider' ? '?v=15' : app.id === 'mail' ? '?v=4' : ''); }
+function shotSrc(i) { return 'shots/' + app.id + '/' + app.shots[i][0] + '.png' + (app.id === 'rider' ? '?v=16' : app.id === 'mail' ? '?v=4' : ''); }
 
 function paint() {
   const s = app.shots[index];
