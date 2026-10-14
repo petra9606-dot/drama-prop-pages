@@ -1,7 +1,7 @@
 // DisolveWorks 업데이트 알림 — 새로 올린 자료 · 수정된 자료 · 공지를 모든 방문자에게 보여 준다.
 // 사용: <script src="/static-items.js"></script><script src="/updates.js"></script>
 (() => {
-  const DAY = 864e5, FRESH_DAYS = 14;
+  const DAY = 864e5, FRESH_DAYS = 7;
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[m]));
   const ls = {
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
@@ -67,6 +67,23 @@
 .dwu-mode button.on{background:#25324f;color:#e3e9ff;font-weight:700}
 .dwu-set{padding:12px 20px;border-top:1px solid #1d2638;font-size:11px;color:#8d99b3;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .dwu-set small{display:block;color:#5e6b84;margin-top:3px}
+
+.dwu-tick{display:flex;align-items:center;gap:10px;width:100%;border:1px solid #243049;background:#0f1522;border-radius:12px;padding:11px 14px;margin:0 0 22px;color:#cfd8ee;font:500 13px/1.3 inherit;cursor:pointer;text-align:left}
+.dwu-tick:hover{border-color:#3d5288;background:#121a2b}
+.dwu-tick .lb{font-weight:800;color:#fff;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+.dwu-tick .lb i{width:7px;height:7px;border-radius:50%;background:#ff5a64;display:inline-block}
+.dwu-tick.calm .lb{color:#8d99b3}.dwu-tick.calm .lb i{background:#4a5672}
+.dwu-tick .tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#a9b4ca}
+.dwu-tick .tx b{color:#e7ecff;font-weight:700}
+.dwu-tick .go{color:#8fa8ff;font-size:12px;white-space:nowrap}
+.dwu-filters{display:flex;gap:6px;flex-wrap:wrap;padding:12px 20px 10px;border-bottom:1px solid #1d2638}
+.dwu-filters button{border:1px solid #2a3650;background:#0f1522;color:#9aa6bd;border-radius:999px;padding:6px 11px;font:700 11.5px/1 inherit;cursor:pointer}
+.dwu-filters button.on{background:#223055;border-color:#4a63a4;color:#fff}
+.dwu-filters button em{font-style:normal;color:#ff8a92;margin-left:3px}
+.dwu-day{font-size:11px;font-weight:800;color:#6f7d98;letter-spacing:.08em;padding:16px 10px 6px}
+.dwu-item .dwu-time{margin-left:auto}
+.dwu-pdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff5a64;margin-left:9px;vertical-align:4px}
+.dwu-less .dwu-pdot{background:#4a5672}
 `;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
@@ -80,7 +97,15 @@
   const feed = Promise.all([fromServer, fromStatic]).then(([a, b]) => {
     const all = [...a, ...b].filter((x) => x && x.at);
     all.sort((x, y) => Date.parse(y.at) - Date.parse(x.at));
-    return all;
+    // 같은 자료의 소식은 가장 최근 것 하나로 합친다 (공지는 그대로)
+    const seenKey = new Map(), out = [];
+    for (const x of all) {
+      const k = x.type === "notice" && !x.sid && !x.key ? "" : (x.sid ? "s:" + x.sid : x.key ? "u:" + x.key : x.url ? "l:" + x.url : "t:" + [x.part, x.scene, x.title].join("|"));
+      if (k && seenKey.has(k)) { seenKey.get(k).times = (seenKey.get(k).times || 1) + 1; continue; }
+      if (k) seenKey.set(k, x);
+      out.push(x);
+    }
+    return out;
   });
 
   const itemId = (x) => x.key ? "u:" + x.key : x.id ? "s:" + x.id : "";
@@ -97,12 +122,12 @@
   const readAt = () => Date.parse(ls.get("dw-feed-read", "")) || (Date.now() - 3 * DAY);
   const unread = (list) => list.filter((x) => Date.parse(x.at) > readAt()).length;
 
-  function rowHTML(x, unreadMark) {
+  function rowHTML(x, unreadMark, since) {
     const [tag] = TYPE[x.type] || TYPE.notice;
     const where = [x.part, x.scene].filter(Boolean).join(" · ");
     const open = x.url ? `href="${esc(x.url)}" target="_blank" rel="noopener"` : "";
-    return `<a class="dwu-item ${unreadMark && Date.parse(x.at) > readAt() ? "dwu-unread" : ""}" ${open} data-sid="${esc(x.sid || "")}" data-key="${esc(x.key || "")}">
-      <div class="dwu-row"><span class="dwu-tag ${esc(x.type)}">${tag}</span>${where ? `<span class="dwu-where">${esc(where)}</span>` : ""}</div>
+    return `<a class="dwu-item ${unreadMark && Date.parse(x.at) > (since ?? readAt()) ? "dwu-unread" : ""}" ${open} data-sid="${esc(x.sid || "")}" data-key="${esc(x.key || "")}">
+      <div class="dwu-row"><span class="dwu-tag ${esc(x.type)}">${tag}</span>${where ? `<span class="dwu-where">${esc(where)}</span>` : ""}${x.times > 1 ? `<span class="dwu-where" style="color:#7d8aa5;font-weight:600">· ${x.times}번 바뀜</span>` : ""}<span class="dwu-time">${esc(ago(x.at))}</span></div>
       <div class="dwu-title">${esc(x.title || "업데이트")}</div>${x.note ? `<div class="dwu-note">${esc(x.note)}</div>` : ""}</a>`;
   }
   function wireClicks(root) {
@@ -115,24 +140,53 @@
     if (panel) return;
     dim = document.createElement("div"); dim.className = "dwu-dim";
     panel = document.createElement("aside"); panel.className = "dwu-panel";
-    panel.innerHTML = `<div class="dwu-head"><div><h3>업데이트 소식</h3><small>새로 올라오거나 수정된 자료를 알려 드립니다.</small></div><button class="dwu-x" aria-label="닫기">×</button></div><div class="dwu-list"><div class="dwu-empty">불러오는 중...</div></div><div class="dwu-set"><div>내 알림 표시<small>이 기기에서만 적용됩니다.</small></div><div class="dwu-mode">${[["normal","보통"],["less","줄이기"],["off","끄기"]].map(([k,l]) => `<button type="button" data-mode="${k}" class="${MODE === k ? "on" : ""}">${l}</button>`).join("")}</div></div><div class="dwu-foot"><span>최근 60건</span><button type="button" data-read>모두 읽음</button></div>`;
+    panel.innerHTML = `<div class="dwu-head"><div><h3>업데이트 소식</h3><small>새로 올라오거나 수정된 자료를 알려 드립니다.</small></div><button class="dwu-x" aria-label="닫기">×</button></div><div class="dwu-filters"></div><div class="dwu-list"><div class="dwu-empty">불러오는 중...</div></div><div class="dwu-set"><div>내 알림 표시<small>이 기기에서만 적용됩니다.</small></div><div class="dwu-mode">${[["normal","보통"],["less","줄이기"],["off","끄기"]].map(([k,l]) => `<button type="button" data-mode="${k}" class="${MODE === k ? "on" : ""}">${l}</button>`).join("")}</div></div><div class="dwu-foot"><span>최근 60건</span><button type="button" data-read>모두 읽음</button></div>`;
     document.body.append(dim, panel);
     const close = () => { panel.classList.remove("show"); dim.classList.remove("show"); };
     dim.onclick = close; panel.querySelector(".dwu-x").onclick = close;
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
     panel.querySelectorAll("[data-mode]").forEach((b) => b.onclick = () => { ls.set("dw-feed-mode", b.dataset.mode); location.reload(); });
-    panel.querySelector("[data-read]").onclick = () => { ls.set("dw-feed-read", new Date().toISOString()); feed.then(paintPanel); };
+    panel.querySelector("[data-read]").onclick = () => { ls.set("dw-feed-read", new Date().toISOString()); readSnap = Date.now(); fType = "all"; feed.then((l) => { paintPanel(l); paintTickers(l); }); };
     wireClicks(panel);
+    panel.querySelector(".dwu-filters").addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if (!b) return; fType = b.dataset.f; paintPanel(lastList); });
+  }
+  let fType = "all", lastList = [], readSnap = 0;
+  const FILTERS = [["unread", "안 읽은 소식"], ["all", "전체"], ["new", "새 자료"], ["updated", "수정"], ["notice", "공지"]];
+  function dayLabel(iso) {
+    const d = new Date(iso), t = new Date(); t.setHours(0, 0, 0, 0);
+    const diff = Math.floor((t - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / DAY);
+    if (diff <= 0) return "오늘";
+    if (diff === 1) return "어제";
+    if (diff < 7) return "이번 주";
+    if (diff < 31) return "이번 달";
+    return "이전";
   }
   function paintPanel(list) {
+    lastList = list;
+    const nUnread = list.filter((x) => Date.parse(x.at) > readSnap).length;
+    if (fType === "unread" && !nUnread) fType = "all";
+    panel.querySelector(".dwu-filters").innerHTML = FILTERS.filter(([k]) => k !== "unread" || nUnread)
+      .map(([k, l]) => `<button type="button" data-f="${k}" class="${fType === k ? "on" : ""}">${l}${k === "unread" ? `<em>${nUnread}</em>` : ""}</button>`).join("");
+    const shown = list.filter((x) => fType === "all" ? true : fType === "unread" ? Date.parse(x.at) > readSnap : x.type === fType);
     const box = panel.querySelector(".dwu-list");
-    box.innerHTML = list.length ? list.map((x) => rowHTML(x, true)).join("") : `<div class="dwu-empty">아직 업데이트 소식이 없습니다.</div>`;
+    let html = "", cur = "";
+    for (const x of shown) {
+      const g = dayLabel(x.at);
+      if (g !== cur) { html += `<div class="dwu-day">${g}</div>`; cur = g; }
+      html += rowHTML(x, true, readSnap);
+    }
+    box.innerHTML = html || `<div class="dwu-empty">${list.length ? "해당하는 소식이 없습니다." : "아직 업데이트 소식이 없습니다."}</div>`;
     paintButtons(list);
   }
   function paintButtons(list) { const n = MODE === "off" ? 0 : unread(list); btns.forEach((b) => { const c = b.querySelector("b"); c.textContent = n > 99 ? "99+" : n; c.classList.toggle("zero", !n); b.classList.toggle("quiet", MODE === "off"); }); }
   function openPanel() {
     ensurePanel();
-    feed.then((list) => { paintPanel(list); setTimeout(() => { ls.set("dw-feed-read", new Date().toISOString()); paintButtons(list); }, 1200); });
+    readSnap = readAt();
+    feed.then((list) => {
+      fType = list.some((x) => Date.parse(x.at) > readSnap) ? "unread" : "all";
+      paintPanel(list);
+      setTimeout(() => { ls.set("dw-feed-read", new Date().toISOString()); paintButtons(list); paintTickers(list); }, 1200);
+    });
     panel.classList.add("show"); dim.classList.add("show");
   }
   // 버튼을 넣을 자리(요소)를 받아 '업데이트' 버튼을 붙인다
@@ -143,16 +197,25 @@
     b.onclick = openPanel; host.appendChild(b); btns.push(b);
     feed.then(paintButtons);
   }
-  // 최근 업데이트 몇 건을 페이지 안에 띠로 보여 준다
-  function mountStrip(host, { limit = 5, filter } = {}) {
-    if (!host || MODE !== "normal") return;
-    feed.then((list) => {
-      const items = (filter ? list.filter(filter) : list).slice(0, limit);
-      if (!items.length) { host.innerHTML = ""; return; }
-      host.innerHTML = `<div class="dwu-strip"><div class="dwu-strip-head"><b>최근 업데이트</b><a data-all>전체 보기 →</a></div>${items.map((x) => rowHTML(x, true)).join("")}</div>`;
-      host.querySelector("[data-all]").onclick = openPanel;
-      wireClicks(host);
+  // 페이지 위쪽 한 줄 알림 — 안 읽은 소식이 있으면 강조, 없으면 최근 1건을 조용히(부 페이지에서는 숨김)
+  const tickers = [];
+  function paintTickers(list) {
+    tickers.forEach(({ host, filter, quietWhenRead }) => {
+      const items = filter ? list.filter(filter) : list;
+      const fresh = items.filter((x) => Date.parse(x.at) > readAt());
+      if (!items.length || (!fresh.length && quietWhenRead)) { host.innerHTML = ""; return; }
+      const top = (fresh[0] || items[0]);
+      const where = [top.part, top.scene].filter(Boolean).join(" ");
+      const label = fresh.length ? `<span class="lb"><i></i>새 소식 ${fresh.length}건</span>` : `<span class="lb"><i></i>최근 업데이트</span>`;
+      const more = fresh.length > 1 ? ` 외 ${fresh.length - 1}건` : "";
+      host.innerHTML = `<button type="button" class="dwu-tick ${fresh.length ? "" : "calm"}">${label}<span class="tx">${where ? esc(where) + " · " : ""}<b>${esc(top.title || "업데이트")}</b>${more}${fresh.length ? "" : " · " + esc(ago(top.at))}</span><span class="go">전체 보기 →</span></button>`;
+      host.firstChild.onclick = openPanel;
     });
+  }
+  function mountStrip(host, { filter } = {}) {
+    if (!host || MODE !== "normal") return;
+    tickers.push({ host, filter, quietWhenRead: !!filter });
+    feed.then(paintTickers);
   }
   window.DW_UPDATES = { feed, badge, badgeHTML, markSeen, mountButton, mountStrip, open: openPanel, ago };
 })();
