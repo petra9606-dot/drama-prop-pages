@@ -495,5 +495,6 @@
     new MutationObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(decorate); }).observe(root, { childList: true, subtree: true });
     decorate(); mountOffline(); loadCounts();
   }
+  window.DW_TOOLS = { openQR, openViewer, openShoot };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();

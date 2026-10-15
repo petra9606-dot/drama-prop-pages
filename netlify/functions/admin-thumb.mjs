@@ -6,7 +6,7 @@ import { readThumbs, thumbKey, THUMBS_KEY } from "../lib/thumbs.mjs";
 export default async (req) => {
   if (!isAdmin(req)) return Response.json({ ok: false, error: "로그인이 필요합니다." }, { status: 401 });
   const id = String(new URL(req.url).searchParams.get("id") || "").slice(0, 300);
-  if (!/^[su]:/.test(id)) return Response.json({ ok: false, error: "id가 올바르지 않습니다." }, { status: 400 });
+  if (!/^[sua]:/.test(id)) return Response.json({ ok: false, error: "id가 올바르지 않습니다." }, { status: 400 });
   const store = uploadsStore();
   const map = await readThumbs(store);
   if (req.method === "DELETE") {

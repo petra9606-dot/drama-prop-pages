@@ -66,10 +66,10 @@ h1{margin:0;font-size:38px;letter-spacing:-.03em}
     <div style="display:flex;align-items:center;gap:14px"><span id="dwuBtn"></span><div class="count" id="totalCount">씬 자료 불러오는 중...</div></div>
   </div>
   <form class="searchbox" action="../search/" method="get"><input name="q" placeholder="피라밋 전체 검색"><button>검색</button></form><div id="dwuStrip"></div><div class="grid" id="partGrid"></div>
-  <h2 class="misc-title">기타 · 촬영용 앱</h2>
+  <h2 class="misc-title" id="apps">기타 · 촬영용 앱</h2>
   <p class="misc-sub">APK 내려받기 · QR로 폰에 설치 · 설치 없이 웹에서 화면 확인<br>
     <a href="../apps/showcase/index.html" style="color:#8fa8ff;text-decoration:none;font-weight:700">▸ 촬영용 앱 화면 모아보기 (설치 없이 주요 장면 전부 보기)</a></p>
-  <div class="grid">
+  <div class="grid" id="appGrid">
     <div class="card" data-sid="app-tarot">
       <div class="part-title"><strong>오늘의 타로</strong><span class="num">v2 FILM</span></div>
       <div class="preview"><div class="scene-row"><span class="scene-badge">47.6MB</span><span class="scene-name">오픈 2.5~5초 조절 · 셔플 · Flip+Glow · 사운드</span></div></div>
@@ -108,7 +108,7 @@ h1{margin:0;font-size:38px;letter-spacing:-.03em}
     </div>
   </div>
 
-  <h2 class="misc-title">게임</h2>
+  <h2 class="misc-title" id="games">게임</h2>
   <p class="misc-sub">설치 없이 웹에서 바로 플레이 · 휴대폰 터치 및 블루투스 게임패드 지원<br>
     <a href="../games/showcase/index.html" style="color:#8fa8ff;text-decoration:none;font-weight:700">▸ 게임 화면 미리보기 모아보기</a></p>
   <div class="game-group"><strong>준우 게임</strong><span>2부 33씬</span></div>
@@ -152,10 +152,12 @@ h1{margin:0;font-size:38px;letter-spacing:-.03em}
       <div class="footer"><span>모바일 가로 · 터치 · 키보드</span><span class="arrow">→</span></div>
     </div>
   </div>
+  <div id="gameExtra"></div>
 </main>
 
 <script src="/static-items.js"></script>
 <script src="/updates.js"></script>
+<script src="/appcards.js" defer></script>
 <script>
 DW_UPDATES.mountButton(document.getElementById("dwuBtn"));
 DW_UPDATES.mountStrip(document.getElementById("dwuStrip"),{limit:4});

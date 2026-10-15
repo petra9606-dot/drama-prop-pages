@@ -20,8 +20,9 @@ function sameOriginCacheable(url) {
   const p = url.pathname;
   if (p.startsWith("/admin")) return false;
   if (p === "/sw.js") return false;
+  if (p.startsWith("/dl/")) return false;
   if (p.startsWith("/.netlify/functions/")) {
-    return p === "/.netlify/functions/file" || p === "/.netlify/functions/catalog" || p === "/.netlify/functions/thumb";
+    return p === "/.netlify/functions/file" || p === "/.netlify/functions/catalog" || p === "/.netlify/functions/thumb" || p === "/.netlify/functions/app-file" || p === "/.netlify/functions/apps";
   }
   return true;
 }

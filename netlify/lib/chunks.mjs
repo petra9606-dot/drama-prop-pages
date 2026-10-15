@@ -3,10 +3,10 @@ export const MAX_FILE = 20 * 1024 * 1024;
 const PREFIX = "__meta/chunks/";
 const safeId = (v) => String(v || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 64);
 
-export async function saveChunk(store, uploadId, index, data) {
+export async function saveChunk(store, uploadId, index, data, keep = false) {
   const id = safeId(uploadId); const i = Math.max(0, Math.min(99, parseInt(index, 10) || 0));
   if (!id) throw new Error("bad upload id");
-  await store.set(`${PREFIX}${id}/${String(i).padStart(3, "0")}`, data, { metadata: { at: Date.now() } });
+  await store.set(`${PREFIX}${id}/${String(i).padStart(3, "0")}`, data, { metadata: { at: Date.now(), keep: !!keep } });
 }
 
 // form 에 file 이 있으면 그대로, 없으면 chunkId 로 조각을 모아 { name, type, size, data } 를 돌려준다
@@ -28,11 +28,14 @@ export async function fileFromForm(form, store) {
   return { name: String(form.get("fileName") || "file"), type: String(form.get("fileType") || "application/octet-stream"), size, data: data.buffer };
 }
 
-// 하루 넘게 남은 조각(올리다 만 것) 정리
+// 하루 넘게 남은 조각(올리다 만 것) 정리 — 앱·게임 카드에 연결된 APK 조각은 남긴다
 export async function cleanupChunks(store) {
+  let keep = new Set();
+  try { const cards = await store.get("__meta/appcards.json", { type: "json" }); if (Array.isArray(cards)) keep = new Set(cards.map((c) => c.apk?.chunkId).filter(Boolean)); } catch {}
   const { blobs } = await store.list({ prefix: PREFIX });
   const old = Date.now() - 864e5;
   for (const b of blobs) {
+    if (keep.has(b.key.slice(PREFIX.length).split("/")[0])) continue;
     const m = await store.getMetadata(b.key).catch(() => null);
     if (!m || (m.metadata?.at || 0) < old) await store.delete(b.key).catch(() => {});
   }

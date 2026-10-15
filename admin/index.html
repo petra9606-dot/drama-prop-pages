@@ -205,6 +205,7 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
     <button data-v="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg>업로드</button>
     <button data-v="items"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>자료 관리</button>
     <button data-v="memo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>메모<span class="cnt" id="memoCnt"></span></button>
+    <button data-v="apps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>앱·게임</button>
     <button data-v="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>기록</button>
     <button data-v="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>소식</button>
   </nav>
@@ -282,6 +283,16 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
   </section>
 
   <!-- 소식 -->
+  <section class="view" id="v-apps">
+    <div class="panel">
+      <div class="toolbar">
+        <div><h1 style="font-size:22px">앱 · 게임</h1><div class="sub" style="margin:3px 0 0">여기서 올리면 피라밋 페이지의 <b>촬영용 앱</b> · <b>게임</b> 섹션에 카드가 자동으로 생깁니다. 배포·크레딧 없이 바로 반영돼요.</div></div>
+        <button class="btn" id="appNew">＋ 새 앱·게임 올리기</button>
+      </div>
+      <div id="appList" style="margin-top:10px"><div class="status">불러오는 중...</div></div>
+    </div>
+  </section>
+
   <section class="view" id="v-log">
     <div class="panel">
       <div class="toolbar">
@@ -337,6 +348,28 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
     <div style="margin-top:12px"><label>무엇을 바꿨나요? (선택 · 방문자에게 보이는 소식)</label><input id="replaceNote" placeholder="예: 병원명 다온대학교병원으로 수정"></div>
     <label class="check" style="margin-top:10px"><input type="checkbox" id="replaceAnnounce" checked> 업데이트 소식으로 알리기 (사이트에 '수정됨' 표시)</label>
     <div class="actions"><button class="btn" id="replaceBtn" onclick="replaceFile()">교체하기</button><button class="btn secondary" onclick="closeModal('replaceModal')">취소</button><span id="replaceStatus" class="status"></span></div>
+  </div>
+</div>
+
+<div id="appModal" class="modal">
+  <div class="modal-card" style="width:min(640px,100%)">
+    <div class="modal-head"><h1 style="font-size:21px" id="amTitle">새 앱·게임 올리기</h1><button class="x" onclick="closeModal('appModal')">×</button></div>
+    <input type="hidden" id="amId">
+    <div class="grid">
+      <div class="full"><label>종류</label><div style="display:flex;gap:14px"><label class="check"><input type="radio" name="amKind" value="app" checked> 촬영용 앱</label><label class="check"><input type="radio" name="amKind" value="game"> 게임</label></div></div>
+      <div><label>이름</label><input id="amName" placeholder="예: 달림 라이더"></div>
+      <div><label>오른쪽 작은 표시 (버전 등)</label><input id="amTag" placeholder="예: v17 · FINAL / RHYTHM"></div>
+      <div class="full amGame"><label>게임 묶음 이름 (같은 이름끼리 한 줄로 모입니다)</label><input id="amGroup" list="amGroups" placeholder="예: 배동찬 게임"><datalist id="amGroups"></datalist></div>
+      <div><label>부</label><select id="amPart"><option value="">없음</option></select></div>
+      <div><label>씬</label><input id="amScene" placeholder="예: 28" inputmode="numeric"></div>
+      <div class="full"><label>한 줄 설명</label><input id="amDesc" placeholder="예: 1분 연주 · 4레인 리듬게임"></div>
+      <div class="full"><label>카드 아래 작은 글씨 (선택)</label><input id="amFoot" placeholder="예: 모바일 세로 · 터치 조작"></div>
+      <div class="full"><label class="check"><input type="checkbox" id="amPortrait"> 세로 화면 (표지 사진을 잘리지 않게 세로로 보여 주기)</label></div>
+      <div class="full"><label>웹 화면 파일 (HTML · 게임 실행 / 웹 체험용 · 최대 20MB)</label><div class="rdrop" id="amWebDrop" style="padding:12px"></div><input type="file" id="amWeb" accept=".html,.htm" hidden></div>
+      <div class="full"><label>APK 파일 (휴대폰 설치용 · 최대 300MB)</label><div class="rdrop" id="amApkDrop" style="padding:12px"></div><input type="file" id="amApk" accept=".apk" hidden></div>
+    </div>
+    <div class="sub" style="margin:10px 0 0">표지 사진은 웹 화면 파일이 있으면 자동으로 찍혀요. 저장한 뒤 목록의 <b>사진</b> 버튼으로 원하는 장면을 고르거나 이미지를 올릴 수 있습니다.</div>
+    <div class="actions"><button class="btn" id="amSave">저장</button><button class="btn secondary" onclick="closeModal('appModal')">취소</button><span class="status" id="amStatus"></span></div>
   </div>
 </div>
 
@@ -396,6 +429,7 @@ function go(v){
   history.replaceState(null,'','#'+v);window.scrollTo({top:0});
   if(v==='memo')loadMemos();
   if(v==='log')loadActivity();
+  if(v==='apps')loadApps();
 }
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(b)go(b.dataset.v);});
 document.querySelectorAll('.stat[data-go]').forEach(s=>s.addEventListener('click',()=>go(s.dataset.go)));
@@ -512,6 +546,7 @@ window.addEventListener('dragleave',e=>{if(!hasFiles(e))return;dragDepth=Math.ma
 window.addEventListener('dragover',e=>{if(!hasFiles(e))return;e.preventDefault();updateCover(e);});
 window.addEventListener('drop',e=>{
   if(!hasFiles(e))return;e.preventDefault();dragDepth=0;$('#dragcover').classList.remove('on');
+  if($('#appModal').classList.contains('show'))return;
   const row=rowTarget(e);clearRowDrop();
   if(e.target.closest('#rdrop')||$('#replaceModal').classList.contains('show')){setReplaceFile(e.dataTransfer.files[0]);return;}
   if(row){if(row.dataset.sid)openStaticReplace(row.dataset.sid,e.dataTransfer.files[0]);else openReplace(row.dataset.key,e.dataTransfer.files[0]);return;}
@@ -521,6 +556,7 @@ function rowTarget(e){return view==='items'&&(currentTab==='active'||currentTab=
 function clearRowDrop(){document.querySelectorAll('.item.dropok').forEach(r=>r.classList.remove('dropok'));$('#drop').classList.remove('over');$('#rdrop').classList.remove('over');}
 function updateCover(e){
   clearRowDrop();
+  if($('#appModal').classList.contains('show')){$('#dragcover').classList.remove('on');return;}
   if($('#replaceModal').classList.contains('show')){$('#rdrop').classList.add('over');$('#dragcover').classList.remove('on');return;}
   const row=rowTarget(e);
   if(row){row.classList.add('dropok');$('#dragcover').classList.remove('on');return;}
@@ -845,8 +881,8 @@ function fitThumbStage(){const st=$('#tpStage'),w=st.clientWidth,k=w/1280;st.sty
 function openThumbPicker(tid,url,label,ct){
   tp={tid,url};$('#tpName').textContent=label;$('#tpStatus').textContent='';
   const isImg=/^image\//.test(ct||'')||/\.(png|jpe?g|webp|gif)(\?|$)/i.test(url||'');
-  $('#tpShot').style.display=isImg?'none':'';$('#tpAuto').textContent=isImg?'원본 이미지로':'첫 화면으로 자동';
-  $('#tpFrame').src=url;$('#thumbModal').classList.add('show');requestAnimationFrame(fitThumbStage);
+  $('#tpShot').style.display=(isImg||!url)?'none':'';$('#tpAuto').style.display=url?'':'none';$('#tpAuto').textContent=isImg?'원본 이미지로':'첫 화면으로 자동';
+  $('#tpFrame').src=url||'about:blank';$('#thumbModal').classList.add('show');requestAnimationFrame(fitThumbStage);
 }
 function closeThumbPicker(){$('#thumbModal').classList.remove('show');$('#tpFrame').src='about:blank';tp=null;}
 addEventListener('resize',()=>{if($('#thumbModal').classList.contains('show'))fitThumbStage();});
@@ -885,6 +921,91 @@ $('#thumbMissing').onclick=async()=>{
   for(const x of list){b.textContent=`🖼 만드는 중 ${++i}/${list.length}`;try{await makeThumb(x.tid,x.url);}catch{}}
   b.disabled=false;b.textContent='🖼 빠진 미리보기 사진 만들기';toast('미리보기 사진을 만들었습니다');
 };
+
+/* ── 앱 · 게임 카드 ── */
+let apps=[];
+const STATIC_GROUPS=['준우 게임','배동찬 게임'];
+for(let i=1;i<=12;i++){const o=document.createElement('option');o.value=i;o.textContent=i+'부';$('#amPart').appendChild(o);}
+async function loadApps(){
+  try{const r=await fetch('/.netlify/functions/admin-appcard',{cache:'no-store'});if(r.status===401){location.reload();return;}const j=await r.json();apps=j.items||[];renderApps();}catch{$('#appList').innerHTML='<div class="status">불러오지 못했습니다.</div>';}
+}
+function renderApps(){
+  if(!apps.length){$('#appList').innerHTML='<div class="status" style="padding:20px 0">아직 관리자에서 올린 앱·게임이 없습니다. 기존 카드는 그대로 사이트에 보입니다.</div>';return;}
+  const sec=(kind,label)=>{const list=apps.filter(a=>a.kind===kind).sort((a,b)=>(a.group||'').localeCompare(b.group||'','ko')||(a.order-b.order));if(!list.length)return'';
+    return `<div class="group-title">${label}</div>`+list.map(a=>`<div class="item${a.visible?'':' off'}" data-app="${esc(a.id)}" style="grid-template-columns:92px minmax(200px,1fr) auto">
+      <div class="scene">${a.cover?`<img class="thumb" src="${esc(a.cover)}" data-apic style="cursor:pointer;width:84px;height:52px">`:`<div class="thumb none" data-apic style="cursor:pointer;width:84px;height:52px">사진 없음</div>`}</div>
+      <div><div class="name">${esc(a.title)} <span class="status" style="font-weight:400">${esc(a.tag)}</span></div>
+        <div class="meta">${esc([a.kind==='game'?(a.group||'게임'):'촬영용 앱',a.part,a.scene].filter(Boolean).join(' · '))}${a.desc?' · '+esc(a.desc):''}</div>
+        <div class="flags">${a.webUrl?`<span class="ov">● 웹 화면 ${esc(a.webName)}</span> `:'<span class="trash">● 웹 화면 없음</span> '}${a.apkUrl?`<span class="ov">● APK ${(a.apkSize/1048576).toFixed(1)}MB</span> `:''}${a.visible?'':'<span class="hidden">● 숨김</span>'}</div></div>
+      <div class="item-actions">${a.webUrl?`<a class="btn secondary small" target="_blank" href="${esc(a.webUrl)}">열기</a>`:''}${a.apkUrl?`<a class="btn secondary small" href="${esc(a.apkUrl)}">APK 받기</a>`:''}<button class="btn secondary small" data-aact="edit">수정</button><button class="btn secondary small" data-aact="pic">사진</button><button class="btn secondary small" data-aact="up">↑</button><button class="btn secondary small" data-aact="down">↓</button><button class="btn ${a.visible?'danger':'ok'} small" data-aact="vis">${a.visible?'숨김':'다시 표시'}</button><button class="btn danger small" data-aact="del">삭제</button></div>
+    </div>`).join('');};
+  $('#appList').innerHTML=sec('app','촬영용 앱')+sec('game','게임');
+}
+const appById=id=>apps.find(a=>a.id===id);
+function openAppPic(a){openThumbPicker('a:'+a.id,a.webUrl||'',`${a.kind==='game'?'게임':'촬영용 앱'} · ${a.title}`);}
+$('#appList').addEventListener('click',async e=>{
+  const row=e.target.closest('[data-app]');if(!row)return;const a=appById(row.dataset.app);if(!a)return;
+  if(e.target.closest('[data-apic]'))return openAppPic(a);
+  const b=e.target.closest('[data-aact]');if(!b)return;const act=b.dataset.aact;
+  if(act==='edit')return openAppModal(a);
+  if(act==='pic')return openAppPic(a);
+  if(act==='del'){if(!confirm(`'${a.title}' 카드를 삭제할까요?\n올린 웹 화면과 APK 파일도 함께 지워집니다.`))return;}
+  const body=act==='vis'?{action:'visible',id:a.id,visible:!a.visible}:act==='del'?{action:'delete',id:a.id}:{action:'move',id:a.id,dir:act==='up'?-1:1};
+  const j=await apiPost('/.netlify/functions/admin-appcard',body);if(j){await loadApps();toast(act==='del'?'삭제했습니다':act==='vis'?(a.visible?'숨겼습니다':'다시 표시합니다'):'순서를 바꿨습니다');}
+});
+let amWebFile=null,amApkFile=null,amCur=null;
+function paintAmDrops(){
+  const cur=amCur||{};
+  $('#amWebDrop').innerHTML=amWebFile?`<b>${esc(amWebFile.name)}</b> · ${fmtSize(amWebFile.size)} <button type="button" class="pick">다른 파일</button>`:(cur.webName?`지금: <b>${esc(cur.webName)}</b> <button type="button" class="pick">📂 바꾸기</button>`:`<button type="button" class="pick">📂 HTML 파일 찾아보기</button> <span class="dt">또는 끌어다 놓기</span>`);
+  $('#amApkDrop').innerHTML=amApkFile?`<b>${esc(amApkFile.name)}</b> · ${fmtSize(amApkFile.size)} <button type="button" class="pick">다른 파일</button>`:(cur.apkName?`지금: <b>${esc(cur.apkName)}</b> · ${(cur.apkSize/1048576).toFixed(1)}MB <button type="button" class="pick">📂 바꾸기</button>`:`<button type="button" class="pick">📂 APK 파일 찾아보기</button> <span class="dt">또는 끌어다 놓기</span>`);
+}
+function syncAmKind(){const g=document.querySelector('input[name=amKind]:checked').value==='game';document.querySelectorAll('.amGame').forEach(el=>el.style.display=g?'':'none');}
+document.querySelectorAll('input[name=amKind]').forEach(r=>r.addEventListener('change',syncAmKind));
+function openAppModal(a){
+  amCur=a||null;amWebFile=null;amApkFile=null;
+  $('#amTitle').textContent=a?'앱·게임 수정':'새 앱·게임 올리기';$('#amId').value=a?a.id:'';
+  document.querySelector(`input[name=amKind][value="${a?a.kind:'app'}"]`).checked=true;
+  $('#amName').value=a?a.title:'';$('#amTag').value=a?a.tag:'';$('#amGroup').value=a?a.group:'';$('#amPart').value=a&&a.part?parseInt(a.part):'';
+  $('#amScene').value=a&&a.scene?a.scene.replace(/씬$/,''):'';$('#amDesc').value=a?a.desc:'';$('#amFoot').value=a?a.footer:'';$('#amPortrait').checked=!!(a&&a.portrait);
+  $('#amGroups').innerHTML=[...new Set([...STATIC_GROUPS,...apps.map(x=>x.group).filter(Boolean)])].map(g=>`<option value="${esc(g)}">`).join('');
+  $('#amStatus').textContent='';$('#amSave').disabled=false;syncAmKind();paintAmDrops();$('#appModal').classList.add('show');
+}
+$('#appNew').onclick=()=>openAppModal(null);
+$('#amWebDrop').onclick=()=>{$('#amWeb').value='';$('#amWeb').click();};
+$('#amApkDrop').onclick=()=>{$('#amApk').value='';$('#amApk').click();};
+$('#amWeb').onchange=()=>{const f=$('#amWeb').files[0];if(f){if(!/\.html?$/i.test(f.name))return alert('웹 화면은 HTML 파일만 올릴 수 있어요.');amWebFile=f;paintAmDrops();}};
+$('#amApk').onchange=()=>{const f=$('#amApk').files[0];if(f){if(!/\.apk$/i.test(f.name))return alert('APK 파일을 골라 주세요.');amApkFile=f;paintAmDrops();}};
+['amWebDrop','amApkDrop'].forEach(id=>{const el=$('#'+id);el.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();el.classList.add('over');});el.addEventListener('dragleave',()=>el.classList.remove('over'));el.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();el.classList.remove('over');const f=e.dataTransfer.files[0];if(!f)return;if(id==='amWebDrop'){if(!/\.html?$/i.test(f.name))return alert('HTML 파일만 올릴 수 있어요.');amWebFile=f;}else{if(!/\.apk$/i.test(f.name))return alert('APK 파일만 올릴 수 있어요.');amApkFile=f;}paintAmDrops();});});
+$('#amSave').onclick=async()=>{
+  const kind=document.querySelector('input[name=amKind]:checked').value;
+  if(!$('#amName').value.trim())return alert('이름을 입력해 주세요.');
+  if(!amCur&&!amWebFile&&!amApkFile)return alert('웹 화면 파일이나 APK 파일 중 하나는 올려 주세요.');
+  if(amWebFile&&amWebFile.size>20*1024*1024)return alert('웹 화면 파일은 20MB까지 올릴 수 있어요.');
+  if(amApkFile&&amApkFile.size>300*1024*1024)return alert('APK는 300MB까지 올릴 수 있어요.');
+  const st=$('#amStatus'),btn=$('#amSave');btn.disabled=true;
+  try{
+    st.textContent='카드 저장 중…';
+    const j=await apiPost('/.netlify/functions/admin-appcard',{action:'save',id:$('#amId').value||undefined,kind,title:$('#amName').value,tag:$('#amTag').value,group:kind==='game'?$('#amGroup').value:'',partNum:$('#amPart').value,scene:$('#amScene').value,desc:$('#amDesc').value,footer:$('#amFoot').value,portrait:$('#amPortrait').checked});
+    if(!j){btn.disabled=false;return;}
+    let item=j.item;const id=item.id;
+    if(amWebFile){const r=await sendFile('/.netlify/functions/admin-appcard?op=web&id='+encodeURIComponent(id),{},amWebFile,(i,n)=>{st.textContent=`웹 화면 올리는 중… ${i}/${n}`;});item=r.item;}
+    if(amApkFile){
+      const cid=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()).replace(/[^A-Za-z0-9]/g,'');const CH=3*1024*1024,n=Math.ceil(amApkFile.size/CH);
+      for(let i=0;i<n;i++){
+        st.textContent=`APK 올리는 중… ${Math.round(i/n*100)}% (${i+1}/${n})`;
+        let ok=false;for(let t=0;t<3&&!ok;t++){const r=await fetch(`/.netlify/functions/admin-chunk?id=${cid}&i=${i}&keep=1`,{method:'POST',body:amApkFile.slice(i*CH,(i+1)*CH)});ok=r.ok;if(r.status===401){location.reload();return;}}
+        if(!ok)throw new Error('APK 조각 전송에 실패했습니다. 다시 시도해 주세요.');
+      }
+      st.textContent='APK 연결 중…';
+      const k=await apiPost('/.netlify/functions/admin-appcard',{action:'apk',id,chunkId:cid,count:n,size:amApkFile.size,name:amApkFile.name});if(!k)throw new Error('APK 연결 실패');item=k.item;
+    }
+    if(amWebFile&&item.webUrl&&!(amCur&&amCur.cover&&!amWebFile)){st.textContent='표지 사진 찍는 중…';try{await makeThumb('a:'+id,item.webUrl);}catch{}}
+    closeModal('appModal');await loadApps();toast('저장했습니다 · 사이트에 바로 반영됩니다');
+  }catch(err){st.textContent=err.message||'실패';}
+  btn.disabled=false;
+};
+// 앱 탭에서 사진을 바꾸면 목록도 다시 그린다
+const _uploadThumb=uploadThumb;uploadThumb=async(tid,c)=>{await _uploadThumb(tid,c);if(tid.startsWith('a:'))loadApps();};
 checkSession();
 </script>
 </body></html>
