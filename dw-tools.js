@@ -200,7 +200,7 @@
         const b = e.target.closest(".dwt-b"); if (!b) return;
         const info = cardInfo(card);
         if (b.dataset.k === "qr") openQR(info);
-        else if (b.dataset.k === "shoot") location.href = "/shoot.html?u=" + encodeURIComponent(info.id);
+        else if (b.dataset.k === "shoot") openShoot(info);
         else openMemo(info);
       });
       const open = card.querySelector(".open");
@@ -368,6 +368,41 @@
     b.onclick = () => downloadZip(b, m ? +m[1] : 0);
     anchor.parentNode.insertBefore(b, anchor);
     anchor.parentNode.style.flexWrap = "wrap"; anchor.parentNode.style.rowGap = "10px";
+  }
+
+  /* 촬영 모드: 버튼을 누르는 순간 바로 전체 화면 + 화면 꺼짐 방지 */
+  let shootLock = null;
+  function keepAwake() {
+    if (!("wakeLock" in navigator) || document.visibilityState !== "visible") return;
+    navigator.wakeLock.request("screen").then((l) => { shootLock = l; }).catch(() => {});
+  }
+  function openShoot(info) {
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "position:fixed;inset:0;z-index:2147483000;background:#000";
+    const frame = document.createElement("iframe");
+    frame.allow = "fullscreen; autoplay; clipboard-write; camera; microphone";
+    frame.style.cssText = "position:absolute;inset:0;width:100%;height:100%;border:0;background:#000";
+    frame.src = info.id;
+    wrap.appendChild(frame); document.body.appendChild(wrap);
+    const html = document.documentElement, prevOverflow = html.style.overflow; html.style.overflow = "hidden";
+    const req = wrap.requestFullscreen || wrap.webkitRequestFullscreen;
+    let full = false;
+    if (req) { try { const p = req.call(wrap, { navigationUI: "hide" }); full = true; if (p && p.catch) p.catch(() => { full = false; }); } catch { full = false; } }
+    keepAwake();
+    const onVis = () => { if (document.visibilityState === "visible") keepAwake(); };
+    document.addEventListener("visibilitychange", onVis);
+    frame.addEventListener("load", () => { try { frame.contentWindow.focus(); } catch {} });
+    const close = () => {
+      document.removeEventListener("fullscreenchange", onFs); document.removeEventListener("webkitfullscreenchange", onFs);
+      document.removeEventListener("visibilitychange", onVis);
+      try { shootLock && shootLock.release(); } catch {} shootLock = null;
+      html.style.overflow = prevOverflow; wrap.remove();
+    };
+    // 전체 화면에서 나오면(Esc · 뒤로) 목록으로 돌아온다
+    const onFs = () => { if (!(document.fullscreenElement || document.webkitFullscreenElement)) close(); };
+    document.addEventListener("fullscreenchange", onFs); document.addEventListener("webkitfullscreenchange", onFs);
+    // 전체 화면이 안 되는 기기(아이폰)는 따로 연 촬영 페이지로
+    if (!req) { close(); location.href = "/shoot.html?u=" + encodeURIComponent(info.id); }
   }
 
   /* 카드 미리보기 사진 */
