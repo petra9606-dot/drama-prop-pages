@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>촬영</title>
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:#000}
+/* 첫 터치/클릭을 받아 전체 화면으로 전환하는 투명 막 — 화면에는 아무것도 보이지 않는다 */
+#tap{position:fixed;inset:0;z-index:2;background:transparent;cursor:default}
+</style>
+<!-- DW-SITE --><meta name="robots" content="noindex,nofollow,noarchive"><script>if("serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});</script>
+</head>
+<body>
+<iframe id="prop" allow="fullscreen; autoplay; clipboard-write; camera; microphone" allowfullscreen></iframe>
+<div id="tap"></div>
+<script>
+// 촬영용으로 열기: 소품을 꽉 찬 화면으로 띄우고, 첫 터치에 전체 화면 + 화면 꺼짐 방지.
+// 사용: /shoot.html?u=/pyramid/part4/scene37-petct.html
+(function () {
+  var frame = document.getElementById('prop'), tap = document.getElementById('tap');
+  var u = new URLSearchParams(location.search).get('u') || '/';
+  try { var t = new URL(u, location.href); if (t.origin !== location.origin) u = '/'; else u = t.pathname + t.search + t.hash; } catch (e) { u = '/'; }
+  frame.src = u;
+  frame.addEventListener('load', function () {
+    try { document.title = frame.contentDocument.title || '촬영'; } catch (e) {}
+  });
+
+  var lock = null;
+  function keepAwake() {
+    if (!('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
+    navigator.wakeLock.request('screen').then(function (l) { lock = l; }).catch(function () {});
+  }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') keepAwake(); });
+
+  function goFull() {
+    var el = document.documentElement;
+    var req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req && !(document.fullscreenElement || document.webkitFullscreenElement)) {
+      try { var p = req.call(el, { navigationUI: 'hide' }); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+    }
+    keepAwake();
+  }
+  function start(e) {
+    goFull();
+    tap.style.display = 'none';
+    try { frame.focus(); frame.contentWindow.focus(); } catch (err) {}
+  }
+  tap.addEventListener('pointerdown', start, { once: true });
+  // 키보드로 먼저 시작해도 전체 화면 (첫 키는 소품에도 그대로 전달)
+  document.addEventListener('keydown', function (e) {
+    if (tap.style.display === 'none') return;
+    start();
+    try {
+      var d = frame.contentDocument;
+      d.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, keyCode: e.keyCode, which: e.which, altKey: e.altKey, ctrlKey: e.ctrlKey, shiftKey: e.shiftKey, metaKey: e.metaKey, bubbles: true }));
+    } catch (err) {}
+  }, { once: true });
+  // 전체 화면이 풀렸다가 다시 누르면 다시 전체 화면
+  document.addEventListener('fullscreenchange', function () {
+    if (!document.fullscreenElement) { tap.style.display = 'block'; tap.addEventListener('pointerdown', start, { once: true }); }
+  });
+})();
+</script>
+</body>
+</html>

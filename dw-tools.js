@@ -24,13 +24,17 @@
   const I = {
     qr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>',
     memo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>',
+    play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>',
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>',
     zip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M10 13h4"/></svg>',
     dl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>'
   };
 
   const css = `
-.dwt-row{display:flex;gap:6px;margin-top:12px;position:relative;z-index:1}
+.dwt-row{display:flex;gap:6px;margin-top:12px;position:relative;z-index:1;flex-wrap:wrap}
+.dwt-thumb{display:block;margin:0 0 14px;border-radius:10px;overflow:hidden;aspect-ratio:16/10;background:#0b0f17;border:1px solid #222c41}
+.dwt-thumb img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.dwt-b.shoot{color:#ffd28a;border-color:#4a3c22}.dwt-b.shoot:hover{color:#fff;border-color:#c99a3a;background:#2a2213}
 .dwt-b{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px;border-radius:8px;border:1px solid #2a3650;background:#0d1320;color:#9fb0d4;font:700 11px/1 'Segoe UI','Malgun Gothic',sans-serif;cursor:pointer;user-select:none}
 .dwt-b:hover{border-color:#5b7de7;color:#fff;background:#141d31}
 .dwt-b svg{width:13px;height:13px}
@@ -190,17 +194,19 @@
     document.querySelectorAll(CARD_SEL).forEach((card) => {
       if (card.querySelector(".dwt-row")) return;
       const row = document.createElement("div"); row.className = "dwt-row";
-      row.innerHTML = `<span class="dwt-b" role="button" data-k="qr" title="QR 코드">${I.qr}QR</span><span class="dwt-b" role="button" data-k="memo" title="메모">${I.memo}<em style="font-style:normal">메모</em></span>`;
+      row.innerHTML = `<span class="dwt-b" role="button" data-k="qr" title="QR 코드">${I.qr}QR</span><span class="dwt-b" role="button" data-k="memo" title="메모">${I.memo}<em style="font-style:normal">메모</em></span><span class="dwt-b shoot" role="button" data-k="shoot" title="전체 화면 · 화면 꺼짐 방지로 열기">${I.play}촬영</span>`;
       row.addEventListener("click", (e) => {
         e.preventDefault(); e.stopPropagation();
         const b = e.target.closest(".dwt-b"); if (!b) return;
         const info = cardInfo(card);
-        if (b.dataset.k === "qr") openQR(info); else openMemo(info);
+        if (b.dataset.k === "qr") openQR(info);
+        else if (b.dataset.k === "shoot") location.href = "/shoot.html?u=" + encodeURIComponent(info.id);
+        else openMemo(info);
       });
       const open = card.querySelector(".open");
       card.insertBefore(row, open || null);
     });
-    paintCounts();
+    paintCounts(); paintThumbs();
   }
   function paintCounts() {
     document.querySelectorAll(CARD_SEL).forEach((card) => {
@@ -362,6 +368,37 @@
     b.onclick = () => downloadZip(b, m ? +m[1] : 0);
     anchor.parentNode.insertBefore(b, anchor);
     anchor.parentNode.style.flexWrap = "wrap"; anchor.parentNode.style.rowGap = "10px";
+  }
+
+  /* 카드 미리보기 사진 */
+  let thumbIdx = null, staticByPath = null;
+  const thumbIndexP = fetch("/.netlify/functions/thumb?index=1").then((r) => r.json()).then((j) => j.thumbs || {}).catch(() => ({}));
+  Promise.all([thumbIndexP, (window.DW_STATIC || Promise.resolve({ scenes: [] })).catch(() => ({ scenes: [] }))]).then(([t, st]) => {
+    thumbIdx = t; staticByPath = new Map();
+    for (const x of [...(st.scenes || []), ...(st.apps || [])]) { try { const u = new URL(x.url, location.href); staticByPath.set(u.pathname + u.search, x.id); } catch {} }
+    paintThumbs();
+  });
+  function thumbFor(card) {
+    const u = new URL(card.getAttribute("href"), location.href);
+    let tid = "";
+    if (u.pathname === "/.netlify/functions/file") tid = "u:" + (u.searchParams.get("key") || "");
+    else if (staticByPath && staticByPath.has(u.pathname + u.search)) tid = "s:" + staticByPath.get(u.pathname + u.search);
+    if (!tid) return null;
+    if (thumbIdx[tid]) return `/.netlify/functions/thumb?id=${encodeURIComponent(tid)}&v=${thumbIdx[tid]}`;
+    if (tid.startsWith("s:")) return `/thumbs/${tid.slice(2)}.jpg`;
+    return null;
+  }
+  function paintThumbs() {
+    if (!thumbIdx) return;
+    document.querySelectorAll(CARD_SEL).forEach((card) => {
+      if (card.dataset.dwThumb) return;
+      card.dataset.dwThumb = "1";
+      const src = thumbFor(card); if (!src) return;
+      const box = document.createElement("span"); box.className = "dwt-thumb";
+      const img = new Image(); img.loading = "lazy"; img.alt = ""; img.src = src;
+      img.onerror = () => box.remove();
+      box.appendChild(img); card.insertBefore(box, card.firstChild);
+    });
   }
 
   function boot() {

@@ -2,8 +2,9 @@
 import { isAdmin } from "../lib/auth.mjs";
 import { uploadsStore, patchFlags, readFlags, merge, pushUpdate, cleanNote } from "../lib/flags.mjs";
 import { createBackup, cleanupExpiredBackups } from "../lib/backups.mjs";
+import { fileFromForm, MAX_FILE } from "../lib/chunks.mjs";
+import { logActivity } from "../lib/activity.mjs";
 
-const MAX = 4 * 1024 * 1024;
 const ALLOWED = new Set(["html","htm","png","jpg","jpeg","webp","gif","pdf","pptx","xlsx","docx","txt","zip"]);
 
 export default async (req) => {
@@ -12,11 +13,12 @@ export default async (req) => {
 
   const form = await req.formData();
   const key = String(form.get("key") || "");
-  const file = form.get("file");
   const note = cleanNote(form.get("note"));
   const announce = String(form.get("announce")) !== "false";
-  if (!key || !(file instanceof File)) return Response.json({ ok:false, error:"파일 정보가 없습니다." }, { status:400 });
-  if (file.size > MAX) return Response.json({ ok:false, error:"파일당 4MB까지 지원합니다." }, { status:413 });
+  let file;
+  try { file = await fileFromForm(form, uploadsStore()); } catch (e) { return Response.json({ ok:false, error:e.message }, { status:400 }); }
+  if (!key || !file) return Response.json({ ok:false, error:"파일 정보가 없습니다." }, { status:400 });
+  if (file.size > MAX_FILE) return Response.json({ ok:false, error:"파일당 20MB까지 올릴 수 있습니다." }, { status:413 });
 
   const ext = (file.name.split(".").pop() || "").toLowerCase();
   if (!ALLOWED.has(ext)) return Response.json({ ok:false, error:`지원하지 않는 확장자입니다: .${ext}` }, { status:400 });
@@ -32,12 +34,12 @@ export default async (req) => {
     const meta = {
       ...currentMeta,
       filename:file.name,
-      contentType:file.type || "application/octet-stream",
+      contentType:file.type,
       size:file.size,
       updatedAt:new Date().toISOString()
     };
     if (announce) { meta.changedAt = meta.updatedAt; meta.changeType = "updated"; meta.changeNote = note; }
-    await store.set(key, file, { metadata:meta });
+    await store.set(key, file.data, { metadata:meta });
     cleanupExpiredBackups(store).catch(()=>{});
     await patchFlags(store, key, {
       filename:meta.filename, contentType:meta.contentType, size:meta.size, updatedAt:meta.updatedAt,
@@ -46,6 +48,7 @@ export default async (req) => {
     if (announce && meta.visible !== false && !meta.deleted) {
       try { await pushUpdate(store, { type:"updated", key, project:meta.project, part:meta.part, scene:meta.scene, title:meta.title || meta.filename, note, url:`/.netlify/functions/file?key=${encodeURIComponent(key)}` }); } catch {}
     }
+    await logActivity(store, { action:"파일 교체", title:meta.title || meta.filename, part:meta.part, scene:meta.scene, detail:`${file.name}${note ? " · " + note : ""}`, url:`/.netlify/functions/file?key=${encodeURIComponent(key)}` });
     return Response.json({ ok:true }, { headers:{ "Cache-Control":"no-store" }});
   } catch (err) {
     return Response.json({ ok:false, error:`서버 오류: ${err && err.message ? err.message : String(err)}` }, { status:500 });

@@ -1,8 +1,9 @@
 
 import { uploadsStore, pushUpdate, cleanNote } from "../lib/flags.mjs";
 import { isAdmin } from "../lib/auth.mjs";
+import { fileFromForm, MAX_FILE } from "../lib/chunks.mjs";
+import { logActivity } from "../lib/activity.mjs";
 
-const MAX = 4 * 1024 * 1024;
 const ALLOWED = new Set(["html","htm","png","jpg","jpeg","webp","gif","pdf","pptx","xlsx","docx","txt","zip"]);
 
 function cleanName(name) {
@@ -18,9 +19,11 @@ export default async (req) => {
   if (!isAdmin(req)) return Response.json({ ok:false, error:"로그인이 필요합니다." }, { status:401 });
 
   const form = await req.formData();
-  const file = form.get("file");
-  if (!(file instanceof File)) return Response.json({ ok:false, error:"파일을 선택해 주세요." }, { status:400 });
-  if (file.size > MAX) return Response.json({ ok:false, error:"현재 웹 업로드는 파일당 4MB까지 지원합니다." }, { status:413 });
+  const store = uploadsStore();
+  let file;
+  try { file = await fileFromForm(form, store); } catch (e) { return Response.json({ ok:false, error:e.message }, { status:400 }); }
+  if (!file) return Response.json({ ok:false, error:"파일을 선택해 주세요." }, { status:400 });
+  if (file.size > MAX_FILE) return Response.json({ ok:false, error:"파일당 20MB까지 올릴 수 있습니다." }, { status:413 });
 
   const ext = (file.name.split(".").pop() || "").toLowerCase();
   if (!ALLOWED.has(ext)) return Response.json({ ok:false, error:`지원하지 않는 확장자입니다: .${ext}` }, { status:400 });
@@ -41,12 +44,11 @@ export default async (req) => {
   const id = crypto.randomUUID();
   const key = `${project}/part${partNum}/scene-${sceneRaw}/${Date.now()}-${id}-${filename}`;
   const now = new Date().toISOString();
-  const store = uploadsStore();
 
-  await store.set(key, file, {
+  await store.set(key, file.data, {
     metadata: {
       id, project, projectName, part:`${partNum}부`, partNum, scene, sceneRaw,
-      title, filename:file.name, contentType:file.type || "application/octet-stream",
+      title, filename:file.name, contentType:file.type,
       size:file.size, uploadedAt:now, updatedAt:now, visible, pinned,
       changedAt: announce ? now : null, changeType: announce ? "new" : null, changeNote: note,
       deleted:false, deletedAt:null
@@ -56,6 +58,8 @@ export default async (req) => {
   if (announce && visible) {
     try { await pushUpdate(store, { type:"new", key, project, part:`${partNum}부`, scene, title, note, url:`/.netlify/functions/file?key=${encodeURIComponent(key)}` }); } catch {}
   }
+
+  await logActivity(store, { action:"업로드", title, part:`${partNum}부`, scene, detail:file.name, url:`/.netlify/functions/file?key=${encodeURIComponent(key)}` });
 
   return Response.json({ ok:true, key, url:`/.netlify/functions/file?key=${encodeURIComponent(key)}` },
     { headers:{ "Cache-Control":"no-store" }});

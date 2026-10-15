@@ -111,6 +111,29 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
 .reply{display:flex;gap:8px;padding:10px 14px;background:#0b1019;border-top:1px solid #1d2537}
 .reply input{padding:9px 11px;font-size:13px}
 
+/* 선택 · 일괄 작업 */
+.item .sel{position:absolute;left:-4px;top:16px;width:18px;height:18px;accent-color:#7590ff;cursor:pointer}
+.item.has-sel{padding-left:26px}
+.item.picked{background:#121a30}
+.bulkbar{position:sticky;bottom:12px;z-index:12;display:none;align-items:center;gap:8px;flex-wrap:wrap;background:#18213a;border:1px solid #3a4d78;border-radius:14px;padding:10px 12px;margin-top:12px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.bulkbar.on{display:flex}
+.bulkbar b{font-size:13px;margin-right:6px}
+.selall{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#aab5ca;margin-left:4px}
+.selall input{width:16px;height:16px;accent-color:#7590ff}
+.thumb{width:72px;height:45px;border-radius:6px;object-fit:cover;background:#0b0f17;border:1px solid #232c3f;display:block}
+.thumb.none{display:grid;place-items:center;color:#4d5a74;font-size:10px}
+.item .scene .thumb{margin-top:6px}
+@media(max-width:760px){.item .thumb{width:52px;height:33px}}
+.ov{color:#7fd3ff}
+/* 기록 */
+.act-day{font-size:11px;font-weight:800;color:#6f7d98;letter-spacing:.08em;margin:18px 0 4px}
+.act{display:grid;grid-template-columns:92px 1fr auto;gap:12px;align-items:center;padding:11px 4px;border-bottom:1px solid #1d2435}
+.act .tag{font-size:11px;font-weight:800;border-radius:6px;padding:4px 7px;text-align:center;background:#1a2340;color:#a9b9ff}
+.act .tag.up{background:#163828;color:#7fe3b0}.act .tag.rp{background:#3a2f15;color:#f3c66a}.act .tag.del{background:#44242a;color:#ffb3b3}.act .tag.hide{background:#2c2446;color:#c4b2ff}
+.act .nm{font-size:14px;font-weight:700}.act .dt{font-size:12px;color:#7e899f;margin-top:3px}
+.act .tm{font-size:11px;color:#6f7b92;white-space:nowrap;text-align:right}
+@media(max-width:760px){.act{grid-template-columns:76px 1fr}.act .tm{grid-column:2;text-align:left}}
+.thumbjob{position:fixed;left:-20000px;top:0;width:1280px;height:800px;border:0;visibility:hidden}
 /* 모달 */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;padding:18px;z-index:30}
 .modal.show{display:flex}
@@ -182,6 +205,7 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
     <button data-v="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg>업로드</button>
     <button data-v="items"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>자료 관리</button>
     <button data-v="memo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>메모<span class="cnt" id="memoCnt"></span></button>
+    <button data-v="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>기록</button>
     <button data-v="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>소식</button>
   </nav>
 
@@ -213,7 +237,7 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
       <div class="sub">여러 파일을 한 번에 끌어다 놓거나 골라 주세요. 파일 이름에 <b>4부</b>, <b>37씬</b> 같은 표시가 있으면 자동으로 채워집니다. 사이트에는 <b>씬 번호 + 화면 제목</b>으로 표시돼요.</div>
       <div class="drop" id="drop">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></svg>
-        <b class="dt">파일을 여기로 끌어다 놓기</b><b class="tt">파일을 골라 주세요</b><span>여러 개 가능 · 파일당 최대 4MB</span>
+        <b class="dt">파일을 여기로 끌어다 놓기</b><b class="tt">파일을 골라 주세요</b><span>여러 개 가능 · 파일당 최대 20MB</span>
         <button type="button" class="pick">📂 파일 찾아보기</button>
       </div>
       <input type="file" id="files" multiple hidden accept=".html,.htm,.png,.jpg,.jpeg,.webp,.gif,.pdf,.pptx,.xlsx,.docx,.txt,.zip">
@@ -239,8 +263,9 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
         <div><h1 style="font-size:22px">자료 관리</h1><div class="sub" style="margin:3px 0 0">검색 · 수정 · 교체 · 숨김 · 고정 · 휴지통</div></div>
         <input id="adminSearch" class="search" placeholder="씬, 제목, 파일명, 부 검색" type="search">
       </div>
-      <div class="tabs"><button class="tab active" data-tab="active">활성 파일</button><button class="tab" data-tab="trash">휴지통</button><button class="tab" data-tab="static">깃허브 자료</button><select id="partFilter" style="width:auto;padding:7px 10px;font-size:12px;border-radius:999px"><option value="">전체 부</option></select></div>
+      <div class="tabs"><button class="tab active" data-tab="active">활성 파일</button><button class="tab" data-tab="trash">휴지통</button><button class="tab" data-tab="static">깃허브 자료</button><select id="partFilter" style="width:auto;padding:7px 10px;font-size:12px;border-radius:999px"><option value="">전체 부</option></select><label class="selall"><input type="checkbox" id="selAll"> 전체 선택</label><button class="btn secondary small" id="thumbMissing" style="margin-left:auto">🖼 빠진 미리보기 사진 만들기</button></div>
       <div id="items"><div class="status">불러오는 중...</div></div>
+      <div class="bulkbar" id="bulkbar"></div>
     </div>
   </section>
 
@@ -257,6 +282,16 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
   </section>
 
   <!-- 소식 -->
+  <section class="view" id="v-log">
+    <div class="panel">
+      <div class="toolbar">
+        <div><h1 style="font-size:22px">작업 기록</h1><div class="sub" style="margin:3px 0 0">언제, 무엇을 올리고 바꾸고 숨겼는지 최근 400건까지 남습니다.</div></div>
+        <div style="display:flex;gap:8px"><input id="logSearch" class="search" placeholder="제목, 작업 검색" type="search" style="max-width:240px"><button class="btn secondary small" id="logReload">새로고침</button></div>
+      </div>
+      <div id="logList" style="margin-top:6px"><div class="status">불러오는 중...</div></div>
+    </div>
+  </section>
+
   <section class="view" id="v-notice">
     <div class="panel">
       <h1 style="font-size:22px">업데이트 소식</h1>
@@ -318,7 +353,7 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
 
 <script>
 const $=s=>document.querySelector(s);
-const MAX=4*1024*1024;
+const MAX=20*1024*1024;
 const ALLOWED=new Set(["html","htm","png","jpg","jpeg","webp","gif","pdf","pptx","xlsx","docx","txt","zip"]);
 const MEMO_API='/.netlify/functions/memo';
 let allItems=[], currentTab='active', staticData={scenes:[],apps:[]}, staticHidden=new Set(), memoDocs=[], memoFilter='open', view='dash';
@@ -337,7 +372,7 @@ async function login(){const r=await fetch('/.netlify/functions/admin-login',{me
 async function logout(){await fetch('/.netlify/functions/admin-logout',{method:'POST'});location.reload();}
 async function checkSession(){const r=await fetch('/.netlify/functions/admin-list',{cache:'no-store'});if(r.ok){const j=await r.json();allItems=j.items||[];enter();}}
 async function showAdmin(){await loadItems();enter();}
-function enter(){$('#loginView').style.display='none';$('#adminView').style.display='block';go((location.hash||'').slice(1)||'dash');renderAll();loadStatic();loadNotices();loadMemos();}
+function enter(){$('#loginView').style.display='none';$('#adminView').style.display='block';go((location.hash||'').slice(1)||'dash');renderAll();loadStatic();loadNotices();loadMemos();loadActivity();loadThumbs();}
 $('#password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
 
 /* ── 화면 전환 ── */
@@ -349,6 +384,7 @@ function go(v){
   if(tab)setTab(tab);
   history.replaceState(null,'','#'+v);window.scrollTo({top:0});
   if(v==='memo')loadMemos();
+  if(v==='log')loadActivity();
 }
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(b)go(b.dataset.v);});
 document.querySelectorAll('.stat[data-go]').forEach(s=>s.addEventListener('click',()=>go(s.dataset.go)));
@@ -412,7 +448,7 @@ function addFiles(list){
   const defPart=$('#part').value;
   for(const f of files){
     const p=parseName(f.name);const ext=(f.name.split('.').pop()||'').toLowerCase();
-    let err='';if(!ALLOWED.has(ext))err=`지원하지 않는 형식 (.${ext})`;else if(f.size>MAX)err='4MB 초과';
+    let err='';if(!ALLOWED.has(ext))err=`지원하지 않는 형식 (.${ext})`;else if(f.size>MAX)err='20MB 초과';
     queue.push({id:++qid,file:f,part:(+p.part>=1&&+p.part<=12)?p.part:defPart,scene:p.scene,title:p.title,state:err?'err':'ready',msg:err});
   }
   renderQueue();go('upload');
@@ -444,15 +480,12 @@ $('#upAll').onclick=async()=>{
   const opt=$('#project').selectedOptions[0];
   for(const q of todo){
     q.state='uploading';q.msg='올리는 중…';renderQueue();
-    const fd=new FormData();
-    fd.append('project',$('#project').value);fd.append('projectName',opt.dataset.name||opt.textContent);
-    fd.append('part',q.part);fd.append('scene',q.scene);fd.append('title',q.title);
-    fd.append('visible',$('#visible').checked?'true':'false');fd.append('note',$('#note').value);fd.append('announce',$('#announce').checked?'true':'false');fd.append('pinned',$('#pinned').checked?'true':'false');fd.append('file',q.file);
+    const fields={project:$('#project').value,projectName:opt.dataset.name||opt.textContent,part:q.part,scene:q.scene,title:q.title,
+      visible:$('#visible').checked?'true':'false',note:$('#note').value,announce:$('#announce').checked?'true':'false',pinned:$('#pinned').checked?'true':'false'};
     try{
-      const r=await fetch('/.netlify/functions/admin-upload',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));
-      if(r.status===401){alert('로그인이 풀렸습니다. 다시 로그인해 주세요.');location.reload();return;}
-      if(!r.ok)throw new Error(j.error||('실패 '+r.status));
+      const j=await sendFile('/.netlify/functions/admin-upload',fields,q.file,(i,n)=>{q.msg=`올리는 중… ${i}/${n}`;renderQueue();});
       q.state='done';q.msg='완료 ✓';ok++;
+      if(j.key)makeThumb('u:'+j.key,j.url,q.file).catch(()=>{});
     }catch(err){q.state='err';q.msg=err.message||'실패';fail++;}
     renderQueue();
   }
@@ -470,10 +503,10 @@ window.addEventListener('drop',e=>{
   if(!hasFiles(e))return;e.preventDefault();dragDepth=0;$('#dragcover').classList.remove('on');
   const row=rowTarget(e);clearRowDrop();
   if(e.target.closest('#rdrop')||$('#replaceModal').classList.contains('show')){setReplaceFile(e.dataTransfer.files[0]);return;}
-  if(row){openReplace(row.dataset.key,e.dataTransfer.files[0]);return;}
+  if(row){if(row.dataset.sid)openStaticReplace(row.dataset.sid,e.dataTransfer.files[0]);else openReplace(row.dataset.key,e.dataTransfer.files[0]);return;}
   if($('#adminView').style.display!=='none')addFiles(e.dataTransfer.files);
 });
-function rowTarget(e){return view==='items'&&currentTab==='active'?e.target.closest?.('.item[data-key]'):null;}
+function rowTarget(e){return view==='items'&&(currentTab==='active'||currentTab==='static')?e.target.closest?.('.item[data-key],.item[data-sid]'):null;}
 function clearRowDrop(){document.querySelectorAll('.item.dropok').forEach(r=>r.classList.remove('dropok'));$('#drop').classList.remove('over');$('#rdrop').classList.remove('over');}
 function updateCover(e){
   clearRowDrop();
@@ -491,22 +524,23 @@ $('#adminSearch').addEventListener('input',renderItems);$('#partFilter').addEven
 function memoCountFor(url){try{const u=new URL(url,location.origin);const id=u.pathname+u.search;const d=memoDocs.find(x=>x.id===id);return d?d.memos.filter(m=>!m.done).length:0;}catch{return 0}}
 async function toggleStatic(id,hide){
   if(hide&&!confirm('사이트에서 숨길까요? (파일은 남아 있고, 여기서 다시 표시할 수 있습니다)'))return;
-  const j=await apiPost('/.netlify/functions/admin-static',{id,hidden:hide});
+  const sx=staticById(id)||{};const j=await apiPost('/.netlify/functions/admin-static',{id,hidden:hide,title:sx.title,part:sx.part,scene:sx.scene});
   if(!j)return;staticHidden=new Set(j.hidden||[]);renderAll();toast(hide?'사이트에서 숨겼습니다':'다시 표시합니다');
 }
 function renderStatic(q,pf){
   const match=x=>(!q||[x.part,x.scene,x.title,x.filename].join(' ').toLowerCase().includes(q))&&(!pf||partNumOf(x)==pf);
-  const row=(x,label)=>{const off=staticHidden.has(x.id);const mc=memoCountFor(x.url);return `<div class="item${off?' off':''}">
-    <div class="scene">${esc(label)}</div>
-    <div><div class="name">${esc(x.title)}</div><div class="meta">${esc(x.part?x.part+' · ':'')}${esc(x.filename||'')} · 깃허브</div>
-    <div class="flags">${off?'<span class="hidden">● 사이트에서 숨김</span> ':''}${mc?`<span class="memo-flag">● 메모 ${mc}</span>`:''}</div></div>
-    <div class="item-actions"><a class="btn secondary small" target="_blank" href="${esc(x.url)}">열기</a>${off
-      ?`<button class="btn ok small" data-act="static-show" data-id="${esc(x.id)}">다시 표시</button>`
-      :`<button class="btn danger small" data-act="static-hide" data-id="${esc(x.id)}">사이트에서 숨김</button>`}</div>
+  const row=(x,label)=>{const off=staticHidden.has(x.id);const mc=memoCountFor(x.url);const ov=overrideFor(x);const id=esc(x.id);return `<div class="item has-sel${off?' off':''}${selected.has('s:'+x.id)?' picked':''}" data-sid="${id}">
+    <input type="checkbox" class="sel" data-sel="s:${id}" ${selected.has('s:'+x.id)?'checked':''}>
+    <div class="scene">${esc(label)}${thumbHTML('s:'+x.id,x)}</div>
+    <div><div class="name">${esc(x.title)}</div><div class="meta">${esc(x.part?x.part+' · ':'')}${esc(ov?ov.filename||x.filename:x.filename||'')} · 깃허브${ov?' · '+esc(ago(ov.updatedAt))+' 관리자에서 교체':''}</div>
+    <div class="flags">${ov?'<span class="ov">● 관리자에서 교체됨</span> ':''}${off?'<span class="hidden">● 사이트에서 숨김</span> ':''}${mc?`<span class="memo-flag">● 메모 ${mc}</span>`:''}</div></div>
+    <div class="item-actions"><a class="btn secondary small" target="_blank" href="${esc(x.url)}">열기</a><button class="btn secondary small" data-act="static-replace" data-id="${id}">파일교체</button><button class="btn secondary small" data-act="static-versions" data-id="${id}">이전버전</button>${ov?`<button class="btn warn small" data-act="static-revert" data-id="${id}">원본으로</button>`:''}${off
+      ?`<button class="btn ok small" data-act="static-show" data-id="${id}">다시 표시</button>`
+      :`<button class="btn danger small" data-act="static-hide" data-id="${id}">숨김</button>`}</div>
   </div>`;};
   const sc=staticData.scenes.filter(match).sort((a,b)=>(a.partNum-b.partNum)||String(a.scene).localeCompare(String(b.scene),'ko',{numeric:true}));
   const ap=pf?[]:staticData.apps.filter(match);
-  return `<div class="tip">깃허브로 직접 올린 자료입니다. 파일 교체는 깃허브로 해야 하고, 여기서는 사이트에 <b>숨김 / 다시 표시</b>만 할 수 있어요.</div>`
+  return `<div class="tip">깃허브로 올린 자료도 여기서 <b>파일교체</b>하면 배포 없이(크레딧 없이) 바로 바뀝니다. <b>원본으로</b>를 누르면 깃허브 버전으로 돌아가요.</div>`
     +(sc.length?`<div class="group-title">씬 자료</div>`+sc.map(x=>row(x,x.scene)).join(''):'')
     +(ap.length?`<div class="group-title">기타 · 촬영용 앱</div>`+ap.map(x=>row(x,'APP')).join(''):'')
     +(!sc.length&&!ap.length?'<div class="status" style="padding:20px 0">표시할 자료가 없습니다.</div>':'');
@@ -520,8 +554,9 @@ function renderItems(){
   const box=$('#items');
   const tip=currentTab==='active'?'<div class="tip droptip">💡 새 파일을 목록의 자료 위로 <b>끌어다 놓으면</b> 그 자료의 파일이 바로 교체됩니다.</div>':'';
   if(!items.length){box.innerHTML=tip+'<div class="status" style="padding:20px 0">표시할 파일이 없습니다.</div>';return;}
-  box.innerHTML=tip+items.map(x=>{const mc=memoCountFor(x.url);const k=esc(x.key);return `<div class="item" data-key="${k}">
-    <div class="scene">${esc(x.scene||'')}</div>
+  box.innerHTML=tip+items.map(x=>{const mc=memoCountFor(x.url);const k=esc(x.key);return `<div class="item has-sel${selected.has('u:'+x.key)?' picked':''}" data-key="${k}">
+    <input type="checkbox" class="sel" data-sel="u:${k}" ${selected.has('u:'+x.key)?'checked':''}>
+    <div class="scene">${esc(x.scene||'')}${thumbHTML('u:'+x.key,x)}</div>
     <div><div class="name">${esc(x.title||x.filename||'')}</div><div class="meta">${esc(x.part||'')} · ${esc(x.filename||'')} · ${fmtSize(Number(x.size||0))} · ${esc(ago(x.updatedAt||x.uploadedAt))}</div>
     <div class="flags">${x.pinned?'<span class="pin">★ 상단 고정</span> ':''}${x.visible===false?'<span class="hidden">● 숨김</span> ':''}${x.deleted?'<span class="trash">● 휴지통</span> ':''}${mc?`<span class="memo-flag">● 메모 ${mc}</span>`:''}</div></div>
     <div class="item-actions">
@@ -535,6 +570,9 @@ $('#items').addEventListener('click',e=>{
   const act=b.dataset.act;
   if(act==='static-hide')return toggleStatic(b.dataset.id,true);
   if(act==='static-show')return toggleStatic(b.dataset.id,false);
+  if(act==='static-replace')return openStaticReplace(b.dataset.id);
+  if(act==='static-revert')return staticRevert(b.dataset.id);
+  if(act==='static-versions'){const x=staticById(b.dataset.id);return openVersions('__meta/static-files/'+b.dataset.id.replace(/[^A-Za-z0-9_.-]/g,'_'),`${x.part||''} · ${x.scene||''} · ${x.title} (깃허브 자료)`);}
   const key=b.closest('.item')?.dataset.key;if(!key)return;
   if(act==='edit')openEdit(key);else if(act==='replace')openReplace(key);else if(act==='versions')openVersions(key);
   else if(act==='pin'){const x=itemByKey(key);quickPin(key,!x.pinned);}
@@ -549,23 +587,37 @@ function setReplaceFile(f){
   replacePicked=f||null;
   if(!f){$('#rdrop').innerHTML=`${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:30px;height:30px;color:#7590ff"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></svg>'}<div class="dt" style="margin-top:6px">새 파일을 <b>여기로 끌어다 놓거나</b></div><button type="button" class="pick">📂 파일 찾아보기</button>`;return;}
   const big=f.size>MAX;
-  $('#rdrop').innerHTML=`<b>${esc(f.name)}</b> · ${fmtSize(f.size)}${big?' <span class="badtxt">· 4MB 초과</span>':''}<span class="hint status"><span class="dt">다른 파일은 다시 끌어다 놓거나 </span></span><button type="button" class="pick">📂 다른 파일 찾아보기</button>`;
+  $('#rdrop').innerHTML=`<b>${esc(f.name)}</b> · ${fmtSize(f.size)}${big?' <span class="badtxt">· 20MB 초과</span>':''}<span class="hint status"><span class="dt">다른 파일은 다시 끌어다 놓거나 </span></span><button type="button" class="pick">📂 다른 파일 찾아보기</button>`;
 }
-function openReplace(k,file){const x=itemByKey(k);if(!x)return;$('#replaceKey').value=k;$('#replaceName').textContent=`${x.part} · ${x.scene} · ${x.title||x.filename}`;$('#replaceFile').value='';setReplaceFile(file);$('#replaceNote').value='';$('#replaceAnnounce').checked=true;$('#replaceStatus').textContent='';$('#replaceBtn').disabled=false;$('#replaceModal').classList.add('show');}
+function openReplace(k,file){const x=itemByKey(k);if(!x)return;$('#replaceKey').value=k;$('#replaceKey').dataset.mode='';$('#replaceName').textContent=`${x.part} · ${x.scene} · ${x.title||x.filename}`;$('#replaceFile').value='';setReplaceFile(file);$('#replaceNote').value='';$('#replaceAnnounce').checked=true;$('#replaceStatus').textContent='';$('#replaceBtn').disabled=false;$('#replaceModal').classList.add('show');}
+function openStaticReplace(id,file){const x=staticById(id);if(!x)return;$('#replaceKey').value=id;$('#replaceKey').dataset.mode='static';$('#replaceName').innerHTML=`${esc([x.part,x.scene].filter(Boolean).join(' · '))} · ${esc(x.title)}<br><span class="status">깃허브 자료 · HTML 파일만 · 배포 없이 바로 바뀌고, '원본으로'를 누르면 언제든 깃허브 버전으로 돌아갑니다.</span>`;$('#replaceFile').value='';setReplaceFile(file);$('#replaceNote').value='';$('#replaceAnnounce').checked=true;$('#replaceStatus').textContent='';$('#replaceBtn').disabled=false;$('#replaceModal').classList.add('show');}
 $('#rdrop').onclick=()=>{$('#replaceFile').value='';$('#replaceFile').click();};
 $('#replaceFile').onchange=()=>setReplaceFile($('#replaceFile').files[0]);
 async function replaceFile(){
   const f=replacePicked;if(!f)return alert('교체할 파일을 선택해 주세요.');
-  if(f.size>MAX)return alert('파일당 4MB까지 올릴 수 있습니다.');
-  const fd=new FormData();fd.append('key',$('#replaceKey').value);fd.append('file',f);fd.append('note',$('#replaceNote').value);fd.append('announce',$('#replaceAnnounce').checked?'true':'false');
+  if(f.size>MAX)return alert('파일당 20MB까지 올릴 수 있습니다.');
+  const isStatic=$('#replaceKey').dataset.mode==='static', key=$('#replaceKey').value;
+  if(isStatic&&!/\.html?$/i.test(f.name))return alert('깃허브 자료는 HTML 파일로만 교체할 수 있습니다.');
   $('#replaceStatus').textContent='교체 중...';$('#replaceBtn').disabled=true;
-  const r=await fetch('/.netlify/functions/admin-replace',{method:'POST',body:fd});const j=await r.json().catch(()=>({}));
-  if(!r.ok){$('#replaceStatus').textContent=j.error||('교체 실패 ('+r.status+')');$('#replaceBtn').disabled=false;return;}
-  closeModal('replaceModal');await loadItems();loadNotices();toast('파일을 교체했습니다');
+  try{
+    const fields=isStatic?{id:key,note:$('#replaceNote').value,announce:$('#replaceAnnounce').checked?'true':'false'}:{key,note:$('#replaceNote').value,announce:$('#replaceAnnounce').checked?'true':'false'};
+    await sendFile(isStatic?'/.netlify/functions/admin-static-replace':'/.netlify/functions/admin-replace',fields,f,(i,n)=>{$('#replaceStatus').textContent=`올리는 중… ${i}/${n}`;});
+  }catch(err){$('#replaceStatus').textContent=err.message||'교체 실패';$('#replaceBtn').disabled=false;return;}
+  closeModal('replaceModal');
+  if(isStatic){const x=staticById(key);makeThumb('s:'+key,x&&x.url,f).catch(()=>{});await loadActivity();renderItems();}
+  else{const x=itemByKey(key);makeThumb('u:'+key,x&&x.url,f).catch(()=>{});await loadItems();}
+  loadNotices();toast('파일을 교체했습니다');
 }
-async function openVersions(key){
-  const x=itemByKey(key);if(!x)return;
-  $('#versionsName').textContent=`${x.part} · ${x.scene} · ${x.title||x.filename}`;
+async function staticRevert(id){
+  const x=staticById(id);if(!x)return;
+  if(!confirm(`'${x.title}'을(를) 깃허브 원본 버전으로 되돌릴까요?\n지금 교체본은 7일 동안 '이전버전'에 보관됩니다.`))return;
+  try{await sendFile('/.netlify/functions/admin-static-replace',{id,action:'revert'},null);}catch(err){return alert(err.message);}
+  fetch('/.netlify/functions/admin-thumb?id='+encodeURIComponent('s:'+id),{method:'DELETE'}).then(loadThumbs).catch(()=>{});
+  await loadActivity();renderItems();toast('원본으로 되돌렸습니다');
+}
+async function openVersions(key,label){
+  const x=itemByKey(key);if(!x&&!label)return;
+  $('#versionsName').textContent=label||`${x.part} · ${x.scene} · ${x.title||x.filename}`;
   $('#versionsList').innerHTML='<div class="status">불러오는 중...</div>';
   $('#versionsModal').classList.add('show');
   const r=await fetch(`/.netlify/functions/admin-versions?key=${encodeURIComponent(key)}`,{cache:'no-store'});
@@ -580,7 +632,7 @@ async function openVersions(key){
 async function restoreVersion(key,id){
   if(!confirm('이 버전으로 복원할까요? 현재 파일도 복원 전에 자동 백업됩니다.'))return;
   const j=await apiPost('/.netlify/functions/admin-versions',{key,id});if(!j)return;
-  closeModal('versionsModal');await loadItems();loadNotices();toast('이전 버전으로 복원했습니다');
+  closeModal('versionsModal');await loadItems();await loadActivity();renderItems();loadNotices();toast('이전 버전으로 복원했습니다');
 }
 async function apiPost(path,body){
   try{
@@ -664,6 +716,126 @@ function fillNoticeSources(){
   const sel=$('#nSrc');sel.innerHTML='<option value="">직접 입력</option>'+[...staticData.scenes,...staticData.apps].map(x=>`<option value="${esc(x.id)}">${esc([x.part,x.scene].filter(Boolean).join(' '))} ${esc(x.title)}</option>`).join('');
 }
 $('#nSrc').addEventListener('change',()=>{const x=[...staticData.scenes,...staticData.apps].find(v=>v.id===$('#nSrc').value);if(!x)return;$('#nPart').value=x.partNum||'';$('#nScene').value=(x.scene||'').replace(/씬$/,'');$('#nTitle').value=x.title||'';$('#nUrl').value=x.url||'';});
+
+/* ── 큰 파일: 3MB 조각으로 나눠 보내기 ── */
+async function sendFile(url,fields,file,onProgress){
+  const fd=new FormData();for(const [k,v] of Object.entries(fields||{}))fd.append(k,v);
+  if(file&&file.size<=3.5*1024*1024)fd.append('file',file);
+  else if(file){
+    const id=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()).replace(/[^A-Za-z0-9]/g,'');const CH=3*1024*1024,n=Math.ceil(file.size/CH);
+    for(let i=0;i<n;i++){
+      onProgress&&onProgress(i+1,n);
+      const r=await fetch(`/.netlify/functions/admin-chunk?id=${id}&i=${i}`,{method:'POST',body:file.slice(i*CH,(i+1)*CH)});
+      if(r.status===401){alert('로그인이 풀렸습니다. 다시 로그인해 주세요.');location.reload();throw new Error('로그인 필요');}
+      if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.error||'파일 조각 전송 실패');}
+    }
+    fd.append('chunkId',id);fd.append('chunkCount',n);fd.append('fileName',file.name);fd.append('fileType',file.type||'application/octet-stream');
+  }
+  const r=await fetch(url,{method:'POST',body:fd});const j=await r.json().catch(()=>({}));
+  if(r.status===401){alert('로그인이 풀렸습니다. 다시 로그인해 주세요.');location.reload();throw new Error('로그인 필요');}
+  if(!r.ok)throw new Error(j.error||('실패 ('+r.status+')'));
+  return j;
+}
+
+/* ── 깃허브 자료 교체 현황 · 작업 기록 ── */
+let overrides={},activity=[];
+const staticById=id=>[...staticData.scenes,...staticData.apps].find(x=>x.id===id);
+function overrideFor(x){const vals=Object.values(overrides);return vals.find(o=>o.id===x.id)||null;}
+async function loadActivity(){
+  try{const r=await fetch('/.netlify/functions/admin-activity',{cache:'no-store'});if(!r.ok)return;const j=await r.json();activity=j.items||[];overrides=j.overrides||{};renderActivity();if(currentTab==='static')renderItems();}catch{}
+}
+const ACT_CLS=a=>/업로드/.test(a)?'up':/교체|복원|되돌/.test(a)?'rp':/삭제|휴지통/.test(a)?'del':/숨김/.test(a)?'hide':'';
+function renderActivity(){
+  const q=($('#logSearch').value||'').trim().toLowerCase();
+  const list=activity.filter(a=>!q||[a.action,a.title,a.detail,a.part,a.scene].join(' ').toLowerCase().includes(q));
+  if(!list.length){$('#logList').innerHTML='<div class="status" style="padding:20px 0">아직 기록이 없습니다. 이제부터 올리고 바꾸는 작업이 여기에 남아요.</div>';return;}
+  let html='',cur='';
+  for(const a of list){
+    const d=new Date(a.at),day=d.toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'});
+    if(day!==cur){html+=`<div class="act-day">${esc(day)}</div>`;cur=day;}
+    html+=`<div class="act"><span class="tag ${ACT_CLS(a.action)}">${esc(a.action)}</span><div><div class="nm">${a.url?`<a href="${esc(a.url)}" target="_blank" style="color:inherit">${esc(a.title||'-')}</a>`:esc(a.title||'-')}</div><div class="dt">${esc([a.part,a.scene].filter(Boolean).join(' · '))}${a.detail?' · '+esc(a.detail):''}</div></div><span class="tm">${d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}</span></div>`;
+  }
+  $('#logList').innerHTML=html;
+}
+$('#logSearch').addEventListener('input',renderActivity);$('#logReload').onclick=loadActivity;
+
+/* ── 여러 개 선택해서 한 번에 처리 ── */
+const selected=new Set();
+$('#items').addEventListener('change',e=>{const c=e.target.closest('input.sel');if(!c)return;if(c.checked)selected.add(c.dataset.sel);else selected.delete(c.dataset.sel);c.closest('.item').classList.toggle('picked',c.checked);paintBulk();});
+$('#selAll').addEventListener('change',e=>{document.querySelectorAll('#items input.sel').forEach(c=>{c.checked=e.target.checked;if(c.checked)selected.add(c.dataset.sel);else selected.delete(c.dataset.sel);c.closest('.item').classList.toggle('picked',c.checked);});paintBulk();});
+document.querySelectorAll('#v-items .tab').forEach(b=>b.addEventListener('click',()=>{selected.clear();$('#selAll').checked=false;paintBulk();}));
+function paintBulk(){
+  const n=selected.size,bar=$('#bulkbar');bar.classList.toggle('on',n>0);if(!n){bar.innerHTML='';return;}
+  const B=(a,l,c='secondary')=>`<button class="btn ${c} small" data-bulk="${a}">${l}</button>`;
+  bar.innerHTML=`<b>${n}개 선택</b>`+(currentTab==='trash'?B('restore','복구','ok')+B('purge','완전삭제','danger')
+    :currentTab==='static'?B('hide','숨김')+B('show','다시 표시')+B('thumb','미리보기 사진 다시 만들기')
+    :B('hide','숨김')+B('show','다시 표시')+B('pin','고정','warn')+B('unpin','고정 해제')+B('thumb','미리보기 사진 다시 만들기')+B('trash','휴지통','danger'))+B('clear','선택 해제');
+}
+$('#bulkbar').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-bulk]');if(!b)return;const act=b.dataset.bulk;
+  if(act==='clear'){selected.clear();$('#selAll').checked=false;renderItems();paintBulk();return;}
+  const ids=[...selected];
+  const label={hide:'숨김',show:'다시 표시',pin:'고정',unpin:'고정 해제',trash:'휴지통으로 이동',restore:'복구',purge:'완전삭제',thumb:'미리보기 사진 다시 만들기'}[act];
+  if(['trash','purge','hide'].includes(act)&&!confirm(`${ids.length}개를 ${label}할까요?${act==='purge'?'\n완전삭제는 되돌릴 수 없습니다.':''}`))return;
+  let ok=0;$('#bulkbar').querySelectorAll('button').forEach(x=>x.disabled=true);
+  for(const sid of ids){
+    const [kind,...rest]=sid.split(':');const id=rest.join(':');
+    toast(`${label} 중… ${ok+1}/${ids.length}`);
+    try{
+      if(act==='thumb'){const x=kind==='s'?staticById(id):itemByKey(id);if(x)await makeThumb(sid,x.url);}
+      else if(kind==='s'){const x=staticById(id)||{};const r=await fetch('/.netlify/functions/admin-static',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,hidden:act==='hide',title:x.title,part:x.part,scene:x.scene})});const j=await r.json();if(j.hidden)staticHidden=new Set(j.hidden);}
+      else if(act==='hide'||act==='show')await fetch('/.netlify/functions/admin-update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:id,visible:act==='show'})});
+      else if(act==='pin'||act==='unpin')await fetch('/.netlify/functions/admin-update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:id,pinned:act==='pin'})});
+      else await fetch('/.netlify/functions/admin-trash',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:id,action:act})});
+      ok++;
+    }catch{}
+  }
+  selected.clear();$('#selAll').checked=false;paintBulk();await loadItems();loadActivity();toast(`${ok}개 ${label} 완료`);
+});
+
+/* ── 카드 미리보기 사진 (자동으로 찍어서 저장) ── */
+let thumbs={};
+async function loadThumbs(){try{const j=await (await fetch('/.netlify/functions/thumb?index=1',{cache:'no-store'})).json();thumbs=j.thumbs||{};renderItems();}catch{}}
+const STATIC_THUMBS=new Set(['p1-4-cheongyak','p1-46-statement','p1-46-statement-hwp','p2-33-police-game','p4-37-petct','p4-38-carbon-console','p5-62-hospital','p6-44-video-studio','p6-44-loop','p6-44-moment']);
+function thumbURL(tid){
+  if(thumbs[tid])return `/.netlify/functions/thumb?id=${encodeURIComponent(tid)}&v=${thumbs[tid]}`;
+  if(tid.startsWith('s:')&&STATIC_THUMBS.has(tid.slice(2))&&!Object.values(overrides).some(o=>o.id===tid.slice(2)))return `/thumbs/${tid.slice(2)}.jpg`;
+  return '';
+}
+function thumbHTML(tid){const u=thumbURL(tid);return u?`<img class="thumb" loading="lazy" src="${esc(u)}" alt="">`:`<div class="thumb none">사진 없음</div>`;}
+let h2c;
+const loadH2C=()=>h2c||(h2c=new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=()=>ok(window.html2canvas);s.onerror=()=>{h2c=null;no(new Error('html2canvas'));};document.head.appendChild(s);}));
+const W=480,H=300;
+function coverDraw(ctx,img,iw,ih){const r=Math.max(W/iw,H/ih),w=iw*r,h=ih*r;ctx.drawImage(img,(W-w)/2,(H-h)/2,w,h);}
+async function makeThumb(tid,url,file){
+  const type=file?(file.type||''):'';const name=(file?file.name:url||'').toLowerCase();
+  const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  if(/^image\//.test(type)||/\.(png|jpe?g|webp|gif)(\?|$)/.test(name)){
+    const src=file?URL.createObjectURL(file):url;const img=new Image();img.src=src;await img.decode();coverDraw(ctx,img,img.naturalWidth,img.naturalHeight);
+  }else if(/html?/.test(type)||/\.html?(\?|$)/.test(name)||(!file&&url)){
+    const frame=document.createElement('iframe');frame.className='thumbjob';
+    frame.src=file?URL.createObjectURL(file):url;document.body.appendChild(frame);
+    try{
+      await new Promise((ok,no)=>{frame.onload=ok;setTimeout(()=>no(new Error('시간 초과')),20000);});
+      await new Promise(r=>setTimeout(r,2500));
+      const doc=frame.contentDocument;if(!doc)throw new Error('열 수 없음');
+      const H2C=await loadH2C();
+      const shot=await H2C(doc.documentElement,{width:1280,height:800,windowWidth:1280,windowHeight:800,x:0,y:0,scrollX:0,scrollY:0,scale:0.375,useCORS:true,logging:false,backgroundColor:null});
+      ctx.drawImage(shot,0,0,W,H);
+    }finally{frame.remove();}
+  }else return;
+  const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.8));
+  const r=await fetch('/.netlify/functions/admin-thumb?id='+encodeURIComponent(tid),{method:'POST',body:blob});
+  const j=await r.json().catch(()=>({}));if(j.ok){thumbs[tid]=j.at;renderItems();}
+}
+$('#thumbMissing').onclick=async()=>{
+  const list=[...allItems.filter(x=>!x.deleted).map(x=>({tid:'u:'+x.key,url:x.url,ct:x.contentType||''})),...staticData.scenes.map(x=>({tid:'s:'+x.id,url:x.url,ct:'text/html'}))]
+    .filter(x=>!thumbURL(x.tid)&&(/html|image/.test(x.ct)));
+  if(!list.length)return toast('빠진 미리보기 사진이 없습니다');
+  const b=$('#thumbMissing');b.disabled=true;let i=0;
+  for(const x of list){b.textContent=`🖼 만드는 중 ${++i}/${list.length}`;try{await makeThumb(x.tid,x.url);}catch{}}
+  b.disabled=false;b.textContent='🖼 빠진 미리보기 사진 만들기';toast('미리보기 사진을 만들었습니다');
+};
 checkSession();
 </script>
 </body></html>

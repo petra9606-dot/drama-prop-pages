@@ -21,7 +21,7 @@ function sameOriginCacheable(url) {
   if (p.startsWith("/admin")) return false;
   if (p === "/sw.js") return false;
   if (p.startsWith("/.netlify/functions/")) {
-    return p === "/.netlify/functions/file" || p === "/.netlify/functions/catalog";
+    return p === "/.netlify/functions/file" || p === "/.netlify/functions/catalog" || p === "/.netlify/functions/thumb";
   }
   return true;
 }

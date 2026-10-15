@@ -1,5 +1,6 @@
 import { isAdmin } from "../lib/auth.mjs";
 import { uploadsStore, readUpdates, writeUpdates, pushUpdate, cleanNote } from "../lib/flags.mjs";
+import { logActivity } from "../lib/activity.mjs";
 
 // 관리자: 업데이트 공지를 직접 쓰거나(깃허브로 올린 자료 등) 지운다
 export default async (req) => {
@@ -9,8 +10,11 @@ export default async (req) => {
   const store = uploadsStore();
   try {
     if (body.action === "delete") {
-      const list = (await readUpdates(store)).filter((x) => x.id !== body.id);
+      const all = await readUpdates(store);
+      const gone = all.find((x) => x.id === body.id);
+      const list = all.filter((x) => x.id !== body.id);
       await writeUpdates(store, list);
+      if (gone) await logActivity(store, { action: "소식 지움", title: gone.title, part: gone.part, scene: gone.scene, detail: gone.note });
       return Response.json({ ok: true, items: list }, { headers: { "Cache-Control": "no-store" } });
     }
     if (body.action === "list") {
@@ -29,6 +33,7 @@ export default async (req) => {
       scene: sceneRaw ? `${sceneRaw}씬` : "",
       url: body.url ? String(body.url).slice(0, 400) : ""
     });
+    await logActivity(store, { action: "소식 올림", title: item?.title || title, part: item?.part, scene: item?.scene, detail: note, url: item?.url });
     return Response.json({ ok: true, item }, { headers: { "Cache-Control": "no-store" } });
   } catch (err) {
     return Response.json({ ok: false, error: `서버 오류: ${err && err.message ? err.message : String(err)}` }, { status: 500 });

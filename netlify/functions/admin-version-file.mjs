@@ -10,7 +10,8 @@ export default async (req) => {
   const m = backup.metadata;
   const type = m.contentType || "application/octet-stream";
   const inline = type.startsWith("text/html") || type.startsWith("image/") || type === "application/pdf";
-  return new Response(backup.data, { headers:{
+  const body = backup.data.byteLength > 5 * 1024 * 1024 ? new Response(backup.data).body : backup.data;
+  return new Response(body, { headers:{
     "Content-Type":type,
     "Content-Disposition":`${inline ? "inline" : "attachment"}; filename*=UTF-8''${encodeURIComponent(m.filename || "backup")}`,
     "Cache-Control":"no-store",
