@@ -120,6 +120,12 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
 .rdrop{border:2px dashed #34415d;border-radius:12px;padding:20px;text-align:center;cursor:pointer;background:#0b0f17;font-size:13px;color:#aab5ca}
 .rdrop.over{border-color:#7590ff;background:#101833}
 .rdrop b{color:#fff}
+.rdrop .pick{margin-top:12px;display:inline-flex;align-items:center;gap:6px;border:1px solid #3a4d78;background:#1b2540;color:#fff;border-radius:9px;padding:9px 16px;font:800 13px/1 inherit;cursor:pointer}
+.rdrop .pick:hover{background:#24315a}
+.rdrop .hint{display:block;margin-top:8px}
+.drop .pick{margin-top:14px;display:inline-flex;align-items:center;gap:6px;border:1px solid #3a4d78;background:#1b2540;color:#fff;border-radius:9px;padding:10px 18px;font:800 13px/1 inherit;cursor:pointer}
+.drop .pick:hover{background:#24315a}
+@media(hover:none){.rdrop .dt{display:none}}
 
 /* 페이지 전체에 파일을 끌어 왔을 때 */
 .dragcover{position:fixed;inset:0;z-index:25;background:rgba(10,16,40,.55);border:3px dashed #7590ff;display:none;align-items:center;justify-content:center;pointer-events:none}
@@ -207,7 +213,8 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
       <div class="sub">여러 파일을 한 번에 끌어다 놓거나 골라 주세요. 파일 이름에 <b>4부</b>, <b>37씬</b> 같은 표시가 있으면 자동으로 채워집니다. 사이트에는 <b>씬 번호 + 화면 제목</b>으로 표시돼요.</div>
       <div class="drop" id="drop">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></svg>
-        <b class="dt">파일을 여기로 끌어다 놓기</b><b class="tt">눌러서 파일 선택</b><span><i class="dt">또는 눌러서 선택 · </i>여러 개 가능 · 파일당 최대 4MB</span>
+        <b class="dt">파일을 여기로 끌어다 놓기</b><b class="tt">파일을 골라 주세요</b><span>여러 개 가능 · 파일당 최대 4MB</span>
+        <button type="button" class="pick">📂 파일 찾아보기</button>
       </div>
       <input type="file" id="files" multiple hidden accept=".html,.htm,.png,.jpg,.jpeg,.webp,.gif,.pdf,.pptx,.xlsx,.docx,.txt,.zip">
       <div class="defaults">
@@ -290,7 +297,7 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
     <div class="modal-head"><h1 style="font-size:21px">파일 교체</h1><button class="x" onclick="closeModal('replaceModal')">×</button></div>
     <div class="sub" id="replaceName"></div>
     <input type="hidden" id="replaceKey">
-    <div class="rdrop" id="rdrop">새 파일을 <b>여기로 끌어다 놓거나</b> 눌러서 선택</div>
+    <div class="rdrop" id="rdrop"></div>
     <input type="file" id="replaceFile" hidden>
     <div style="margin-top:12px"><label>무엇을 바꿨나요? (선택 · 방문자에게 보이는 소식)</label><input id="replaceNote" placeholder="예: 병원명 다온대학교병원으로 수정"></div>
     <label class="check" style="margin-top:10px"><input type="checkbox" id="replaceAnnounce" checked> 업데이트 소식으로 알리기 (사이트에 '수정됨' 표시)</label>
@@ -540,12 +547,12 @@ async function quickPin(key,pinned){const j=await apiPost('/.netlify/functions/a
 let replacePicked=null;
 function setReplaceFile(f){
   replacePicked=f||null;
-  if(!f){$('#rdrop').innerHTML='새 파일을 <b>여기로 끌어다 놓거나</b> 눌러서 선택';return;}
+  if(!f){$('#rdrop').innerHTML=`${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:30px;height:30px;color:#7590ff"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></svg>'}<div class="dt" style="margin-top:6px">새 파일을 <b>여기로 끌어다 놓거나</b></div><button type="button" class="pick">📂 파일 찾아보기</button>`;return;}
   const big=f.size>MAX;
-  $('#rdrop').innerHTML=`<b>${esc(f.name)}</b> · ${fmtSize(f.size)}${big?' <span class="badtxt">· 4MB 초과</span>':''}<br><span class="status">다른 파일로 바꾸려면 다시 끌어다 놓거나 누르세요</span>`;
+  $('#rdrop').innerHTML=`<b>${esc(f.name)}</b> · ${fmtSize(f.size)}${big?' <span class="badtxt">· 4MB 초과</span>':''}<span class="hint status"><span class="dt">다른 파일은 다시 끌어다 놓거나 </span></span><button type="button" class="pick">📂 다른 파일 찾아보기</button>`;
 }
 function openReplace(k,file){const x=itemByKey(k);if(!x)return;$('#replaceKey').value=k;$('#replaceName').textContent=`${x.part} · ${x.scene} · ${x.title||x.filename}`;$('#replaceFile').value='';setReplaceFile(file);$('#replaceNote').value='';$('#replaceAnnounce').checked=true;$('#replaceStatus').textContent='';$('#replaceBtn').disabled=false;$('#replaceModal').classList.add('show');}
-$('#rdrop').onclick=()=>$('#replaceFile').click();
+$('#rdrop').onclick=()=>{$('#replaceFile').value='';$('#replaceFile').click();};
 $('#replaceFile').onchange=()=>setReplaceFile($('#replaceFile').files[0]);
 async function replaceFile(){
   const f=replacePicked;if(!f)return alert('교체할 파일을 선택해 주세요.');
