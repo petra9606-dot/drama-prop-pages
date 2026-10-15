@@ -370,40 +370,91 @@
     anchor.parentNode.style.flexWrap = "wrap"; anchor.parentNode.style.rowGap = "10px";
   }
 
-  /* 촬영 모드: 버튼을 누르는 순간 바로 전체 화면 + 화면 꺼짐 방지 */
+  /* 소품 보기 창 — 폰·태블릿에서 깨지는 PC용 화면은 PC 크기로 그린 뒤 화면에 맞게 줄여서 보여 준다 */
   let shootLock = null;
   function keepAwake() {
     if (!("wakeLock" in navigator) || document.visibilityState !== "visible") return;
     navigator.wakeLock.request("screen").then((l) => { shootLock = l; }).catch(() => {});
   }
-  function openShoot(info) {
+  // 폰용으로 만든 소품(세로 앱 화면 등)은 원래 크기로, 나머지 PC용 화면은 PC 크기로 그려서 줄여 보여 준다
+  const NATIVE = ["/pyramid/part6/scene44/?screen=loop", "/pyramid/part6/scene44/?screen=moment", "/apps/police-game.html"];
+  const viewPref = (id) => { try { return localStorage.getItem("dw-view:" + id); } catch { return null; } };
+  const setViewPref = (id, v) => { try { localStorage.setItem("dw-view:" + id, v); } catch {} };
+  function viewMode(wrap, id) {
+    if (wrap.clientWidth >= 900) return "native";
+    return viewPref(id) || (NATIVE.includes(id) ? "native" : "pc");
+  }
+  function fitFrame(wrap, frame, mode) {
+    const vw = wrap.clientWidth, vh = wrap.clientHeight;
+    if (mode !== "pc") { frame.style.transform = ""; frame.style.left = "0"; frame.style.top = "0"; frame.style.width = vw + "px"; frame.style.height = vh + "px"; return; }
+    const W = 1280, k = vw / W, H = Math.round(Math.min(Math.max(vh / k, 720), 900));
+    frame.style.width = W + "px"; frame.style.height = H + "px";
+    frame.style.transformOrigin = "0 0"; frame.style.transform = `scale(${k})`;
+    frame.style.left = "0"; frame.style.top = Math.max(0, (vh - H * k) / 2) + "px";
+  }
+  function openViewer(info, shoot) {
     const wrap = document.createElement("div");
-    wrap.style.cssText = "position:fixed;inset:0;z-index:2147483000;background:#000";
+    wrap.style.cssText = "position:fixed;inset:0;z-index:2147483000;background:#000;overflow:hidden";
     const frame = document.createElement("iframe");
     frame.allow = "fullscreen; autoplay; clipboard-write; camera; microphone";
-    frame.style.cssText = "position:absolute;inset:0;width:100%;height:100%;border:0;background:#000";
+    frame.style.cssText = "position:absolute;left:0;top:0;width:100%;height:100%;border:0;background:#fff";
     frame.src = info.id;
-    wrap.appendChild(frame); document.body.appendChild(wrap);
+    wrap.appendChild(frame);
+    let closeBtn = null, modeBtn = null;
+    let mode = "native";
+    if (!shoot) {                                        // 확인용 보기에는 작은 닫기 버튼만 (잠시 뒤 흐려짐)
+      closeBtn = document.createElement("button");
+      closeBtn.type = "button"; closeBtn.setAttribute("aria-label", "닫기"); closeBtn.innerHTML = I.x;
+      closeBtn.style.cssText = "position:absolute;right:10px;top:calc(10px + env(safe-area-inset-top));z-index:2;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;padding:8px;transition:opacity .4s";
+      wrap.appendChild(closeBtn);
+      modeBtn = document.createElement("button"); modeBtn.type = "button";
+      modeBtn.style.cssText = "position:absolute;right:54px;top:calc(10px + env(safe-area-inset-top));z-index:2;height:36px;padding:0 12px;border-radius:18px;border:0;background:rgba(0,0,0,.55);color:#fff;font:700 12px/1 'Malgun Gothic',sans-serif;transition:opacity .4s";
+      wrap.appendChild(modeBtn);
+      setTimeout(() => { closeBtn.style.opacity = ".25"; modeBtn.style.opacity = ".25"; }, 2500);
+    }
+    document.body.appendChild(wrap);
     const html = document.documentElement, prevOverflow = html.style.overflow; html.style.overflow = "hidden";
-    const req = wrap.requestFullscreen || wrap.webkitRequestFullscreen;
     let full = false;
-    if (req) { try { const p = req.call(wrap, { navigationUI: "hide" }); full = true; if (p && p.catch) p.catch(() => { full = false; }); } catch { full = false; } }
-    keepAwake();
-    const onVis = () => { if (document.visibilityState === "visible") keepAwake(); };
-    document.addEventListener("visibilitychange", onVis);
+    if (shoot) {
+      const req = wrap.requestFullscreen || wrap.webkitRequestFullscreen;
+      if (req) { try { const p = req.call(wrap, { navigationUI: "hide" }); full = true; if (p && p.catch) p.catch(() => {}); } catch {} }
+      keepAwake();
+    }
+    const paintMode = () => { if (modeBtn) { modeBtn.style.display = wrap.clientWidth >= 900 ? "none" : ""; modeBtn.textContent = mode === "pc" ? "📱 폰 화면으로" : "🖥 PC 화면으로"; } };
+    const refit = () => { mode = viewMode(wrap, info.id); fitFrame(wrap, frame, mode); paintMode(); };
+    refit();
+    if (modeBtn) modeBtn.onclick = () => { setViewPref(info.id, mode === "pc" ? "native" : "pc"); refit(); modeBtn.style.opacity = "1"; };
     frame.addEventListener("load", () => { try { frame.contentWindow.focus(); } catch {} });
-    const close = () => {
+    const onVis = () => { if (shoot && document.visibilityState === "visible") keepAwake(); };
+    document.addEventListener("visibilitychange", onVis);
+    addEventListener("resize", refit);
+    let closed = false;
+    const close = (fromHistory) => {
+      if (closed) return; closed = true;
       document.removeEventListener("fullscreenchange", onFs); document.removeEventListener("webkitfullscreenchange", onFs);
-      document.removeEventListener("visibilitychange", onVis);
+      document.removeEventListener("visibilitychange", onVis); removeEventListener("resize", refit); removeEventListener("popstate", onPop);
       try { shootLock && shootLock.release(); } catch {} shootLock = null;
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
       html.style.overflow = prevOverflow; wrap.remove();
+      if (!fromHistory && history.state && history.state.dwViewer) history.back();
     };
-    // 전체 화면에서 나오면(Esc · 뒤로) 목록으로 돌아온다
-    const onFs = () => { if (!(document.fullscreenElement || document.webkitFullscreenElement)) close(); };
+    const onFs = () => { if (full && !(document.fullscreenElement || document.webkitFullscreenElement)) close(); };
     document.addEventListener("fullscreenchange", onFs); document.addEventListener("webkitfullscreenchange", onFs);
-    // 전체 화면이 안 되는 기기(아이폰)는 따로 연 촬영 페이지로
-    if (!req) { close(); location.href = "/shoot.html?u=" + encodeURIComponent(info.id); }
+    // 폰의 뒤로가기로 닫기
+    history.pushState({ dwViewer: 1 }, "");
+    const onPop = () => close(true);
+    addEventListener("popstate", onPop);
+    if (closeBtn) closeBtn.onclick = () => close();
   }
+  const openShoot = (info) => openViewer(info, true);
+  // 폰·태블릿에서 카드를 누르면 화면에 맞춘 보기 창으로 연다 (PC는 그대로 새 화면으로 이동)
+  const smallScreen = () => matchMedia("(max-width: 1024px)").matches && matchMedia("(pointer: coarse)").matches;
+  document.addEventListener("click", (e) => {
+    if (!smallScreen() || e.defaultPrevented || e.button) return;
+    const card = e.target.closest(CARD_SEL); if (!card || e.target.closest(".dwt-row")) return;
+    e.preventDefault(); e.stopPropagation();
+    openViewer(cardInfo(card), false);
+  }, true);
 
   /* 카드 미리보기 사진 */
   let thumbIdx = null, staticByPath = null;
