@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>게임 화면 | DisolveWorks</title>
+<meta name="description" content="촬영용 웹 게임의 주요 화면과 모바일 조작 화면을 확인하고 브라우저에서 바로 플레이할 수 있습니다.">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 16% 0,rgba(80,105,190,.13),transparent 28%),#0b0f19;color:#eef2ff;font-family:'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif}
+a{color:#8fa8ff}.wrap{max-width:1180px;margin:0 auto;padding:44px 26px 70px}.back{display:inline-block;margin-bottom:22px;color:#8fa8ff;text-decoration:none;font-size:13px}
+h1{margin:0;font-size:34px;letter-spacing:-.03em}.sub{color:#78869f;font-size:12px;letter-spacing:.12em;margin-top:8px}.lead{color:#9aa7c0;font-size:14px;line-height:1.8;margin:18px 0 20px;max-width:860px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 1px 14px;margin-bottom:12px;scrollbar-width:thin}.tabs button{flex:0 0 auto;border:1px solid #2b3850;background:#121a2a;color:#9caac3;border-radius:999px;padding:10px 15px;font:700 12px inherit;cursor:pointer}.tabs button.on{background:#7590ff;border-color:#7590ff;color:#fff}.tabs button small{display:block;font-size:9px;font-weight:500;opacity:.72;margin-top:3px}
+.panel{display:grid;grid-template-columns:minmax(0,660px) minmax(280px,1fr);gap:34px;align-items:start}.viewer{background:#111827;border:1px solid #263244;border-radius:22px;padding:20px}
+.frame{aspect-ratio:16/9;border-radius:17px;overflow:hidden;background:#030712;box-shadow:0 22px 50px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center}.frame img{display:block;width:100%;height:100%;object-fit:contain;cursor:pointer}
+.nav{display:flex;align-items:center;gap:10px;margin-top:16px}.nav button{font:inherit;cursor:pointer;width:40px;height:40px;border-radius:12px;background:#1c2743;border:1px solid #30436e;color:#cdd8ff;font-size:17px;font-weight:800}.nav button:disabled{opacity:.35;cursor:default}.idx{margin-left:auto;font-size:12px;color:#7d8aa4;font-variant-numeric:tabular-nums}
+.cap{margin-top:14px;font-size:13px;color:#a9b5cc;line-height:1.8;min-height:66px}.cap b{color:#fff;display:block;font-size:15px;margin-bottom:6px}.side h2{margin:0 0 6px;font-size:26px;letter-spacing:-.02em}.meta{color:#8fa8ff;font-size:12px;font-weight:800;letter-spacing:.04em;margin-bottom:7px}.genre{color:#78869f;font-size:11px;letter-spacing:.08em;margin-bottom:16px}.desc{color:#9aa7c0;font-size:14px;line-height:1.85}
+.acts{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0 8px}.acts a{text-decoration:none;font-size:13px;font-weight:800;border-radius:12px;padding:13px 18px}.solid{background:#7590ff;color:#fff!important}.ghost{background:#1c2743;color:#b7c5ff;border:1px solid #30436e}.note{color:#69748c;font-size:11px;line-height:1.8;margin-top:10px}
+.thumbs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:24px}.thumbs button{padding:0;border:2px solid #263244;border-radius:11px;overflow:hidden;background:#0d121b;cursor:pointer;line-height:0}.thumbs img{width:100%;aspect-ratio:16/9;object-fit:contain;display:block;opacity:.55;background:#030712}.thumbs button.on{border-color:#7590ff}.thumbs button.on img{opacity:1}
+.controls{margin-top:22px;padding:16px;border-radius:14px;background:#0d1422;border:1px solid #202d43;font-size:12px;color:#93a0b9;line-height:1.8}.controls b{color:#dbeafe}.pad{display:grid;grid-template-columns:1fr 1fr;gap:5px 15px;margin-top:8px}.pad span{white-space:normal}
+@media(max-width:880px){.panel{grid-template-columns:1fr;gap:24px}.wrap{padding:28px 16px 56px}h1{font-size:27px}.viewer{padding:12px;border-radius:18px}.tabs{margin-right:-16px;padding-right:16px}}
+</style>
+<!-- DW-SITE --><meta name="robots" content="noindex,nofollow,noarchive"><script>if("serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});</script><script src="/dw-tools.js" defer></script>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="../../pyramid/index.html">← 피라밋</a>
+  <h1>게임 화면</h1>
+  <div class="sub">WEB GAMES · PLAY & SCREEN PREVIEW</div>
+  <p class="lead">준우 게임과 4부 28씬 배동찬 게임을 한곳에서 확인할 수 있습니다. 화면 미리보기를 넘겨 본 뒤 별도 설치 없이 브라우저에서 바로 실행하세요.</p>
+  <nav class="tabs" id="tabs" aria-label="게임 선택"></nav>
+  <div class="panel">
+    <section class="viewer" aria-label="게임 화면 미리보기">
+      <div class="frame"><img id="shot" alt=""></div>
+      <div class="nav"><button id="prev" aria-label="이전 화면">‹</button><button id="next" aria-label="다음 화면">›</button><span class="idx" id="idx"></span></div>
+      <div class="cap" id="cap"></div>
+    </section>
+    <aside class="side">
+      <h2 id="title"></h2>
+      <div class="meta" id="group"></div>
+      <div class="genre" id="genre"></div>
+      <div class="desc" id="desc"></div>
+      <div class="acts" id="acts"></div>
+      <div class="note" id="note"></div>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="controls"><b>조작 안내</b><div class="pad" id="controls"></div></div>
+    </aside>
+  </div>
+</main>
+<script>
+const GAMES=[
+  {id:'police',title:'리얼 시티 경찰관',group:'준우 게임 · 2부 33씬',genre:'3D OPEN WORLD · MOBILE TOUCH · GAMEPAD',desc:'도심·시골·해안 구역을 순찰하며 도둑을 체포하는 3D 오픈월드 웹 게임입니다. 택티컬 총, 그물총, C4와 사이렌을 사용할 수 있습니다.',play:'../../apps/police-game.html',qr:'../../apps/qr/police-game.png',note:'휴대폰에서는 Chrome 또는 Safari로 여는 것을 권장합니다. 카카오톡 내부 브라우저가 전체화면을 제한하면 브라우저로 다시 열어주세요.',controls:['PC · WASD 이동','마우스 · 시점/발사','모바일 · 왼쪽 조이스틱','오른쪽 드래그 · 조준','게임패드 · 좌/우 스틱','A·RT 택티컬 / X 그물 / B C4'],shots:[['01-start-desktop.png','게임 시작 화면','PC에서 처음 열었을 때 보이는 출동 화면입니다.'],['02-patrol-desktop.png','도심 순찰 · PC','도심을 순찰하는 실제 플레이 화면입니다.'],['03-start-mobile.png','휴대폰 시작 화면','가로 화면이 낮은 휴대폰에서도 시작 버튼을 확인할 수 있습니다.'],['04-controls-mobile.png','터치 조작 · 휴대폰','터치 이동, 조준과 무기 버튼을 바로 사용할 수 있습니다.']]},
+  {id:'rune',title:'RUNE CHAIN',group:'배동찬 게임 · 4부 28씬',genre:'PORTRAIT · PUZZLE RPG',desc:'다섯 기사와 룬을 연결해 적을 공격하는 세로형 퍼즐 RPG입니다.',play:'../baedongchan/rune-chain.html',controls:['화면 터치 · 시작','같은 룬을 드래그로 연결','적 터치 · 타깃 지정','세로 화면 권장'],shots:[['01-start.png','타이틀 화면','기사들과 RUNE CHAIN 로고가 나타나는 시작 화면입니다.'],['02-play.png','룬 전투 화면','룬을 연결해 공격하는 실제 퍼즐 전투 화면입니다.']]},
+  {id:'chord',title:'코드 러시',group:'배동찬 게임 · 4부 28씬',genre:'PORTRAIT · RHYTHM',desc:'1분짜리 곡을 직접 연주하는 세로형 4레인 리듬게임입니다.',play:'../baedongchan/chord-rush-game.html',controls:['키보드 · D F J K','모바일 · 각 레인 터치','노트가 선에 닿을 때 입력','세로 화면 권장'],shots:[['01-start.png','코드 러시 시작 화면','4개 레인과 게임 방법을 확인하는 타이틀 화면입니다.'],['02-play.png','리듬 플레이 화면','노트 타이밍에 맞춰 코드를 연주하는 실제 화면입니다.']]},
+  {id:'hero',title:'용사의 질주',group:'배동찬 게임 · 4부 28씬',genre:'LANDSCAPE · ACTION RUNNER',desc:'고대 왕국을 향해 달리며 장애물을 피하는 가로형 액션 러너입니다.',play:'../baedongchan/hero-run.html',controls:['좌·우 · 이동','점프 · 장애물 넘기','슬라이드 · 낮은 장애물','가로 화면 권장'],shots:[['01-start.png','용사의 질주 타이틀','고대 왕국을 향한 여정을 시작하는 화면입니다.'],['02-play.png','횡스크롤 질주 화면','모바일 조작 버튼이 포함된 실제 플레이 화면입니다.']]},
+  {id:'lumina',title:'LUMINA',group:'배동찬 게임 · 4부 28씬',genre:'LANDSCAPE · RHYTHM',desc:'빛의 노트를 타이밍에 맞춰 연주하는 4레인 리듬 게임입니다.',play:'../baedongchan/lumina-rhythm.html',controls:['키보드 · D F J K','모바일 · 각 레인 터치','노트 타이밍에 맞춰 입력','가로 화면 권장'],shots:[['01-start.png','LUMINA 타이틀','CHRONO RESONANCE 타이틀과 시작 메뉴입니다.'],['02-play.png','리듬 플레이 화면','4개 레인에서 노트를 연주하는 실제 화면입니다.']]}
+];
+let game=GAMES[0],index=0;const $=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+function src(g,i){return 'shots/'+g.id+'/'+g.shots[i][0]+'?v=2'}
+function paintShot(){const s=game.shots[index];$('shot').src=src(game,index);$('shot').alt=game.title+' '+s[1];$('idx').textContent=(index+1)+' / '+game.shots.length;$('cap').innerHTML='<b>'+esc(s[1])+'</b>'+esc(s[2]);$('prev').disabled=index===0;$('next').disabled=index===game.shots.length-1;$('thumbs').querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===index));try{history.replaceState(null,'','#'+game.id+'-'+(index+1))}catch(e){}}
+function select(g,i=0){game=g;index=Math.max(0,Math.min(g.shots.length-1,i));$('title').textContent=g.title;$('group').textContent=g.group;$('genre').textContent=g.genre;$('desc').textContent=g.desc;$('acts').innerHTML='<a class="solid" href="'+g.play+'">게임 바로 실행</a>'+(g.qr?'<a class="ghost" href="'+g.qr+'" target="_blank">휴대폰 QR</a>':'');$('note').textContent=g.note||'휴대폰에서는 브라우저를 권장 방향으로 돌려 플레이하세요.';$('controls').innerHTML=g.controls.map(x=>'<span>'+esc(x)+'</span>').join('');$('thumbs').innerHTML=g.shots.map((s,n)=>'<button data-i="'+n+'" title="'+esc(s[1])+'"><img src="'+src(g,n)+'" alt="'+esc(s[1])+'"></button>').join('');$('thumbs').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{index=Number(b.dataset.i);paintShot()}));$('tabs').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.id===g.id));paintShot()}
+$('tabs').innerHTML=GAMES.map(g=>'<button data-id="'+g.id+'">'+esc(g.title)+'<small>'+esc(g.group.replace(' · ',' / '))+'</small></button>').join('');$('tabs').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>select(GAMES.find(g=>g.id===b.dataset.id))));$('prev').addEventListener('click',()=>{if(index>0){index--;paintShot()}});$('next').addEventListener('click',()=>{if(index<game.shots.length-1){index++;paintShot()}});$('shot').addEventListener('click',()=>{index=(index+1)%game.shots.length;paintShot()});document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'&&index>0){index--;paintShot()}if(e.key==='ArrowRight'&&index<game.shots.length-1){index++;paintShot()}});
+const match=location.hash.match(/^#([a-z]+)-(\d+)$/);const initial=match&&GAMES.find(g=>g.id===match[1])||GAMES[0];select(initial,match?Number(match[2])-1:0);
+</script>
+</body>
+</html>

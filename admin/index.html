@@ -809,7 +809,7 @@ $('#bulkbar').addEventListener('click',async e=>{
 /* ── 카드 미리보기 사진 (자동으로 찍어서 저장) ── */
 let thumbs={};
 async function loadThumbs(){try{const j=await (await fetch('/.netlify/functions/thumb?index=1',{cache:'no-store'})).json();thumbs=j.thumbs||{};renderItems();}catch{}}
-const STATIC_THUMBS=new Set(['p1-4-cheongyak','p1-46-statement','p1-46-statement-hwp','p2-33-police-game','p4-37-petct','p4-38-carbon-console','p5-62-hospital','p6-44-video-studio','p6-44-loop','p6-44-moment']);
+const STATIC_THUMBS=new Set(['p1-4-cheongyak','p1-46-statement','p1-46-statement-hwp','p2-33-police-game','p4-28-rune-chain','p4-28-chord-rush','p4-28-hero-run','p4-28-lumina','p4-37-petct','p4-38-carbon-console','p5-62-hospital','p6-44-video-studio','p6-44-loop','p6-44-moment']);
 function thumbURL(tid){
   if(thumbs[tid])return `/.netlify/functions/thumb?id=${encodeURIComponent(tid)}&v=${thumbs[tid]}`;
   if(tid.startsWith('s:')&&STATIC_THUMBS.has(tid.slice(2))&&!Object.values(overrides).some(o=>o.id===tid.slice(2)))return `/thumbs/${tid.slice(2)}.jpg`;

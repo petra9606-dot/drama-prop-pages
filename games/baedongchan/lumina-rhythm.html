@@ -1,0 +1,3175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUMINA : CHRONO RESONANCE - 프리미엄 리듬게임</title>
+  <!-- Google Fonts for Luxury & Futuristic Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Pretendard:wght@300;400;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+/* ========================================================
+   LUMINA : CHRONO RESONANCE - LUXURY CYBERPUNK STYLES
+   ======================================================== */
+
+:root {
+  --bg-dark: #07080e;
+  --bg-card: rgba(14, 17, 28, 0.72);
+  --bg-card-hover: rgba(22, 27, 44, 0.85);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(0, 245, 255, 0.35);
+  
+  --color-primary: #00f0ff;
+  --color-secondary: #c084fc;
+  --color-accent: #f43f5e;
+  --color-gold: #fbbf24;
+  --color-success: #10b981;
+  --color-miss: #ef4444;
+  
+  --text-main: #f8fafc;
+  --text-dim: #94a3b8;
+  --text-muted: #64748b;
+
+  --lane-1: #00f0ff;
+  --lane-2: #818cf8;
+  --lane-3: #c084fc;
+  --lane-4: #00f0ff;
+
+  --font-display: 'Orbitron', -apple-system, sans-serif;
+  --font-sub: 'Rajdhani', sans-serif;
+  --font-body: 'Pretendard', -apple-system, sans-serif;
+
+  --glow-cyan: 0 0 25px rgba(0, 240, 255, 0.45);
+  --glow-purple: 0 0 25px rgba(192, 132, 252, 0.45);
+  --glow-gold: 0 0 25px rgba(251, 191, 36, 0.55);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Ambient Background Lights */
+.ambient-glow {
+  position: absolute;
+  width: 550px;
+  height: 550px;
+  border-radius: 50%;
+  filter: blur(140px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.28;
+  animation: floatOrb 16s ease-in-out infinite alternate;
+}
+
+.glow-1 {
+  background: radial-gradient(circle, #00f0ff, #3b82f6);
+  top: -100px;
+  left: 10%;
+}
+
+.glow-2 {
+  background: radial-gradient(circle, #d946ef, #6366f1);
+  bottom: -100px;
+  right: 15%;
+  animation-delay: -8s;
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 30px) scale(1.15); }
+  100% { transform: translate(-30px, -20px) scale(0.95); }
+}
+
+/* Subtle Cyber Grid Background */
+.cyber-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: center center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* App Master Shell */
+.app-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+/* Glassmorphism Panel Class */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ----------------------------------------------------
+   TOP NAVIGATION BAR
+   ---------------------------------------------------- */
+.top-nav {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(7, 8, 14, 0.4);
+  backdrop-filter: blur(12px);
+  z-index: 20;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  letter-spacing: 2px;
+}
+
+.logo-icon {
+  color: var(--color-primary);
+  font-size: 20px;
+  filter: drop-shadow(0 0 8px var(--color-primary));
+  animation: pulseIcon 2s ease-in-out infinite;
+}
+
+@keyframes pulseIcon {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffffff 40%, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: rgba(0, 240, 255, 0.12);
+  color: var(--color-primary);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  letter-spacing: 1.5px;
+}
+
+.player-stats-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.wallet-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: 30px;
+  font-family: var(--font-display);
+}
+
+.rp-icon {
+  color: var(--color-gold);
+  font-size: 14px;
+}
+
+.rp-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--font-sub);
+  letter-spacing: 1px;
+}
+
+.rp-val {
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+
+.rp-unit {
+  font-size: 11px;
+  color: var(--color-gold);
+  font-weight: 700;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ----------------------------------------------------
+   SCREEN CONTROLLER
+   ---------------------------------------------------- */
+.screen {
+  display: none;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ----------------------------------------------------
+   1. START SCREEN
+   ---------------------------------------------------- */
+#screen-start {
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.start-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 680px;
+  width: 100%;
+}
+
+.hero-badge {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  line-height: 1.1;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.glow-accent {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.5));
+}
+
+.hero-desc {
+  font-size: 15px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+/* Track Preview Card */
+.track-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 24px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.track-art {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  flex-shrink: 0;
+}
+
+.disc-spin {
+  position: absolute;
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  border: 2px dashed rgba(0, 240, 255, 0.4);
+  animation: spin 10s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.music-note-icon {
+  font-size: 26px;
+  color: var(--color-primary);
+  filter: drop-shadow(0 0 10px var(--color-primary));
+}
+
+.track-info {
+  flex: 1;
+}
+
+.track-tag {
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--color-primary);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.track-title {
+  font-family: var(--font-sub);
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.track-meta {
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.live-tag {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.key-preview-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.key-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.hint-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* Control Settings */
+.start-controls-panel {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  margin-bottom: 28px;
+  gap: 20px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.ctrl-label {
+  font-family: var(--font-sub);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+}
+
+.diff-selector {
+  display: flex;
+  gap: 8px;
+}
+
+.diff-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.diff-btn.active {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(129, 140, 248, 0.2));
+  border-color: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+}
+
+.diff-btn .sparkle {
+  color: var(--color-accent);
+}
+
+.speed-slider-wrap {
+  display: flex;
+  align-items: center;
+  width: 160px;
+}
+
+#speed-slider {
+  width: 100%;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* Primary Glowing Action Button */
+.btn-primary-glow {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  padding: 18px 36px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 50%, #6366f1 100%);
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 240, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary-glow:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 16px 45px rgba(0, 240, 255, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.btn-primary-glow:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-glimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-25deg);
+  animation: glimmer 3.5s infinite;
+}
+
+@keyframes glimmer {
+  0% { left: -100%; }
+  40%, 100% { left: 160%; }
+}
+
+.btn-primary-glow .btn-text {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 900;
+  color: #07080e;
+  letter-spacing: 2px;
+}
+
+.btn-primary-glow .btn-subtext {
+  font-family: var(--font-sub);
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(7, 8, 14, 0.7);
+  letter-spacing: 3px;
+  margin-top: 2px;
+}
+
+/* ----------------------------------------------------
+   2. GAMEPLAY SCREEN
+   ---------------------------------------------------- */
+#screen-game {
+  height: calc(100vh - 64px);
+  position: relative;
+  display: none;
+  flex-direction: column;
+}
+
+#screen-game.active {
+  display: flex;
+}
+
+.game-hud {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+/* Top HUD Bar */
+.hud-top {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1.5fr;
+  gap: 16px;
+  padding: 12px 32px;
+  z-index: 15;
+}
+
+.hud-box {
+  background: rgba(14, 18, 30, 0.6);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(12px);
+  border-radius: 14px;
+  padding: 10px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.song-progress-box .progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.song-title-mini {
+  color: #fff;
+  font-weight: 600;
+}
+
+.time-counter {
+  font-family: var(--font-display);
+  color: var(--color-primary);
+  font-size: 11px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  transition: width 0.1s linear;
+  box-shadow: 0 0 10px var(--color-primary);
+}
+
+.hud-label {
+  font-family: var(--font-sub);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.hud-val {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.hud-score-val {
+  color: var(--color-gold);
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+}
+
+.fever-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.fever-status {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--color-accent);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.fever-gauge-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.fever-gauge-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #ec4899, #f43f5e);
+  transition: width 0.15s ease-out;
+  box-shadow: 0 0 8px #f43f5e;
+}
+
+.fever-active .fever-gauge-fill {
+  background: linear-gradient(90deg, #00f0ff, #f43f5e, #fbbf24);
+  animation: feverRainbow 1s linear infinite;
+  box-shadow: 0 0 16px #f43f5e;
+}
+
+@keyframes feverRainbow {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* Game Viewport / Canvas */
+.game-viewport {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#rhythmCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+}
+
+/* Judgment & Combo Center Layer */
+.judgment-layer {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 12;
+  text-align: center;
+}
+
+.judgment-text {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: none;
+}
+
+.judgment-text.anim-judge {
+  opacity: 1;
+  transform: scale(1.15);
+  animation: judgePop 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes judgePop {
+  0% { opacity: 0; transform: scale(0.6) translateY(10px); }
+  30% { opacity: 1; transform: scale(1.15) translateY(-5px); }
+  75% { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(0.95) translateY(-15px); }
+}
+
+.judge-perfect {
+  color: #00f0ff;
+  text-shadow: 0 0 25px rgba(0, 240, 255, 0.9), 0 0 50px rgba(0, 240, 255, 0.5);
+}
+
+.judge-great {
+  color: #10b981;
+  text-shadow: 0 0 20px rgba(16, 185, 129, 0.8);
+}
+
+.judge-good {
+  color: #f59e0b;
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+}
+
+.judge-miss {
+  color: #ef4444;
+  text-shadow: 0 0 20px rgba(239, 68, 68, 0.9);
+}
+
+.combo-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.combo-display.visible {
+  opacity: 1;
+}
+
+.combo-count {
+  font-family: var(--font-display);
+  font-size: 54px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+  letter-spacing: 2px;
+  transition: transform 0.08s ease;
+}
+
+.combo-count.pulse {
+  transform: scale(1.2);
+}
+
+.combo-label {
+  font-family: var(--font-sub);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: var(--color-primary);
+  margin-top: 2px;
+}
+
+/* Key Touch Deck at Bottom */
+.key-touch-deck {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  max-width: 440px;
+  height: 90px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.key-slot {
+  flex: 1;
+  background: rgba(14, 18, 30, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.08s ease;
+  backdrop-filter: blur(10px);
+}
+
+.key-cap {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.6);
+  z-index: 2;
+  transition: all 0.08s ease;
+}
+
+.key-light {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.08s ease;
+}
+
+.key-glow-floor {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.08s ease;
+}
+
+/* Active Key Press States */
+.key-slot:active, .key-slot.pressed {
+  transform: translateY(2px);
+  border-color: var(--color-primary);
+}
+
+.key-slot.pressed .key-cap {
+  color: #ffffff;
+  transform: scale(1.15);
+  text-shadow: 0 0 15px #fff;
+}
+
+.key-slot[data-key="0"].pressed .key-light,
+.key-slot[data-key="3"].pressed .key-light {
+  background: var(--lane-1);
+  box-shadow: 0 0 15px var(--lane-1);
+}
+
+.key-slot[data-key="0"].pressed .key-glow-floor,
+.key-slot[data-key="3"].pressed .key-glow-floor {
+  opacity: 0.35;
+  background: radial-gradient(circle at bottom, var(--lane-1), transparent 70%);
+}
+
+.key-slot[data-key="1"].pressed .key-light,
+.key-slot[data-key="2"].pressed .key-light {
+  background: var(--lane-2);
+  box-shadow: 0 0 15px var(--lane-2);
+}
+
+.key-slot[data-key="1"].pressed .key-glow-floor,
+.key-slot[data-key="2"].pressed .key-glow-floor {
+  opacity: 0.35;
+  background: radial-gradient(circle at bottom, var(--lane-2), transparent 70%);
+}
+
+/* Footer Controls in Game */
+.hud-footer {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(7, 8, 14, 0.5);
+  z-index: 15;
+}
+
+.hud-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.hud-quit-btn {
+  padding: 4px 12px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hud-quit-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+/* ----------------------------------------------------
+   3. RESULT SCREEN
+   ---------------------------------------------------- */
+#screen-result {
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.result-container {
+  width: 100%;
+  max-width: 680px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  animation: resultSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes resultSlideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.result-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.result-subtitle {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--color-primary);
+}
+
+.result-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: #fff;
+  margin-top: 4px;
+}
+
+.result-main-grid {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+/* Rank Showcase Badge */
+.result-rank-card {
+  background: rgba(10, 13, 22, 0.6);
+  border: 1px solid var(--border-glass);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.rank-badge {
+  font-family: var(--font-display);
+  font-size: 80px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 12px;
+  animation: rankPopIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes rankPopIn {
+  0% { transform: scale(0.2) rotate(-15deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.rank-sss, .rank-ss, .rank-s {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f43f5e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.7));
+}
+
+.rank-a {
+  color: #00f0ff;
+  text-shadow: 0 0 25px rgba(0, 240, 255, 0.7);
+}
+
+.rank-b {
+  color: #818cf8;
+  text-shadow: 0 0 20px rgba(129, 140, 248, 0.6);
+}
+
+.rank-c {
+  color: #f59e0b;
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+}
+
+.rank-f {
+  color: #ef4444;
+  text-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+}
+
+.clear-type {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--color-gold);
+}
+
+/* Stats Card */
+.result-stats-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 0;
+}
+
+.result-stat-row.highlight-row .stat-value {
+  font-size: 24px;
+  color: var(--color-gold);
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+}
+
+.stat-name {
+  font-family: var(--font-sub);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.stat-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 0;
+}
+
+/* Breakdown Grid */
+.judgment-breakdown {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.breakdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.breakdown-item .j-title {
+  font-family: var(--font-sub);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.breakdown-item .j-val {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.perfect-item .j-title { color: #00f0ff; }
+.great-item .j-title { color: #10b981; }
+.good-item .j-title { color: #f59e0b; }
+.miss-item .j-title { color: #ef4444; }
+
+/* Point Reward Box */
+.point-reward-box {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.05));
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  border-radius: 14px;
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.reward-title {
+  display: block;
+  font-family: var(--font-sub);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 1px;
+}
+
+.reward-detail {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.point-reward-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--font-display);
+}
+
+.plus-sign {
+  font-size: 18px;
+  color: var(--color-gold);
+  font-weight: 700;
+}
+
+.earned-points-number {
+  font-size: 26px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+}
+
+.total-saved-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.total-saved-row strong {
+  color: var(--color-gold);
+  font-family: var(--font-display);
+}
+
+/* Result Buttons */
+.result-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.btn-secondary-glass {
+  flex: 1;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-glass);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.25s ease;
+}
+
+.btn-secondary-glass:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+/* ----------------------------------------------------
+   MODAL DIALOG
+   ---------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 540px;
+  padding: 28px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #fff;
+}
+
+.modal-body {
+  overflow-y: auto;
+  padding-right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.guide-section h4 {
+  font-size: 14px;
+  color: var(--color-primary);
+  margin-bottom: 6px;
+}
+
+.guide-section p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.keys-demonstration {
+  display: flex;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+.demo-key {
+  flex: 1;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.demo-key span:first-child {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.demo-key span:last-child {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.guide-note {
+  font-size: 11px !important;
+  color: var(--text-muted) !important;
+}
+
+.guide-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.color-perfect { color: #00f0ff; }
+.color-great { color: #10b981; }
+.color-good { color: #f59e0b; }
+.color-miss { color: #ef4444; }
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-sm {
+  max-width: 140px;
+  padding: 12px 20px;
+}
+
+.btn-sm .btn-text {
+  font-size: 14px;
+}
+
+/* ----------------------------------------------------
+   RESPONSIVE
+   ---------------------------------------------------- */
+@media (max-width: 768px) {
+  .hero-title { font-size: 36px; }
+  .hud-top { grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px 16px; }
+  .result-main-grid { grid-template-columns: 1fr; }
+  .result-rank-card { flex-direction: row; gap: 20px; }
+  .rank-badge { font-size: 54px; margin-bottom: 0; }
+  .start-controls-panel { flex-direction: column; align-items: stretch; }
+  .top-nav { padding: 0 16px; }
+}
+
+</style>
+</head>
+<body>
+  <!-- Ambient Background Glows -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="cyber-grid-bg"></div>
+
+  <!-- App Container -->
+  <div id="app" class="app-container">
+
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+      <div class="brand-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">LUMINA</span>
+        <span class="logo-badge">RESONANCE</span>
+      </div>
+      <div class="player-stats-preview">
+        <div class="wallet-badge">
+          <span class="rp-icon">✦</span>
+          <span class="rp-label">POINTS:</span>
+          <span id="total-wallet-rp" class="rp-val">0</span>
+          <span class="rp-unit">RP</span>
+        </div>
+        <button id="btn-how-to-play" class="nav-btn" title="게임 방법">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          가이드
+        </button>
+      </div>
+    </header>
+
+    <!-- 1. START SCREEN -->
+    <section id="screen-start" class="screen active">
+      <div class="start-hero">
+        <div class="hero-badge">AETHER CYBER ACOUSTIC EXPERIENCE</div>
+        <h1 class="hero-title">CHRONO<span class="glow-accent">PULSE</span></h1>
+        <p class="hero-desc">당신의 손끝에서 완성되는 60초의 일렉트로닉 심포니.<br>정확한 비트에 맞춰 건반을 두드려 음악을 연주하세요.</p>
+        
+        <!-- Track Preview Card -->
+        <div class="track-card glass-panel">
+          <div class="track-art">
+            <div class="disc-spin"></div>
+            <div class="pulse-ring"></div>
+            <span class="music-note-icon">♫</span>
+          </div>
+          <div class="track-info">
+            <div class="track-tag">ORIGINAL COMPOSITION</div>
+            <div class="track-title">Cybernetic Horizon (128 BPM)</div>
+            <div class="track-meta">
+              <span>⏱ 01:00</span>
+              <span>•</span>
+              <span>Genre: Future Synthwave</span>
+              <span>•</span>
+              <span class="live-tag">Interactive Keysound</span>
+            </div>
+            <div class="key-preview-hint">
+              <span class="key-chip">D</span>
+              <span class="key-chip">F</span>
+              <span class="key-chip">J</span>
+              <span class="key-chip">K</span>
+              <span class="hint-text">4키 건반으로 직접 멜로디 연주</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Bar (Speed, Difficulty) -->
+        <div class="start-controls-panel glass-panel">
+          <div class="control-group">
+            <label class="ctrl-label">난이도 (DIFFICULTY)</label>
+            <div class="diff-selector">
+              <button class="diff-btn active" data-diff="normal">NORMAL</button>
+              <button class="diff-btn" data-diff="hard">HARD <span class="sparkle">★</span></button>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <label class="ctrl-label">노트 속도 (HI-SPEED): <span id="speed-display">2.5x</span></label>
+            <div class="speed-slider-wrap">
+              <input type="range" id="speed-slider" min="1.0" max="4.5" step="0.5" value="2.5">
+            </div>
+          </div>
+        </div>
+
+        <!-- Big Start Button -->
+        <button id="btn-start-game" class="btn-primary-glow">
+          <span class="btn-glimmer"></span>
+          <span class="btn-text">게임 시작 (START)</span>
+          <span class="btn-subtext">CLICK TO PLAY</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 2. GAMEPLAY SCREEN -->
+    <section id="screen-game" class="screen">
+      <!-- Game HUD -->
+      <div class="game-hud">
+        <!-- Top Status Bar -->
+        <div class="hud-top">
+          <div class="hud-box song-progress-box">
+            <div class="progress-info">
+              <span class="song-title-mini">Cybernetic Horizon</span>
+              <span id="hud-time" class="time-counter">00:00 / 01:00</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div id="hud-progress-fill" class="progress-bar-fill"></div>
+            </div>
+          </div>
+
+          <div class="hud-box score-box">
+            <span class="hud-label">SCORE</span>
+            <span id="hud-score" class="hud-val hud-score-val">0000000</span>
+          </div>
+
+          <div class="hud-box acc-box">
+            <span class="hud-label">ACCURACY</span>
+            <span id="hud-acc" class="hud-val">100.00%</span>
+          </div>
+
+          <div class="hud-box fever-box">
+            <div class="fever-info">
+              <span class="hud-label">OVERDRIVE</span>
+              <span id="hud-fever-status" class="fever-status">READY</span>
+            </div>
+            <div class="fever-gauge-bg">
+              <div id="hud-fever-fill" class="fever-gauge-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- In-game Canvas Area -->
+        <div class="game-viewport">
+          <canvas id="rhythmCanvas"></canvas>
+
+          <!-- Combo & Judgment Overlay (Positioned centrally) -->
+          <div id="judgment-layer" class="judgment-layer">
+            <div id="judgment-text" class="judgment-text"></div>
+            <div id="combo-display" class="combo-display">
+              <span id="combo-count" class="combo-count">0</span>
+              <span class="combo-label">COMBO</span>
+            </div>
+          </div>
+
+          <!-- Bottom Key Pad Visualizers (D, F, J, K) -->
+          <div class="key-touch-deck">
+            <div class="key-slot" data-key="0" id="key-guide-0">
+              <div class="key-light"></div>
+              <div class="key-cap">D</div>
+              <div class="key-glow-floor"></div>
+            </div>
+            <div class="key-slot" data-key="1" id="key-guide-1">
+              <div class="key-light"></div>
+              <div class="key-cap">F</div>
+              <div class="key-glow-floor"></div>
+            </div>
+            <div class="key-slot" data-key="2" id="key-guide-2">
+              <div class="key-light"></div>
+              <div class="key-cap">J</div>
+              <div class="key-glow-floor"></div>
+            </div>
+            <div class="key-slot" data-key="3" id="key-guide-3">
+              <div class="key-light"></div>
+              <div class="key-cap">K</div>
+              <div class="key-glow-floor"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game Pause / Mute shortcuts footer -->
+        <div class="hud-footer">
+          <span class="hud-hint">조작키: [ D ] [ F ] [ J ] [ K ] (또는 화면의 건반 터치)</span>
+          <button id="btn-give-up" class="hud-quit-btn">포기하기</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. RESULT SCREEN -->
+    <section id="screen-result" class="screen">
+      <div class="result-container glass-panel">
+        <div class="result-header">
+          <span class="result-subtitle">PERFORMANCE REPORT</span>
+          <h2 class="result-title">STAGE COMPLETE</h2>
+        </div>
+
+        <div class="result-main-grid">
+          <!-- Rank Showcase -->
+          <div class="result-rank-card">
+            <div id="res-rank-badge" class="rank-badge rank-s">S</div>
+            <div id="res-clear-type" class="clear-type">FULL COMBO!</div>
+          </div>
+
+          <!-- Score & Stats -->
+          <div class="result-stats-card">
+            <div class="result-stat-row highlight-row">
+              <span class="stat-name">FINAL SCORE</span>
+              <span id="res-score" class="stat-value">985,200</span>
+            </div>
+            <div class="result-stat-row">
+              <span class="stat-name">ACCURACY</span>
+              <span id="res-acc" class="stat-value">97.8%</span>
+            </div>
+            <div class="result-stat-row">
+              <span class="stat-name">MAX COMBO</span>
+              <span id="res-max-combo" class="stat-value">184</span>
+            </div>
+
+            <div class="stat-divider"></div>
+
+            <!-- Judgment Breakdown Grid -->
+            <div class="judgment-breakdown">
+              <div class="breakdown-item perfect-item">
+                <span class="j-title">PERFECT</span>
+                <span id="res-perfect-count" class="j-val">172</span>
+              </div>
+              <div class="breakdown-item great-item">
+                <span class="j-title">GREAT</span>
+                <span id="res-great-count" class="j-val">12</span>
+              </div>
+              <div class="breakdown-item good-item">
+                <span class="j-title">GOOD</span>
+                <span id="res-good-count" class="j-val">0</span>
+              </div>
+              <div class="breakdown-item miss-item">
+                <span class="j-title">MISS</span>
+                <span id="res-miss-count" class="j-val">0</span>
+              </div>
+            </div>
+
+            <!-- Earned Points Reward Box -->
+            <div class="point-reward-box">
+              <div class="point-reward-info">
+                <span class="reward-title">획득한 보상 (EARNED POINTS)</span>
+                <span class="reward-detail">기본 점수 + 콤보 보너스 + 정확도 보너스</span>
+              </div>
+              <div class="point-reward-amount">
+                <span class="plus-sign">+</span>
+                <span id="res-earned-points" class="earned-points-number">2,450</span>
+                <span class="rp-unit">RP</span>
+              </div>
+            </div>
+
+            <div class="total-saved-row">
+              <span>보유 누적 포인트:</span>
+              <strong id="res-total-wallet-rp">12,500 RP</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="result-actions">
+          <button id="btn-replay" class="btn-primary-glow">
+            <span class="btn-text">다시 플레이 (RETRY)</span>
+          </button>
+          <button id="btn-home" class="btn-secondary-glass">
+            <span>메인으로 (HOME)</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- HOW TO PLAY MODAL -->
+  <div id="modal-how-to-play" class="modal-overlay">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h3 class="modal-title">LUMINA 가이드 및 게임 방법</h3>
+        <button id="btn-close-modal" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="guide-section">
+          <h4>🎮 기본 조작 (Controls)</h4>
+          <p>노트가 하단의 판정선(Receptor)에 도달하는 순간, 해당하는 키를 정확히 누르세요.</p>
+          <div class="keys-demonstration">
+            <div class="demo-key"><span>D</span><span>라인 1</span></div>
+            <div class="demo-key"><span>F</span><span>라인 2</span></div>
+            <div class="demo-key"><span>J</span><span>라인 3</span></div>
+            <div class="demo-key"><span>K</span><span>라인 4</span></div>
+          </div>
+          <p class="guide-note">* 스마트폰이나 태블릿 등 터치 화면에서는 하단 건반을 직접 터치하여 플레이할 수 있습니다.</p>
+        </div>
+
+        <div class="guide-section">
+          <h4>🎵 인터랙티브 연주 시스템 (Key Sound)</h4>
+          <p>노트를 정확하게 타격할 때마다 화려한 신디사이저 멜로디가 연주됩니다. 타이밍을 놓치면 멜로디가 끊기므로 리듬에 몰입하여 연주를 완성해보세요!</p>
+        </div>
+
+        <div class="guide-section">
+          <h4>⚡ 판정 및 콤보 (Judgment & Combo)</h4>
+          <ul class="guide-list">
+            <li><strong class="color-perfect">PERFECT:</strong> 가장 정확한 타이밍! 최고 점수 + 콤보 상승</li>
+            <li><strong class="color-great">GREAT:</strong> 우수한 타이밍! 높은 점수 + 콤보 유지</li>
+            <li><strong class="color-good">GOOD:</strong> 약간 벗어난 타이밍. 점수 획득 + 콤보 유지</li>
+            <li><strong class="color-miss">MISS:</strong> 타이밍을 놓침. 점수 없음 & <strong>콤보 초기화</strong></li>
+          </ul>
+        </div>
+
+        <div class="guide-section">
+          <h4>🔥 오버드라이브 피버 (Overdrive Fever)</h4>
+          <p>연속 콤보를 달성하면 오버드라이브 게이지가 충전됩니다. 게이지가 가득 차면 피버 모드가 발동되어 <strong>1.5배 보너스 점수</strong>를 획득합니다!</p>
+        </div>
+
+        <div class="guide-section">
+          <h4>💎 점수 및 포인트 (Points & Rewards)</h4>
+          <p>클리어 후 점수와 최대 콤보, 판정 등급에 따라 <strong>RP(Rhythm Points)</strong>를 획득할 수 있으며 누적 저장됩니다.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-modal-confirm" class="btn-primary-glow btn-sm">확인했습니다</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio and Game Scripts -->
+  <script>
+/**
+ * LUMINA : CHRONO RESONANCE - Web Audio Synthesizer & Music Engine
+ * 128 BPM Cybernetic Horizon (Duration: ~60.0s)
+ * Interactive Key Sound Synthesis & Multi-track Audio Scheduler
+ */
+
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.masterGain = null;
+    this.currentBgmBus = null;
+    this.sfxGain = null;
+    this.keySoundGain = null;
+    this.delayNode = null;
+    this.feedbackNode = null;
+
+    this.isPlaying = false;
+    this.startTime = 0;
+    this.bpm = 128;
+    this.secondsPerBeat = 60 / this.bpm; // 0.46875s
+    this.totalDuration = 60.0; // 1 minute song
+
+    // Frequency mapping for musical notes
+    this.noteFrequencies = {
+      'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23,
+      'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
+      'C5': 523.25, 'D5': 587.33, 'E5': 659.25, 'F5': 698.46,
+      'G5': 783.99, 'A5': 880.00, 'B5': 987.77,
+      'C6': 1046.50, 'D6': 1174.66, 'E6': 1318.51
+    };
+  }
+
+  // Initialize Web Audio Context upon user interaction
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+
+      // Master Output
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
+
+      // Dynamics Compressor for studio polish & no distortion
+      const compressor = this.ctx.createDynamicsCompressor();
+      compressor.threshold.setValueAtTime(-18, this.ctx.currentTime);
+      compressor.knee.setValueAtTime(20, this.ctx.currentTime);
+      compressor.ratio.setValueAtTime(8, this.ctx.currentTime);
+      compressor.attack.setValueAtTime(0.005, this.ctx.currentTime);
+      compressor.release.setValueAtTime(0.15, this.ctx.currentTime);
+
+      this.masterGain.connect(compressor);
+      compressor.connect(this.ctx.destination);
+
+      // Dedicated Key Sound & SFX Busses
+      this.keySoundGain = this.ctx.createGain();
+      this.keySoundGain.gain.setValueAtTime(0.9, this.ctx.currentTime);
+      this.keySoundGain.connect(this.masterGain);
+
+      this.sfxGain = this.ctx.createGain();
+      this.sfxGain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+      this.sfxGain.connect(this.masterGain);
+
+      // Subtle Cyber Stereo Echo Delay
+      this.delayNode = this.ctx.createDelay();
+      this.delayNode.delayTime.setValueAtTime(0.234, this.ctx.currentTime); // 16th note delay
+      this.feedbackNode = this.ctx.createGain();
+      this.feedbackNode.gain.setValueAtTime(0.28, this.ctx.currentTime);
+
+      this.delayNode.connect(this.feedbackNode);
+      this.feedbackNode.connect(this.delayNode);
+      this.delayNode.connect(this.masterGain);
+    }
+
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  // ==========================================
+  // DRUM SYNTHESIS
+  // ==========================================
+
+  playKick(time) {
+    if (!this.ctx || !this.currentBgmBus) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    // Punchy pitch drop: 160Hz -> 38Hz
+    osc.frequency.setValueAtTime(160, time);
+    osc.frequency.exponentialRampToValueAtTime(38, time + 0.12);
+
+    gain.gain.setValueAtTime(0.9, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.28);
+
+    osc.connect(gain);
+    gain.connect(this.currentBgmBus);
+
+    osc.start(time);
+    osc.stop(time + 0.3);
+  }
+
+  playSnare(time) {
+    if (!this.ctx || !this.currentBgmBus) return;
+    // Tone body
+    const osc = this.ctx.createOscillator();
+    const oscGain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(180, time);
+    osc.frequency.exponentialRampToValueAtTime(60, time + 0.1);
+    oscGain.gain.setValueAtTime(0.5, time);
+    oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.12);
+    osc.connect(oscGain);
+    oscGain.connect(this.currentBgmBus);
+
+    // Snare noise crack
+    const dur = 0.18;
+    const bufferSize = Math.floor(this.ctx.sampleRate * dur);
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.7;
+    }
+
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.setValueAtTime(1200, time);
+
+    const noiseGain = this.ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.7, time);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+    noise.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(this.currentBgmBus);
+
+    osc.start(time);
+    noise.start(time);
+    osc.stop(time + 0.14);
+    noise.stop(time + dur + 0.02);
+  }
+
+  playHiHat(time, open = false) {
+    if (!this.ctx || !this.currentBgmBus) return;
+    const dur = open ? 0.2 : 0.045;
+    const bufferSize = Math.floor(this.ctx.sampleRate * dur);
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.5;
+    }
+
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.setValueAtTime(7500, time);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(open ? 0.3 : 0.2, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.currentBgmBus);
+
+    noise.start(time);
+    noise.stop(time + dur + 0.01);
+  }
+
+  // ==========================================
+  // BASS & CHORDS SYNTHESIS
+  // ==========================================
+
+  playBassNote(freq, time, dur = 0.35) {
+    if (!this.ctx || !this.currentBgmBus) return;
+    const osc = this.ctx.createOscillator();
+    const filter = this.ctx.createBiquadFilter();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freq, time);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(550, time);
+    filter.frequency.exponentialRampToValueAtTime(160, time + dur);
+    filter.Q.setValueAtTime(3.5, time);
+
+    gain.gain.setValueAtTime(0.45, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.currentBgmBus);
+
+    osc.start(time);
+    osc.stop(time + dur + 0.05);
+  }
+
+  playPadChord(freqs, time, dur = 1.8) {
+    if (!this.ctx || !this.currentBgmBus) return;
+    freqs.forEach(freq => {
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+
+      osc1.type = 'sawtooth';
+      osc2.type = 'sawtooth';
+      osc1.frequency.setValueAtTime(freq, time);
+      osc2.frequency.setValueAtTime(freq * 1.005, time); // Lush detuned chorus
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1500, time);
+
+      gain.gain.setValueAtTime(0.001, time);
+      gain.gain.linearRampToValueAtTime(0.1, time + 0.35);
+      gain.gain.setValueAtTime(0.1, time + dur - 0.35);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+      osc1.connect(filter);
+      osc2.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.currentBgmBus);
+
+      osc1.start(time);
+      osc2.start(time);
+      osc1.stop(time + dur);
+      osc2.stop(time + dur);
+    });
+  }
+
+  // ==========================================
+  // INTERACTIVE KEY SOUND (HIT NOTE SYNTH)
+  // Plays when user hits a note on time!
+  // ==========================================
+
+  playKeyMelodyNote(noteName = 'C5', time = null, isPerfect = true) {
+    if (!this.ctx) return;
+    const t = time || this.ctx.currentTime;
+    const freq = typeof noteName === 'number' ? noteName : (this.noteFrequencies[noteName] || 523.25);
+
+    // 1. Dual Oscillator Crystal Lead Synth
+    const oscMain = this.ctx.createOscillator();
+    const oscSub = this.ctx.createOscillator();
+    const filter = this.ctx.createBiquadFilter();
+    const noteGain = this.ctx.createGain();
+
+    oscMain.type = 'sawtooth';
+    oscSub.type = 'square';
+
+    oscMain.frequency.setValueAtTime(freq, t);
+    oscSub.frequency.setValueAtTime(freq * 0.5, t); // Sub octave fullness
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(isPerfect ? 5000 : 3200, t);
+    filter.frequency.exponentialRampToValueAtTime(900, t + 0.35);
+    filter.Q.setValueAtTime(4.0, t);
+
+    const maxGain = isPerfect ? 0.38 : 0.26;
+    noteGain.gain.setValueAtTime(0.001, t);
+    noteGain.gain.linearRampToValueAtTime(maxGain, t + 0.015);
+    noteGain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+
+    oscMain.connect(filter);
+    oscSub.connect(filter);
+    filter.connect(noteGain);
+    noteGain.connect(this.keySoundGain);
+    noteGain.connect(this.delayNode);
+
+    oscMain.start(t);
+    oscSub.start(t);
+    oscMain.stop(t + 0.42);
+    oscSub.stop(t + 0.42);
+
+    // 2. Crisp Hit Tap
+    this.playHitClack(t, isPerfect);
+  }
+
+  playHitClack(t, isPerfect = true) {
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(isPerfect ? 2000 : 1300, t);
+    osc.frequency.exponentialRampToValueAtTime(400, t + 0.05);
+
+    gain.gain.setValueAtTime(isPerfect ? 0.28 : 0.16, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+
+    osc.start(t);
+    osc.stop(t + 0.07);
+  }
+
+  playMissGlitch() {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(130, t);
+    osc.frequency.linearRampToValueAtTime(40, t + 0.15);
+
+    gain.gain.setValueAtTime(0.28, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+
+    osc.start(t);
+    osc.stop(t + 0.16);
+  }
+
+  playButtonClick() {
+    this.init();
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, t);
+    osc.frequency.exponentialRampToValueAtTime(950, t + 0.06);
+
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+
+    osc.start(t);
+    osc.stop(t + 0.07);
+  }
+
+  playFeverTrigger() {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const freqs = [523.25, 659.25, 783.99, 1046.50];
+    freqs.forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const delay = idx * 0.05;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t + delay);
+
+      gain.gain.setValueAtTime(0.25, t + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.35);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+
+      osc.start(t + delay);
+      osc.stop(t + delay + 0.4);
+    });
+  }
+
+  // ==========================================
+  // FULL 60-SECOND SONG SCHEDULER (128 BPM)
+  // ==========================================
+
+  startBgmTrack() {
+    this.init();
+    this.stopBgmTrack();
+
+    // Create fresh dedicated bus for this playback session
+    this.currentBgmBus = this.ctx.createGain();
+    this.currentBgmBus.gain.setValueAtTime(0.65, this.ctx.currentTime);
+    this.currentBgmBus.connect(this.masterGain);
+
+    this.isPlaying = true;
+    this.startTime = this.ctx.currentTime + 0.1; // 100ms sync cushion
+
+    const spb = this.secondsPerBeat; // 0.46875s
+    const barDur = spb * 4; // 1.875s
+    const totalBars = 32; // 32 * 1.875 = 60.0s
+
+    // Chord Roots & Notes: [Am7, Fmaj7, C, G]
+    const chordProgression = [
+      { root: 110.00, notes: [220, 261.63, 329.63, 440] },
+      { root: 87.31,  notes: [174.61, 261.63, 329.63, 349.23] },
+      { root: 130.81, notes: [261.63, 329.63, 392.00, 523.25] },
+      { root: 98.00,  notes: [196.00, 246.94, 293.66, 392.00] }
+    ];
+
+    for (let bar = 0; bar < totalBars; bar++) {
+      const barTime = this.startTime + bar * barDur;
+      const prog = chordProgression[bar % 4];
+
+      // SECTION 1: INTRO (Bars 0 - 7, 0.0s - 15.0s)
+      if (bar < 8) {
+        this.playPadChord(prog.notes, barTime, barDur);
+        this.playKick(barTime);
+        if (bar >= 4) {
+          this.playHiHat(barTime + spb * 1);
+          this.playHiHat(barTime + spb * 2);
+          this.playHiHat(barTime + spb * 3);
+          this.playBassNote(prog.root, barTime, 0.8);
+        }
+      }
+
+      // SECTION 2: BUILD-UP (Bars 8 - 15, 15.0s - 30.0s)
+      else if (bar >= 8 && bar < 16) {
+        this.playPadChord(prog.notes, barTime, barDur);
+
+        for (let beat = 0; beat < 4; beat++) {
+          this.playKick(barTime + beat * spb);
+          this.playHiHat(barTime + beat * spb + spb * 0.5, beat === 2);
+        }
+
+        this.playBassNote(prog.root, barTime, 0.35);
+        this.playBassNote(prog.root * 1.5, barTime + spb * 1, 0.35);
+        this.playBassNote(prog.root, barTime + spb * 2, 0.35);
+        this.playBassNote(prog.root * 1.25, barTime + spb * 3, 0.35);
+
+        if (bar >= 14) {
+          for (let beat = 0; beat < 4; beat++) {
+            this.playSnare(barTime + beat * spb + spb * 0.5);
+          }
+        }
+      }
+
+      // SECTION 3: CLIMAX / DROP (Bars 16 - 27, 30.0s - 52.5s)
+      else if (bar >= 16 && bar < 28) {
+        this.playPadChord(prog.notes, barTime, barDur);
+
+        this.playKick(barTime + 0 * spb);
+        this.playKick(barTime + 1 * spb);
+        this.playKick(barTime + 2 * spb);
+        this.playKick(barTime + 3 * spb);
+
+        this.playSnare(barTime + 1 * spb);
+        this.playSnare(barTime + 3 * spb);
+
+        for (let beat = 0; beat < 4; beat++) {
+          this.playHiHat(barTime + beat * spb + spb * 0.5, true);
+          this.playHiHat(barTime + beat * spb + spb * 0.25, false);
+          this.playHiHat(barTime + beat * spb + spb * 0.75, false);
+        }
+
+        for (let i = 0; i < 8; i++) {
+          const bassFreq = (i % 2 === 0) ? prog.root : prog.root * 2;
+          this.playBassNote(bassFreq, barTime + i * (spb / 2), 0.2);
+        }
+      }
+
+      // SECTION 4: OUTRO (Bars 28 - 31, 52.5s - 60.0s)
+      else {
+        this.playPadChord(prog.notes, barTime, barDur);
+        this.playKick(barTime);
+        this.playSnare(barTime + 2 * spb);
+        this.playHiHat(barTime + 1 * spb, true);
+        this.playHiHat(barTime + 3 * spb, true);
+        this.playBassNote(prog.root, barTime, 1.2);
+      }
+    }
+  }
+
+  stopBgmTrack() {
+    this.isPlaying = false;
+    if (this.currentBgmBus) {
+      try {
+        this.currentBgmBus.gain.setValueAtTime(this.currentBgmBus.gain.value, this.ctx.currentTime);
+        this.currentBgmBus.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+        this.currentBgmBus.disconnect();
+      } catch (e) {
+        // Safe disconnect
+      }
+      this.currentBgmBus = null;
+    }
+  }
+
+  getCurrentSongTime() {
+    if (!this.isPlaying || !this.ctx) return 0;
+    const elapsed = this.ctx.currentTime - this.startTime;
+    return Math.max(0, elapsed);
+  }
+}
+
+// Global Sound Engine Instance
+window.soundEngine = new SoundEngine();
+
+</script>
+  <script>
+/**
+ * LUMINA : CHRONO RESONANCE - Chart Data & Note Generator
+ * 128 BPM (1 Beat = 0.46875s, 1 Bar = 1.875s)
+ * Perfectly synchronized melody notes with musical pitches for lanes 0..3 (D, F, J, K)
+ */
+
+class ChartGenerator {
+  constructor() {
+    this.bpm = 128;
+    this.spb = 60 / this.bpm; // 0.46875s
+    this.barDur = this.spb * 4; // 1.875s
+  }
+
+  generateChart(difficulty = 'normal') {
+    const isHard = difficulty === 'hard';
+    const notes = [];
+    let noteId = 1;
+
+    // Helper to add note
+    const addNote = (bar, beatFraction, lane, noteName) => {
+      const time = bar * this.barDur + beatFraction * this.spb;
+      notes.push({
+        id: noteId++,
+        time: parseFloat(time.toFixed(4)),
+        lane: lane, // 0: D, 1: F, 2: J, 3: K
+        noteName: noteName,
+        hit: false,
+        missed: false
+      });
+    };
+
+    // --- SECTION 1: INTRO (Bars 1 to 7) ---
+    // Start gently at Bar 1 (around 1.875s) so the player gets ready
+    const introMelody = [
+      // Bar 1 (Am)
+      { b: 0, l: 0, n: 'A4' }, { b: 2, l: 1, n: 'C5' },
+      // Bar 2 (F)
+      { b: 0, l: 2, n: 'D5' }, { b: 2, l: 3, n: 'E5' },
+      // Bar 3 (C)
+      { b: 0, l: 2, n: 'G5' }, { b: 2, l: 1, n: 'E5' },
+      // Bar 4 (G)
+      { b: 0, l: 0, n: 'D5' }, { b: 2, l: 1, n: 'C5' },
+      // Bar 5 (Am)
+      { b: 0, l: 0, n: 'A4' }, { b: 1, l: 1, n: 'C5' }, { b: 2, l: 2, n: 'E5' }, { b: 3, l: 3, n: 'G5' },
+      // Bar 6 (F)
+      { b: 0, l: 2, n: 'A5' }, { b: 1.5, l: 1, n: 'G5' }, { b: 2.5, l: 0, n: 'E5' },
+      // Bar 7 (G / Turnaround)
+      { b: 0, l: 1, n: 'D5' }, { b: 1, l: 2, n: 'E5' }, { b: 2, l: 3, n: 'G5' }, { b: 3, l: 2, n: 'A5' }
+    ];
+
+    introMelody.forEach(m => {
+      addNote(1 + Math.floor(m.b / 4), m.b % 4, m.l, m.n);
+    });
+
+    if (isHard) {
+      // Add extra 8th notes to intro for Hard
+      addNote(2, 1.0, 1, 'B4');
+      addNote(3, 1.0, 0, 'D5');
+      addNote(4, 1.0, 2, 'A4');
+      addNote(6, 0.5, 3, 'G5');
+      addNote(7, 2.5, 1, 'E5');
+    }
+
+    // --- SECTION 2: BUILD-UP (Bars 8 to 15, 15.0s - 30.0s) ---
+    // More rhythmic drive, alternating hands D/F and J/K
+    for (let bar = 8; bar < 16; bar++) {
+      const step = bar - 8;
+      // Melodic motif
+      const scale = ['A4', 'C5', 'D5', 'E5', 'G5', 'A5'];
+      const rootNote = scale[step % scale.length];
+      const fifthNote = scale[(step + 3) % scale.length];
+
+      // Beats 0, 1, 2, 3
+      addNote(bar, 0.0, (step % 2 === 0 ? 0 : 2), rootNote);
+      addNote(bar, 1.0, (step % 2 === 0 ? 1 : 3), scale[(step + 1) % scale.length]);
+      addNote(bar, 2.0, (step % 2 === 0 ? 2 : 1), fifthNote);
+      addNote(bar, 3.0, (step % 2 === 0 ? 3 : 0), scale[(step + 2) % scale.length]);
+
+      if (isHard || bar >= 12) {
+        // 8th-note syncopation
+        addNote(bar, 0.5, 1, scale[(step + 2) % scale.length]);
+        addNote(bar, 2.5, 2, scale[(step + 4) % scale.length]);
+      }
+
+      // Bar 14 & 15 Snare Roll Climax
+      if (bar === 14 || bar === 15) {
+        addNote(bar, 1.5, 0, 'E5');
+        addNote(bar, 3.5, 3, 'G5');
+        if (isHard) {
+          addNote(bar, 0.25, 2, 'D5');
+          addNote(bar, 2.25, 1, 'C5');
+        }
+      }
+    }
+
+    // --- SECTION 3: CLIMAX DROP (Bars 16 to 27, 30.0s - 52.5s) ---
+    // The peak energetic section! High melodic hooks, cascading runs
+    const dropPhrases = [
+      // Sub-bar 0
+      [
+        { beat: 0.0, lane: 0, note: 'A5' },
+        { beat: 0.5, lane: 1, note: 'G5' },
+        { beat: 1.0, lane: 2, note: 'E5' },
+        { beat: 1.75, lane: 3, note: 'D5' },
+        { beat: 2.0, lane: 2, note: 'E5' },
+        { beat: 2.5, lane: 1, note: 'G5' },
+        { beat: 3.0, lane: 0, note: 'A5' }
+      ],
+      // Sub-bar 1
+      [
+        { beat: 0.0, lane: 3, note: 'C6' },
+        { beat: 0.5, lane: 2, note: 'A5' },
+        { beat: 1.0, lane: 1, note: 'G5' },
+        { beat: 1.5, lane: 0, note: 'E5' },
+        { beat: 2.0, lane: 1, note: 'G5' },
+        { beat: 3.0, lane: 2, note: 'C5' }
+      ],
+      // Sub-bar 2
+      [
+        { beat: 0.0, lane: 1, note: 'D5' },
+        { beat: 0.75, lane: 2, note: 'E5' },
+        { beat: 1.5, lane: 3, note: 'G5' },
+        { beat: 2.0, lane: 2, note: 'A5' },
+        { beat: 2.5, lane: 1, note: 'C6' },
+        { beat: 3.0, lane: 0, note: 'B5' }
+      ],
+      // Sub-bar 3 (Climax turnaround)
+      [
+        { beat: 0.0, lane: 0, note: 'A5' },
+        { beat: 0.5, lane: 1, note: 'E5' },
+        { beat: 1.0, lane: 2, note: 'G5' },
+        { beat: 1.5, lane: 3, note: 'A5' },
+        { beat: 2.0, lane: 3, note: 'B5' },
+        { beat: 2.5, lane: 2, note: 'C6' },
+        { beat: 3.0, lane: 1, note: 'D6' }
+      ]
+    ];
+
+    for (let bar = 16; bar < 28; bar++) {
+      const phraseIndex = (bar - 16) % 4;
+      const phrase = dropPhrases[phraseIndex];
+      phrase.forEach(p => {
+        addNote(bar, p.beat, p.lane, p.note);
+      });
+
+      if (isHard) {
+        // Fast dual tap or syncopation on beats 1.25 and 2.75
+        addNote(bar, 1.25, (phrase[0].lane + 2) % 4, 'E5');
+        addNote(bar, 2.75, (phrase[0].lane + 1) % 4, 'A5');
+      }
+    }
+
+    // --- SECTION 4: OUTRO (Bars 28 to 31, 52.5s - 59.0s) ---
+    // Melodic resolution, fading gracefully
+    const outroNotes = [
+      // Bar 28
+      { bar: 28, b: 0.0, l: 0, n: 'A5' },
+      { bar: 28, b: 1.0, l: 1, n: 'G5' },
+      { bar: 28, b: 2.0, l: 2, n: 'E5' },
+      { bar: 28, b: 3.0, l: 3, n: 'C5' },
+      // Bar 29
+      { bar: 29, b: 0.0, l: 2, n: 'D5' },
+      { bar: 29, b: 1.5, l: 1, n: 'E5' },
+      { bar: 29, b: 2.5, l: 0, n: 'A4' },
+      // Bar 30
+      { bar: 30, b: 0.0, l: 1, n: 'C5' },
+      { bar: 30, b: 1.0, l: 2, n: 'D5' },
+      { bar: 30, b: 2.0, l: 3, n: 'E5' },
+      { bar: 30, b: 3.0, l: 2, n: 'G5' },
+      // Bar 31 - Grand Final Resonance Note
+      { bar: 31, b: 0.0, l: 0, n: 'A5' },
+      { bar: 31, b: 0.5, l: 3, n: 'A5' },
+      { bar: 31, b: 2.0, l: 1, n: 'E5' },
+      { bar: 31, b: 2.0, l: 2, n: 'A4' }
+    ];
+
+    outroNotes.forEach(o => {
+      addNote(o.bar, o.b, o.l, o.n);
+    });
+
+    // Sort notes chronologically
+    notes.sort((a, b) => a.time - b.time);
+
+    return notes;
+  }
+}
+
+window.chartGenerator = new ChartGenerator();
+
+</script>
+  <script>
+/**
+ * LUMINA : CHRONO RESONANCE - Core Game Engine
+ * Precision Timing, 3D Perspective Canvas Rendering, Particle System,
+ * Combo & Judgment, Overdrive Fever, and Reward Point Economics.
+ */
+
+class LuminaGame {
+  constructor() {
+    // DOM Elements
+    this.screenStart = document.getElementById('screen-start');
+    this.screenGame = document.getElementById('screen-game');
+    this.screenResult = document.getElementById('screen-result');
+    this.modalHowToPlay = document.getElementById('modal-how-to-play');
+
+    this.canvas = document.getElementById('rhythmCanvas');
+    this.ctx = this.canvas.getContext('2d');
+
+    // UI Elements
+    this.hudTime = document.getElementById('hud-time');
+    this.hudProgressFill = document.getElementById('hud-progress-fill');
+    this.hudScore = document.getElementById('hud-score');
+    this.hudAcc = document.getElementById('hud-acc');
+    this.hudFeverFill = document.getElementById('hud-fever-fill');
+    this.hudFeverStatus = document.getElementById('hud-fever-status');
+    this.judgmentText = document.getElementById('judgment-text');
+    this.comboDisplay = document.getElementById('combo-display');
+    this.comboCountEl = document.getElementById('combo-count');
+
+    this.walletRpDisplay = document.getElementById('total-wallet-rp');
+    this.speedSlider = document.getElementById('speed-slider');
+    this.speedDisplay = document.getElementById('speed-display');
+
+    // Game Config & State
+    this.difficulty = 'normal';
+    this.noteSpeed = 2.5; // Multiplier
+    this.gameState = 'START'; // START, PLAYING, RESULT
+
+    this.notes = [];
+    this.activeParticles = [];
+    this.laneKeys = ['d', 'f', 'j', 'k'];
+    this.keyState = [false, false, false, false];
+    this.laneLightGlow = [0, 0, 0, 0]; // 0 to 1 intensity fade
+
+    // Score & Stats Tracking
+    this.score = 0;
+    this.combo = 0;
+    this.maxCombo = 0;
+    this.perfectCount = 0;
+    this.greatCount = 0;
+    this.goodCount = 0;
+    this.missCount = 0;
+    this.totalJudged = 0;
+    this.totalChartNotes = 0;
+
+    // Fever System
+    this.feverGauge = 0; // 0 to 100
+    this.isFeverActive = false;
+    this.feverTimer = 0;
+
+    // Viewport & Perspective metrics
+    this.width = 800;
+    this.height = 700;
+    this.hitLineY = 560; // Receptor position
+    this.spawnY = 80;
+
+    // Wallet (LocalStorage)
+    this.walletRP = parseInt(localStorage.getItem('lumina_rp') || '0', 10);
+    this.updateWalletUI();
+
+    this.initEvents();
+    this.resizeCanvas();
+    window.addEventListener('resize', () => this.resizeCanvas());
+
+    // Start Animation Loop
+    this.lastFrameTime = performance.now();
+    requestAnimationFrame((t) => this.gameLoop(t));
+  }
+
+  updateWalletUI() {
+    this.walletRpDisplay.textContent = this.walletRP.toLocaleString();
+  }
+
+  saveWalletRP(added) {
+    this.walletRP += added;
+    localStorage.setItem('lumina_rp', this.walletRP.toString());
+    this.updateWalletUI();
+  }
+
+  resizeCanvas() {
+    const rect = this.canvas.parentElement.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    this.width = rect.width;
+    this.height = rect.height;
+
+    this.canvas.width = this.width * dpr;
+    this.canvas.height = this.height * dpr;
+    this.ctx.resetTransform();
+    this.ctx.scale(dpr, dpr);
+
+    // Dynamic hit line calculation based on viewport
+    this.hitLineY = this.height - 95;
+    this.spawnY = 60;
+  }
+
+  initEvents() {
+    // Start Game Button
+    document.getElementById('btn-start-game').addEventListener('click', () => {
+      window.soundEngine.playButtonClick();
+      this.startGame();
+    });
+
+    // Difficulty Toggle
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        window.soundEngine.playButtonClick();
+        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.difficulty = btn.dataset.diff;
+      });
+    });
+
+    // Speed Slider
+    this.speedSlider.addEventListener('input', (e) => {
+      this.noteSpeed = parseFloat(e.target.value);
+      this.speedDisplay.textContent = `${this.noteSpeed.toFixed(1)}x`;
+    });
+
+    // How to Play Modal
+    document.getElementById('btn-how-to-play').addEventListener('click', () => {
+      window.soundEngine.playButtonClick();
+      this.modalHowToPlay.classList.add('active');
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', () => {
+      this.modalHowToPlay.classList.remove('active');
+    });
+    document.getElementById('btn-modal-confirm').addEventListener('click', () => {
+      this.modalHowToPlay.classList.remove('active');
+    });
+
+    // Replay & Home Buttons
+    document.getElementById('btn-replay').addEventListener('click', () => {
+      window.soundEngine.playButtonClick();
+      this.startGame();
+    });
+    document.getElementById('btn-home').addEventListener('click', () => {
+      window.soundEngine.playButtonClick();
+      this.switchScreen('START');
+    });
+
+    // Give up in game
+    document.getElementById('btn-give-up').addEventListener('click', () => {
+      window.soundEngine.stopBgmTrack();
+      this.finishGame();
+    });
+
+    // Keyboard Listeners
+    window.addEventListener('keydown', (e) => {
+      if (this.gameState !== 'PLAYING') return;
+      const key = e.key.toLowerCase();
+      const laneIndex = this.laneKeys.indexOf(key);
+      if (laneIndex !== -1 && !this.keyState[laneIndex]) {
+        e.preventDefault();
+        this.keyState[laneIndex] = true;
+        this.onKeyPress(laneIndex);
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      const key = e.key.toLowerCase();
+      const laneIndex = this.laneKeys.indexOf(key);
+      if (laneIndex !== -1) {
+        this.keyState[laneIndex] = false;
+        this.updateKeyDeckUI(laneIndex, false);
+      }
+    });
+
+    // Touch / Click on Bottom Key Slots
+    for (let i = 0; i < 4; i++) {
+      const slot = document.getElementById(`key-guide-${i}`);
+      const handleDown = (e) => {
+        e.preventDefault();
+        if (this.gameState !== 'PLAYING') return;
+        this.keyState[i] = true;
+        this.onKeyPress(i);
+      };
+      const handleUp = (e) => {
+        e.preventDefault();
+        this.keyState[i] = false;
+        this.updateKeyDeckUI(i, false);
+      };
+
+      slot.addEventListener('mousedown', handleDown);
+      slot.addEventListener('mouseup', handleUp);
+      slot.addEventListener('touchstart', handleDown, { passive: false });
+      slot.addEventListener('touchend', handleUp, { passive: false });
+    }
+  }
+
+  updateKeyDeckUI(laneIndex, isPressed) {
+    const slot = document.getElementById(`key-guide-${laneIndex}`);
+    if (!slot) return;
+    if (isPressed) {
+      slot.classList.add('pressed');
+    } else {
+      slot.classList.remove('pressed');
+    }
+  }
+
+  switchScreen(screenName) {
+    this.gameState = screenName;
+    this.screenStart.classList.remove('active');
+    this.screenGame.classList.remove('active');
+    this.screenResult.classList.remove('active');
+
+    if (screenName === 'START') this.screenStart.classList.add('active');
+    else if (screenName === 'PLAYING') this.screenGame.classList.add('active');
+    else if (screenName === 'RESULT') this.screenResult.classList.add('active');
+  }
+
+  // ==========================================
+  // GAME START & INITIALIZATION
+  // ==========================================
+
+  startGame() {
+    this.switchScreen('PLAYING');
+    this.resizeCanvas();
+
+    // Reset stats
+    this.score = 0;
+    this.combo = 0;
+    this.maxCombo = 0;
+    this.perfectCount = 0;
+    this.greatCount = 0;
+    this.goodCount = 0;
+    this.missCount = 0;
+    this.totalJudged = 0;
+    this.feverGauge = 0;
+    this.isFeverActive = false;
+    this.feverTimer = 0;
+
+    this.hudScore.textContent = '0000000';
+    this.hudAcc.textContent = '100.00%';
+    this.hudProgressFill.style.width = '0%';
+    this.hudFeverFill.style.width = '0%';
+    this.hudFeverStatus.textContent = 'READY';
+    this.comboDisplay.classList.remove('visible');
+    this.judgmentText.className = 'judgment-text';
+
+    // Generate chart
+    this.notes = window.chartGenerator.generateChart(this.difficulty);
+    this.totalChartNotes = this.notes.length;
+
+    // Start Music
+    window.soundEngine.startBgmTrack();
+  }
+
+  // ==========================================
+  // KEY HIT & TIMING JUDGMENT
+  // ==========================================
+
+  onKeyPress(laneIndex) {
+    this.updateKeyDeckUI(laneIndex, true);
+    this.laneLightGlow[laneIndex] = 1.0; // Flash lane glow
+
+    if (this.gameState !== 'PLAYING') return;
+
+    const currentSongTime = window.soundEngine.getCurrentSongTime();
+    
+    // Find earliest unhit note in this lane within hit window (±160ms)
+    let candidateNote = null;
+    let minTimeDiff = Infinity;
+
+    for (const note of this.notes) {
+      if (note.lane === laneIndex && !note.hit && !note.missed) {
+        const diff = Math.abs(currentSongTime - note.time);
+        if (diff <= 0.16) { // 160ms window
+          if (diff < minTimeDiff) {
+            minTimeDiff = diff;
+            candidateNote = note;
+          }
+        }
+      }
+    }
+
+    if (candidateNote) {
+      candidateNote.hit = true;
+      this.evaluateHit(candidateNote, minTimeDiff);
+    }
+  }
+
+  evaluateHit(note, diff) {
+    let judgment = 'GOOD';
+    let baseScore = 300;
+    let isPerfect = false;
+
+    // Judgment Windows
+    if (diff <= 0.050) { // ±50ms -> PERFECT
+      judgment = 'PERFECT';
+      baseScore = 1000;
+      isPerfect = true;
+      this.perfectCount++;
+    } else if (diff <= 0.100) { // ±100ms -> GREAT
+      judgment = 'GREAT';
+      baseScore = 700;
+      this.greatCount++;
+    } else { // ±160ms -> GOOD
+      judgment = 'GOOD';
+      baseScore = 300;
+      this.goodCount++;
+    }
+
+    this.totalJudged++;
+    this.combo++;
+    if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+
+    // Apply Overdrive multiplier if active
+    const multiplier = this.isFeverActive ? 1.5 : 1.0;
+    const comboBonus = Math.min(this.combo * 5, 200);
+    this.score += Math.round((baseScore + comboBonus) * multiplier);
+
+    // Charge Overdrive Gauge
+    if (!this.isFeverActive) {
+      this.feverGauge = Math.min(100, this.feverGauge + (isPerfect ? 3.0 : 1.5));
+      if (this.feverGauge >= 100) {
+        this.activateFever();
+      }
+    }
+
+    // Play Key Melody Note Synthesizer! (The interactive core mechanic!)
+    window.soundEngine.playKeyMelodyNote(note.noteName, null, isPerfect);
+
+    // Spawn Particles & Visual FX
+    this.spawnHitParticles(note.lane, judgment);
+
+    // Show Judgment UI
+    this.displayJudgment(judgment);
+    this.updateHUD();
+  }
+
+  registerMiss(note) {
+    note.missed = true;
+    this.missCount++;
+    this.totalJudged++;
+    this.combo = 0; // Reset Combo!
+
+    // Reset Fever gauge on miss
+    if (!this.isFeverActive) {
+      this.feverGauge = Math.max(0, this.feverGauge - 10);
+    }
+
+    // Play miss glitch sound
+    window.soundEngine.playMissGlitch();
+
+    this.displayJudgment('MISS');
+    this.updateHUD();
+  }
+
+  activateFever() {
+    this.isFeverActive = true;
+    this.feverTimer = 10.0; // 10 seconds of Overdrive!
+    this.hudFeverStatus.textContent = 'BURST x1.5!';
+    document.querySelector('.fever-box').classList.add('fever-active');
+    window.soundEngine.playFeverTrigger();
+  }
+
+  displayJudgment(judge) {
+    this.judgmentText.textContent = judge;
+    this.judgmentText.className = `judgment-text anim-judge judge-${judge.toLowerCase()}`;
+
+    // Restart animation
+    void this.judgmentText.offsetWidth;
+
+    // Combo counter UI
+    if (this.combo > 1) {
+      this.comboDisplay.classList.add('visible');
+      this.comboCountEl.textContent = this.combo;
+      this.comboCountEl.classList.remove('pulse');
+      void this.comboCountEl.offsetWidth;
+      this.comboCountEl.classList.add('pulse');
+    } else {
+      this.comboDisplay.classList.remove('visible');
+    }
+  }
+
+  updateHUD() {
+    // Score formatted to 7 digits
+    this.hudScore.textContent = this.score.toString().padStart(7, '0');
+
+    // Accuracy calculation
+    const totalMax = this.totalJudged * 1000;
+    const currentEarned = (this.perfectCount * 1000) + (this.greatCount * 700) + (this.goodCount * 300);
+    const acc = this.totalJudged > 0 ? (currentEarned / totalMax) * 100 : 100.0;
+    this.hudAcc.textContent = `${acc.toFixed(2)}%`;
+
+    // Fever Gauge Fill
+    this.hudFeverFill.style.width = `${this.feverGauge}%`;
+  }
+
+  // ==========================================
+  // PARTICLE SYSTEM & VISUAL EFFECTS
+  // ==========================================
+
+  spawnHitParticles(lane, judgment) {
+    const laneCoords = this.getLaneBottomCoords(lane);
+    const x = laneCoords.x;
+    const y = this.hitLineY;
+
+    let color = '#00f0ff';
+    let count = 22;
+    if (judgment === 'GREAT') color = '#10b981';
+    else if (judgment === 'GOOD') color = '#f59e0b';
+    else if (judgment === 'MISS') { color = '#ef4444'; count = 10; }
+
+    // Blast shockwave ring
+    this.activeParticles.push({
+      type: 'ring',
+      x, y,
+      radius: 8,
+      maxRadius: 55,
+      alpha: 1.0,
+      color: color,
+      life: 0.28
+    });
+
+    // Spark particles
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + (Math.random() * 0.5);
+      const speed = 120 + Math.random() * 240;
+      this.activeParticles.push({
+        type: 'spark',
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 60, // Slight upward boost
+        size: 3 + Math.random() * 4,
+        alpha: 1.0,
+        color: color,
+        life: 0.35 + Math.random() * 0.2
+      });
+    }
+  }
+
+  getLaneBottomCoords(lane) {
+    const trackWidthBottom = Math.min(this.width * 0.82, 420);
+    const startX = (this.width - trackWidthBottom) / 2;
+    const laneWidth = trackWidthBottom / 4;
+    return {
+      x: startX + laneWidth * (lane + 0.5),
+      width: laneWidth,
+      left: startX + laneWidth * lane,
+      right: startX + laneWidth * (lane + 1)
+    };
+  }
+
+  // ==========================================
+  // MAIN GAME LOOP & CANVAS RENDERING
+  // ==========================================
+
+  gameLoop(currentTime) {
+    const dt = Math.min((currentTime - this.lastFrameTime) / 1000, 0.1);
+    this.lastFrameTime = currentTime;
+
+    if (this.gameState === 'PLAYING') {
+      this.update(dt);
+    }
+    this.render();
+
+    requestAnimationFrame((t) => this.gameLoop(t));
+  }
+
+  update(dt) {
+    const songTime = window.soundEngine.getCurrentSongTime();
+    const songDuration = window.soundEngine.totalDuration;
+
+    // Update song time and progress bar
+    const currentSec = Math.floor(songTime);
+    const minStr = Math.floor(currentSec / 60).toString().padStart(2, '0');
+    const secStr = (currentSec % 60).toString().padStart(2, '0');
+    this.hudTime.textContent = `${minStr}:${secStr} / 01:00`;
+
+    const progressPct = Math.min(100, (songTime / songDuration) * 100);
+    this.hudProgressFill.style.width = `${progressPct}%`;
+
+    // Update Fever Timer
+    if (this.isFeverActive) {
+      this.feverTimer -= dt;
+      this.feverGauge = (this.feverTimer / 10.0) * 100;
+      this.hudFeverFill.style.width = `${this.feverGauge}%`;
+      if (this.feverTimer <= 0) {
+        this.isFeverActive = false;
+        this.feverGauge = 0;
+        this.hudFeverStatus.textContent = 'READY';
+        document.querySelector('.fever-box').classList.remove('fever-active');
+      }
+    }
+
+    // Decay Lane Glow Lights
+    for (let i = 0; i < 4; i++) {
+      if (this.laneLightGlow[i] > 0) {
+        this.laneLightGlow[i] = Math.max(0, this.laneLightGlow[i] - dt * 3.5);
+      }
+    }
+
+    // Check notes for MISS (if note passed the receptor by >160ms)
+    for (const note of this.notes) {
+      if (!note.hit && !note.missed) {
+        if (songTime - note.time > 0.16) {
+          this.registerMiss(note);
+        }
+      }
+    }
+
+    // Update Particles
+    for (let i = this.activeParticles.length - 1; i >= 0; i--) {
+      const p = this.activeParticles[i];
+      p.life -= dt;
+      if (p.life <= 0) {
+        this.activeParticles.splice(i, 1);
+        continue;
+      }
+      p.alpha = Math.max(0, p.life / 0.4);
+      if (p.type === 'ring') {
+        p.radius += dt * 140;
+      } else if (p.type === 'spark') {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 320 * dt; // Gravity
+      }
+    }
+
+    // Check Song End Condition (60 seconds finished)
+    if (songTime >= songDuration + 0.5) {
+      this.finishGame();
+    }
+  }
+
+  // ==========================================
+  // 3D PERSPECTIVE CANVAS RENDERING
+  // ==========================================
+
+  render() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    if (this.gameState !== 'PLAYING') return;
+
+    const trackTopW = Math.min(this.width * 0.55, 280);
+    const trackBottomW = Math.min(this.width * 0.82, 420);
+    const topX = (this.width - trackTopW) / 2;
+    const bottomX = (this.width - trackBottomW) / 2;
+    const topY = this.spawnY;
+    const bottomY = this.hitLineY + 30;
+
+    // 1. Draw Highway Track Background (Trapezoid perspective)
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.moveTo(topX, topY);
+    this.ctx.lineTo(topX + trackTopW, topY);
+    this.ctx.lineTo(bottomX + trackBottomW, bottomY);
+    this.ctx.lineTo(bottomX, bottomY);
+    this.ctx.closePath();
+
+    // Dark sleek glass gradient
+    const trackGrad = this.ctx.createLinearGradient(0, topY, 0, bottomY);
+    trackGrad.addColorStop(0, 'rgba(10, 14, 26, 0.45)');
+    trackGrad.addColorStop(0.8, 'rgba(15, 23, 42, 0.85)');
+    trackGrad.addColorStop(1, 'rgba(30, 41, 59, 0.95)');
+    this.ctx.fillStyle = trackGrad;
+    this.ctx.fill();
+
+    // Border Neon Edges
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+    this.ctx.stroke();
+    this.ctx.restore();
+
+    // 2. Draw Lane Dividers & Perspective Grid Lines
+    for (let i = 1; i < 4; i++) {
+      const topLaneX = topX + (trackTopW / 4) * i;
+      const bottomLaneX = bottomX + (trackBottomW / 4) * i;
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(topLaneX, topY);
+      this.ctx.lineTo(bottomLaneX, bottomY);
+      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      this.ctx.lineWidth = 1.5;
+      this.ctx.stroke();
+    }
+
+    // 3. Lane Light Beams when key is hit
+    for (let lane = 0; lane < 4; lane++) {
+      if (this.laneLightGlow[lane] > 0) {
+        const topLaneL = topX + (trackTopW / 4) * lane;
+        const topLaneR = topX + (trackTopW / 4) * (lane + 1);
+        const btmLaneL = bottomX + (trackBottomW / 4) * lane;
+        const btmLaneR = bottomX + (trackBottomW / 4) * (lane + 1);
+
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(topLaneL, topY);
+        this.ctx.lineTo(topLaneR, topY);
+        this.ctx.lineTo(btmLaneR, bottomY);
+        this.ctx.lineTo(btmLaneL, bottomY);
+        this.ctx.closePath();
+
+        const beamColor = (lane === 0 || lane === 3) ? '0, 240, 255' : '192, 132, 252';
+        const beamGrad = this.ctx.createLinearGradient(0, bottomY, 0, topY);
+        beamGrad.addColorStop(0, `rgba(${beamColor}, ${0.45 * this.laneLightGlow[lane]})`);
+        beamGrad.addColorStop(1, `rgba(${beamColor}, 0)`);
+        this.ctx.fillStyle = beamGrad;
+        this.ctx.fill();
+        this.ctx.restore();
+      }
+    }
+
+    // 4. Judgment Line (Receptor Line)
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.moveTo(bottomX - 6, this.hitLineY);
+    this.ctx.lineTo(bottomX + trackBottomW + 6, this.hitLineY);
+    this.ctx.lineWidth = 3;
+    this.ctx.strokeStyle = '#00f0ff';
+    this.ctx.shadowColor = '#00f0ff';
+    this.ctx.shadowBlur = 14;
+    this.ctx.stroke();
+
+    // Receptors (Target rings for 4 lanes)
+    for (let lane = 0; lane < 4; lane++) {
+      const laneCoords = this.getLaneBottomCoords(lane);
+      const isPressed = this.keyState[lane];
+
+      this.ctx.beginPath();
+      this.ctx.arc(laneCoords.x, this.hitLineY, isPressed ? 18 : 14, 0, Math.PI * 2);
+      this.ctx.fillStyle = isPressed ? 'rgba(0, 240, 255, 0.45)' : 'rgba(255, 255, 255, 0.12)';
+      this.ctx.fill();
+      this.ctx.lineWidth = isPressed ? 3 : 2;
+      this.ctx.strokeStyle = isPressed ? '#ffffff' : 'rgba(0, 240, 255, 0.7)';
+      this.ctx.stroke();
+    }
+    this.ctx.restore();
+
+    // 5. Draw Falling Notes
+    this.renderNotes(topX, trackTopW, bottomX, trackBottomW, topY, this.hitLineY);
+
+    // 6. Draw Active Particles
+    this.renderParticles();
+  }
+
+  renderNotes(topX, topW, btmX, btmW, spawnY, hitY) {
+    const songTime = window.soundEngine.getCurrentSongTime();
+    // Time ahead visible on track: depends on noteSpeed
+    const visibleWindow = 1.6 / this.noteSpeed;
+
+    for (const note of this.notes) {
+      if (note.hit || note.missed) continue;
+
+      const timeUntilHit = note.time - songTime;
+      // If note is within sight
+      if (timeUntilHit <= visibleWindow && timeUntilHit >= -0.2) {
+        // Progress: 0 at spawnY (timeUntilHit = visibleWindow), 1.0 at hitY (timeUntilHit = 0)
+        const progress = 1.0 - (timeUntilHit / visibleWindow);
+
+        // Interpolate perspective width and position
+        const currentY = spawnY + (hitY - spawnY) * progress;
+        const currentTrackW = topW + (btmW - topW) * progress;
+        const currentTrackX = topX + (btmX - topX) * progress;
+        const currentLaneW = currentTrackW / 4;
+        const currentX = currentTrackX + currentLaneW * (note.lane + 0.5);
+
+        // Note size scales with depth perspective
+        const noteWidth = currentLaneW * 0.78;
+        const noteHeight = 12 + progress * 10;
+
+        this.ctx.save();
+        this.ctx.translate(currentX, currentY);
+
+        // Note Color Theme
+        const isCyan = (note.lane === 0 || note.lane === 3);
+        const baseColor = isCyan ? '#00f0ff' : '#c084fc';
+        const glowColor = isCyan ? 'rgba(0, 240, 255, 0.8)' : 'rgba(192, 132, 252, 0.8)';
+
+        // Rounded Glow Capsule
+        this.ctx.shadowColor = glowColor;
+        this.ctx.shadowBlur = 12 * progress;
+
+        const noteGrad = this.ctx.createLinearGradient(0, -noteHeight / 2, 0, noteHeight / 2);
+        noteGrad.addColorStop(0, '#ffffff');
+        noteGrad.addColorStop(0.3, baseColor);
+        noteGrad.addColorStop(1, isCyan ? '#0284c7' : '#9333ea');
+
+        this.ctx.fillStyle = noteGrad;
+        this.drawRoundedRect(-noteWidth / 2, -noteHeight / 2, noteWidth, noteHeight, 6);
+        this.ctx.fill();
+
+        // Inner highlight core
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        this.drawRoundedRect(-noteWidth * 0.35, -noteHeight * 0.25, noteWidth * 0.7, noteHeight * 0.5, 3);
+        this.ctx.fill();
+
+        this.ctx.restore();
+      }
+    }
+  }
+
+  drawRoundedRect(x, y, w, h, r) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(x + r, y);
+    this.ctx.lineTo(x + w - r, y);
+    this.ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    this.ctx.lineTo(x + w, y + h - r);
+    this.ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    this.ctx.lineTo(x + r, y + h);
+    this.ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    this.ctx.lineTo(x, y + r);
+    this.ctx.quadraticCurveTo(x, y, x + r, y);
+    this.ctx.closePath();
+  }
+
+  renderParticles() {
+    for (const p of this.activeParticles) {
+      this.ctx.save();
+      this.ctx.globalAlpha = p.alpha;
+
+      if (p.type === 'ring') {
+        this.ctx.beginPath();
+        this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        this.ctx.lineWidth = 2.5;
+        this.ctx.strokeStyle = p.color;
+        this.ctx.shadowColor = p.color;
+        this.ctx.shadowBlur = 10;
+        this.ctx.stroke();
+      } else if (p.type === 'spark') {
+        this.ctx.beginPath();
+        this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        this.ctx.fillStyle = p.color;
+        this.ctx.shadowColor = p.color;
+        this.ctx.shadowBlur = 8;
+        this.ctx.fill();
+      }
+
+      this.ctx.restore();
+    }
+  }
+
+  // ==========================================
+  // GAME OVER & RESULT SCREEN
+  // ==========================================
+
+  finishGame() {
+    window.soundEngine.stopBgmTrack();
+    this.switchScreen('RESULT');
+
+    // Calculate final stats
+    const totalMax = Math.max(1, this.totalJudged * 1000);
+    const currentEarned = (this.perfectCount * 1000) + (this.greatCount * 700) + (this.goodCount * 300);
+    const finalAccuracy = (currentEarned / totalMax) * 100;
+
+    // Rank evaluation
+    let rank = 'F';
+    let rankClass = 'rank-f';
+    if (finalAccuracy >= 98.0) { rank = 'SSS'; rankClass = 'rank-sss'; }
+    else if (finalAccuracy >= 95.0) { rank = 'SS'; rankClass = 'rank-ss'; }
+    else if (finalAccuracy >= 90.0) { rank = 'S'; rankClass = 'rank-s'; }
+    else if (finalAccuracy >= 80.0) { rank = 'A'; rankClass = 'rank-a'; }
+    else if (finalAccuracy >= 70.0) { rank = 'B'; rankClass = 'rank-b'; }
+    else if (finalAccuracy >= 60.0) { rank = 'C'; rankClass = 'rank-c'; }
+
+    // Clear Type
+    let clearType = 'STAGE CLEAR';
+    if (this.missCount === 0 && this.totalJudged > 0) {
+      if (this.greatCount === 0 && this.goodCount === 0) {
+        clearType = 'ALL PERFECT!';
+      } else {
+        clearType = 'FULL COMBO!';
+      }
+    } else if (finalAccuracy < 60) {
+      clearType = 'FAILED';
+    }
+
+    // Point Economy Calculation (RP)
+    const baseRP = Math.floor(this.score / 100);
+    const comboRP = this.maxCombo * 2;
+    const accRP = Math.floor(finalAccuracy * 5);
+    const earnedRP = Math.max(50, baseRP + comboRP + accRP);
+
+    // Save RP to wallet
+    this.saveWalletRP(earnedRP);
+
+    // Update Result DOM
+    const rankBadge = document.getElementById('res-rank-badge');
+    rankBadge.textContent = rank;
+    rankBadge.className = `rank-badge ${rankClass}`;
+    document.getElementById('res-clear-type').textContent = clearType;
+
+    document.getElementById('res-score').textContent = this.score.toLocaleString();
+    document.getElementById('res-acc').textContent = `${finalAccuracy.toFixed(2)}%`;
+    document.getElementById('res-max-combo').textContent = this.maxCombo.toString();
+
+    document.getElementById('res-perfect-count').textContent = this.perfectCount.toString();
+    document.getElementById('res-great-count').textContent = this.greatCount.toString();
+    document.getElementById('res-good-count').textContent = this.goodCount.toString();
+    document.getElementById('res-miss-count').textContent = this.missCount.toString();
+
+    document.getElementById('res-earned-points').textContent = earnedRP.toLocaleString();
+    document.getElementById('res-total-wallet-rp').textContent = `${this.walletRP.toLocaleString()} RP`;
+
+    // Play Victory Fanfare
+    window.soundEngine.playFeverTrigger();
+  }
+}
+
+// Initialize on DOM Ready
+window.addEventListener('DOMContentLoaded', () => {
+  window.luminaGame = new LuminaGame();
+});
+
+</script>
+</body>
+</html>
