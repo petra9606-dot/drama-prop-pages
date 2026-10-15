@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zeom-chain — Zeom Chain Console</title>
+<style>
+:root{
+  --bg:#171717;
+  --panel:#1e1e1e;
+  --panel2:#252526;
+  --line:#343434;
+  --text:#d4d4d4;
+  --muted:#8b8b8b;
+  --blue:#4fc1ff;
+  --green:#6a9955;
+  --yellow:#dcdcaa;
+  --orange:#ce9178;
+  --purple:#c586c0;
+  --cyan:#4ec9b0;
+  --red:#f14c4c;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#111;
+  color:var(--text);
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+}
+.workspace{
+  height:100vh;
+  display:grid;
+  grid-template-columns:52% 48%;
+  background:#0b0f14;
+}
+.ops{
+  min-width:0;
+  min-height:0;
+  display:grid;
+  grid-template-rows:46px 1fr;
+  border-right:1px solid #28313d;
+  background:#0d1218;
+  color:#d7dee8;
+}
+.ops-top{
+  display:grid;
+  grid-template-columns:210px 1fr 210px;
+  align-items:center;
+  padding:0 14px;
+  background:#10161e;
+  border-bottom:1px solid #28313d;
+  font-size:11px;
+}
+.ops-brand{display:flex;align-items:center;gap:10px;font-weight:700;color:#eef4fb}
+.ops-logo{
+  width:27px;height:27px;display:grid;place-items:center;border-radius:7px;
+  background:linear-gradient(135deg,#16b8a6,#3c7cff);
+  box-shadow:0 0 18px rgba(32,186,169,.22);
+  color:white;font-weight:800
+}
+.ops-path{text-align:center;color:#8c9bad;font-family:Consolas,monospace}
+.ops-actions{text-align:right;color:#9eabba}
+.env-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#31d0aa;margin-right:6px;box-shadow:0 0 8px rgba(49,208,170,.6)}
+.ops-body{min-height:0;display:grid;grid-template-columns:160px minmax(0,1fr) 190px}
+.ops-nav,.inspector{
+  min-height:0;overflow:hidden;background:#10161e;padding:12px 9px;font-size:10px
+}
+.ops-nav{border-right:1px solid #25303c}
+.inspector{border-left:1px solid #25303c}
+.nav-title,.inspect-title{font-size:9px;letter-spacing:.12em;color:#667688;margin:4px 7px 10px}
+.nav-item{padding:7px 8px;border-radius:6px;margin-bottom:3px;color:#8fa0b3;display:flex;justify-content:space-between;align-items:center}
+.nav-item.active{background:#162b31;color:#7ce4d6;border:1px solid #1d4e51}
+.nav-item span:last-child{font-size:8px;color:#647487}
+.service-list{margin-top:14px;padding-top:12px;border-top:1px solid #25303c}
+.service{padding:6px 7px;color:#8fa0b3;display:flex;align-items:center;gap:7px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#32d39d;box-shadow:0 0 8px rgba(50,211,157,.5)}
+.status-dot.warn{background:#f0b34b;box-shadow:none}
+.ops-canvas{
+  min-width:0;min-height:0;overflow:hidden;padding:16px;background:
+    radial-gradient(circle at 1px 1px,#25303c 1px,transparent 1px),#0b1016;
+  background-size:18px 18px;
+}
+.console{
+  width:100%;height:100%;margin:auto;border:1px solid #2a3542;border-radius:10px;overflow:hidden;
+  background:#0f151d;box-shadow:0 18px 40px rgba(0,0,0,.28);display:grid;grid-template-rows:48px 76px 1fr 132px
+}
+.console-head{display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #26313d;background:#121923}
+.console-title b{font-size:13px;color:#ecf3fb}.console-title span{display:block;font-size:9px;color:#748497;margin-top:3px}
+.deploy-btn{padding:7px 11px;border-radius:6px;background:#1d766d;color:#dffffa;font-size:9px;font-weight:700;border:1px solid #29988d}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 12px;border-bottom:1px solid #26313d;background:#101720}
+.summary-card{padding:9px 10px;border:1px solid #263441;border-radius:7px;background:#131c26}
+.summary-card span{display:block;font-size:8px;color:#718397;margin-bottom:5px}.summary-card b{font-size:15px;color:#e8f0f8}.summary-card em{font-style:normal;font-size:8px;color:#44d4af;margin-left:4px}
+.pipeline{min-height:0;padding:14px 12px;display:grid;grid-template-rows:22px 1fr;gap:8px}
+.pipeline-head{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#9aabba}.pipeline-head b{color:#dce7f2}.live{color:#48d2ae}
+.flow{min-height:0;display:grid;grid-template-columns:1fr 26px 1fr 26px 1fr;grid-template-rows:1fr 30px 1fr;align-items:stretch;gap:8px}
+.node{min-width:0;border:1px solid #2a3947;border-radius:8px;background:#131c26;padding:10px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 3px 0 0 #3e8cf5}
+.node.green{box-shadow:inset 3px 0 0 #36c7a3}.node.purple{box-shadow:inset 3px 0 0 #a07cf7}.node.orange{box-shadow:inset 3px 0 0 #e6a95a}.node.red{box-shadow:inset 3px 0 0 #ef6b75}
+.node-top{display:flex;justify-content:space-between;gap:8px}.node h4{margin:0;font-size:10px;color:#e3edf6}.node small{font-size:8px;color:#75879a}.node-code{font:8px/1.45 Consolas,monospace;color:#8fa2b5;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.node-foot{display:flex;justify-content:space-between;margin-top:8px;font-size:8px;color:#607386}.ok{color:#45d3aa}.arrow{display:grid;place-items:center;color:#3b7692;font-size:17px}.down{grid-column:5;display:grid;place-items:center;color:#3b7692}.n1{grid-column:1;grid-row:1}.a1{grid-column:2;grid-row:1}.n2{grid-column:3;grid-row:1}.a2{grid-column:4;grid-row:1}.n3{grid-column:5;grid-row:1}.n4{grid-column:5;grid-row:3}.a3{grid-column:4;grid-row:3}.n5{grid-column:3;grid-row:3}.a4{grid-column:2;grid-row:3}.n6{grid-column:1;grid-row:3}
+.runtime{display:grid;grid-template-columns:1.2fr .8fr;border-top:1px solid #26313d;background:#0d131a;min-height:0}
+.trace{padding:10px 12px;border-right:1px solid #26313d;overflow:hidden}.trace-title,.health-title{font-size:9px;color:#6f8093;margin-bottom:7px;letter-spacing:.08em}.trace-line{font:8.5px/1.65 Consolas,monospace;color:#8fa2b5;white-space:nowrap}.trace-line b{color:#4ccfb0}.trace-line i{font-style:normal;color:#5c9fe8}.health{padding:10px 12px}.health-row{display:grid;grid-template-columns:1fr 44px 42px;align-items:center;padding:5px 0;border-bottom:1px solid #202b36;font-size:8.5px;color:#8999aa}.health-row:last-child{border-bottom:0}.health-row strong{color:#dce7f2}.health-row span:nth-child(2){color:#44d1aa}.health-row span:last-child{text-align:right;color:#6f8194}
+.inspect-block{margin-bottom:16px}.inspect-label{font-size:8px;color:#667789;margin-bottom:5px}.inspect-box{border:1px solid #2b3642;background:#131b24;border-radius:6px;padding:7px;color:#a8b6c5;font:9px Consolas,monospace}.inspect-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #24303b;color:#8292a4}.inspect-row b{color:#d6e1ec;font-weight:500}.badge{padding:3px 6px;border-radius:999px;background:#17382f;color:#52d7af;font-size:8px}
+.vscode{
+  min-width:0;
+  min-height:0;
+  height:100vh;
+  overflow:hidden;
+  display:grid;
+  grid-template-rows:35px minmax(0,1fr) 22px;
+  background:var(--panel);
+}
+.titlebar{
+  display:grid;
+  grid-template-columns:120px 1fr 120px;
+  align-items:center;
+  padding:0 10px;
+  background:#181818;
+  border-bottom:1px solid #303030;
+  color:#bcbcbc;
+  font-size:10px;
+}
+.titlebar .center{text-align:center}
+.titlebar .right{text-align:right}
+.vscode-main{
+  min-width:0;
+  min-height:0;
+  height:100%;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:44px 180px minmax(0,1fr);
+}
+.activitybar{
+  background:#181818;
+  border-right:1px solid #2a2a2a;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:10px;
+  gap:18px;
+  color:#8c8c8c;
+  font-size:17px;
+}
+.activitybar .active{color:#fff;border-left:2px solid #fff;width:100%;text-align:center}
+.explorer{
+  background:#181818;
+  border-right:1px solid #2a2a2a;
+  font-family:Consolas,monospace;
+  font-size:10px;
+  overflow:hidden;
+}
+.explorer-title{
+  height:34px;
+  display:flex;align-items:center;
+  padding:0 10px;
+  color:#c7c7c7;
+  letter-spacing:.05em;
+  font-family:Inter,Arial,sans-serif;
+}
+.tree{padding:3px 7px;color:#c5c5c5}
+.tree div{padding:4px 2px}
+.tree .indent{padding-left:15px}
+.tree .active{background:#37373d}
+.tree .py{color:#4fc1ff}
+.editor-area{
+  min-width:0;
+  min-height:0;
+  height:100%;
+  overflow:hidden;
+  display:grid;
+  grid-template-rows:34px minmax(0,1.4fr) minmax(0,1fr);
+}
+.tabs{
+  display:flex;
+  background:#181818;
+  border-bottom:1px solid #2b2b2b;
+}
+.tab{
+  min-width:155px;
+  padding:0 12px;
+  display:flex;align-items:center;
+  background:#1f1f1f;
+  border-right:1px solid #2b2b2b;
+  font:10px Consolas,monospace;
+  color:#d4d4d4;
+}
+.tab span{color:#4fc1ff;margin-right:7px}
+.editor{
+  min-height:0;
+  height:100%;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:48px minmax(0,1fr);
+  background:#1e1e1e;
+  border-bottom:1px solid #333;
+}
+.line-numbers{
+  min-height:0;
+  height:100%;
+  padding:10px 9px 10px 0;
+  text-align:right;
+  overflow:hidden;
+  color:#858585;
+  font:12px/1.55 Consolas,monospace;
+  user-select:none;
+}
+.code{
+  min-height:0;
+  height:100%;
+  padding:10px 14px;
+  overflow:auto;
+  white-space:pre;
+  color:#d4d4d4;
+  font:12px/1.55 Consolas,monospace;
+  scroll-behavior:auto;
+}
+.code::-webkit-scrollbar,.terminal-log::-webkit-scrollbar{width:8px;height:8px}
+.code::-webkit-scrollbar-thumb,.terminal-log::-webkit-scrollbar-thumb{background:#424242}
+.kw{color:#c586c0}.fn{color:#dcdcaa}.str{color:#ce9178}.type{color:#4ec9b0}.var{color:#9cdcfe}.num{color:#b5cea8}.comment{color:#6a9955}.decor{color:#d7ba7d}
+.cursor{
+  display:inline-block;
+  width:1px;height:14px;
+  background:#fff;
+  vertical-align:-2px;
+  animation:blink .8s steps(1) infinite;
+}
+.terminal{
+  min-height:0;
+  height:100%;
+  overflow:hidden;
+  display:grid;
+  grid-template-rows:30px minmax(0,1fr);
+  background:#181818;
+}
+.terminal-tabs{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:0 12px;
+  border-bottom:1px solid #303030;
+  color:#a9a9a9;
+  font-size:10px;
+}
+.terminal-tabs .active{color:#fff;border-bottom:1px solid #fff;height:30px;display:flex;align-items:center}
+.terminal-log{
+  min-height:0;
+  height:100%;
+  overflow:auto;
+  padding:8px 12px 15px;
+  font:10.5px/1.6 Consolas,monospace;
+  color:#c8c8c8;
+  scroll-behavior:auto;
+}
+.log-line{white-space:pre-wrap}
+.log-time{color:#6f8aa3}.log-mcp{color:#4fc1ff}.log-ok{color:#6bcf8d}.log-tool{color:#dcdcaa}.log-detail{color:#b9b9b9}.log-json{color:#ce9178}
+.statusbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 8px;
+  background:#007acc;
+  color:#fff;
+  font-size:9px;
+}
+@keyframes blink{50%{opacity:0}}
+@keyframes fade{from{opacity:0;transform:translateY(3px)}}
+@media(max-width:1200px){.workspace{min-width:1200px}}
+
+.console{grid-template-rows:48px 76px minmax(0,1fr) 140px}
+.pipeline{grid-template-rows:22px 250px minmax(0,1fr)}
+.flow{grid-template-rows:110px 30px 110px;align-content:start}
+.chart-wrap{min-height:0;display:grid;grid-template-rows:18px 1fr;border:1px solid #26313d;border-radius:8px;background:#0f151d;padding:8px 10px}
+.chart-head{display:flex;justify-content:space-between;font-size:8.5px;color:#6f8093;letter-spacing:.06em}
+.chart{min-height:0;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid #26313d}
+.chart i{flex:1;background:linear-gradient(180deg,#36c7a3,#1d766d);border-radius:1px 1px 0 0;min-height:2px;transition:height .3s}
+.summary-card em{white-space:nowrap}
+.pipeline{grid-template-rows:22px 272px minmax(0,1fr)}
+.summary-card{overflow:hidden}
+.summary-card b{white-space:nowrap}
+.summary-card em{display:block;margin:3px 0 0}
+.console{grid-template-rows:48px 88px minmax(0,1fr) 140px}
+.summary-card{padding:8px 10px}
+</style>
+<!-- DW-SITE --><meta name="robots" content="noindex,nofollow,noarchive"><script>if("serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});</script><!-- DW-GA --><script>(function(){try{if(localStorage.getItem('dw-noga'))return;}catch(e){}window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','G-ZMQZ7X9F3J');var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-ZMQZ7X9F3J';(document.head||document.documentElement).appendChild(s);})();</script>
+</head>
+<body>
+<div class="workspace">
+  <section class="ops">
+    <div class="ops-top">
+      <div class="ops-brand"><div class="ops-logo">Z</div><span>Zeom Chain Console</span></div>
+      <div class="ops-path" id="opsPath"></div>
+      <div class="ops-actions" id="opsStatus"></div>
+    </div>
+    <div class="ops-body">
+      <aside class="ops-nav">
+        <div class="nav-title">NETWORK</div>
+        <div class="nav-item active"><span>Overview</span><span>⌘1</span></div>
+        <div class="nav-item"><span>Validators</span><span id="navVal">-</span></div>
+        <div class="nav-item"><span>Blocks</span><span>LIVE</span></div>
+        <div class="nav-item"><span>Contracts</span><span id="navCon">-</span></div>
+        <div class="nav-item"><span>Staking</span><span id="navStk">-</span></div>
+        <div class="nav-item"><span>Bridge</span><span id="navBrg">-</span></div>
+        <div class="nav-item"><span>Releases</span><span id="navRel">-</span></div>
+        <div class="service-list">
+          <div class="nav-title">MILESTONES</div>
+          <div id="milestones"></div>
+        </div>
+      </aside>
+
+      <main class="ops-canvas">
+        <div class="console">
+          <div class="console-head">
+            <div class="console-title"><b id="conTitle">Zeom Network Overview</b><span id="conSub"></span></div>
+            <div class="deploy-btn" id="deployBtn">Deploy revision</div>
+          </div>
+          <div class="summary" id="summary"></div>
+          <div class="pipeline">
+            <div class="pipeline-head"><b>Transaction lifecycle</b><span class="live" id="liveTag"></span></div>
+            <div class="flow" id="flow"></div>
+            <div class="chart-wrap"><div class="chart-head"><span>TXS PER BLOCK · last 64 blocks</span><span id="chartMeta"></span></div><div class="chart" id="chart"></div></div>
+          </div>
+          <div class="runtime">
+            <div class="trace">
+              <div class="trace-title">LIVE BLOCK STREAM</div>
+              <div id="traceList"></div>
+            </div>
+            <div class="health">
+              <div class="health-title">SERVICE HEALTH</div>
+              <div id="healthList"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="inspector">
+        <div class="inspect-title">SELECTED CONTRACT</div>
+        <div class="inspect-block"><div class="inspect-label">CONTRACT</div><div class="inspect-box">ZeomToken (ZEOM)</div></div>
+        <div class="inspect-block"><div class="inspect-label">ADDRESS</div><div class="inspect-box" id="insAddr"></div></div>
+        <div class="inspect-block"><div class="inspect-label">BUILD</div><div class="inspect-box" id="insRev"></div></div>
+        <div class="inspect-block" id="insRows"></div>
+        <div class="inspect-block"><div class="inspect-label">PARAMETERS</div><div class="inspect-box">MAX_SUPPLY=10,000,000,000<br>DECIMALS=18<br>EPOCH=6h<br>UNBONDING=14d</div></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="vscode">
+    <div class="titlebar">
+      <div>⌘ &nbsp; ◀ ▶</div>
+      <div class="center" id="vsTitle"></div>
+      <div class="right">— □ ×</div>
+    </div>
+    <div class="vscode-main">
+      <aside class="activitybar">
+        <div class="active">▱</div><div>⌕</div><div>⑂</div><div>▷</div><div>⬡</div>
+      </aside>
+      <aside class="explorer">
+        <div class="explorer-title">EXPLORER</div>
+        <div class="tree" id="tree"></div>
+      </aside>
+      <div class="editor-area">
+        <div class="tabs" id="tabs"></div>
+        <div class="editor">
+          <div id="lineNumbers" class="line-numbers"></div>
+          <div id="codeArea" class="code"></div>
+        </div>
+        <div class="terminal">
+          <div class="terminal-tabs">
+            <div class="active">TERMINAL</div><div>OUTPUT</div><div>DEBUG CONSOLE</div><div id="probTab">PROBLEMS 0</div>
+          </div>
+          <div id="terminalLog" class="terminal-log"></div>
+        </div>
+      </div>
+    </div>
+    <div class="statusbar">
+      <div id="sbLeft"></div>
+      <div>Ln <span id="linePos">1</span>, Col <span id="colPos">1</span> &nbsp; Spaces: 4 &nbsp; UTF-8 &nbsp; Rust &nbsp; rust-analyzer</div>
+    </div>
+  </section>
+</div>
+
+<script>
+// stage: 1 = 초반 작업, 2 = 중반 작업, 3 = 마무리 (Enter 로 완료)
+const ZEOM_STAGE = (() => {
+  const q = new URLSearchParams(location.search).get("stage");
+  const h = (location.hash || "").replace("#", "");
+  const v = parseInt(q || h || "1", 10);
+  return [1, 2, 3].includes(v) ? v : 1;
+})();
+document.addEventListener("keydown", (e) => {
+  const d = e.code && e.code.startsWith("Digit") ? e.code.slice(5) : e.key;
+  if (e.altKey && ["1", "2", "3"].includes(d)) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    location.hash = "#" + d;
+    location.reload();
+  }
+}, true);
+
+// 완료 연출 (Enter "탁!" 이후)
+function zeomCelebrate(opts) {
+  if (document.getElementById("zeomDone")) return;
+  const o = Object.assign({ delay: 0 }, opts || {});
+  const css = `
+#zeomFlash{position:fixed;inset:0;z-index:9998;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(94,234,212,.55),rgba(16,185,129,.18) 40%,transparent 70%);opacity:0;animation:zfFlash 1.1s ease-out forwards}
+@keyframes zfFlash{0%{opacity:0}12%{opacity:1}100%{opacity:0}}
+#zeomDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;pointer-events:none;font-family:Inter,Pretendard,"Segoe UI",system-ui,sans-serif}
+#zeomDone .zd-dim{position:absolute;inset:0;background:radial-gradient(circle at 50% 46%,rgba(4,10,14,.35),rgba(2,6,10,.78) 70%);opacity:0;animation:zdIn .7s .15s ease-out forwards}
+#zeomDone canvas{position:absolute;inset:0;width:100%;height:100%}
+#zeomDone .zd-card{position:relative;width:min(560px,86vw);padding:34px 38px 28px;border-radius:20px;text-align:center;color:#e8fff9;
+  background:linear-gradient(160deg,rgba(18,38,40,.94),rgba(8,18,22,.96));border:1px solid rgba(94,234,212,.45);
+  box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 30px 90px rgba(0,0,0,.6),0 0 80px rgba(45,212,191,.28);
+  opacity:0;transform:translateY(18px) scale(.94);animation:zdCard .75s .35s cubic-bezier(.2,.9,.25,1.15) forwards}
+@keyframes zdIn{to{opacity:1}}
+@keyframes zdCard{to{opacity:1;transform:none}}
+#zeomDone .zd-ring{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:2px solid rgba(94,234,212,.7);opacity:0;animation:zdRing 1.6s .2s ease-out forwards}
+#zeomDone .zd-ring.r2{animation-delay:.5s}
+@keyframes zdRing{0%{opacity:.9;transform:scale(.4)}100%{opacity:0;transform:scale(7)}}
+#zeomDone .zd-coin{width:104px;height:104px;margin:-86px auto 14px;perspective:600px}
+#zeomDone .zd-coin i{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;font-style:normal;font-weight:900;font-size:52px;color:#04201c;letter-spacing:-2px;
+  background:radial-gradient(circle at 32% 28%,#fff6c9,#f5c84b 38%,#c98a12 70%,#8a5a06);
+  box-shadow:0 0 0 5px #0d1a1c,0 0 0 7px rgba(245,200,75,.85),0 0 40px rgba(245,200,75,.55),inset 0 -6px 14px rgba(0,0,0,.25);
+  animation:zdSpin 1.4s .35s cubic-bezier(.3,.7,.3,1) both}
+@keyframes zdSpin{0%{transform:rotateY(-540deg) scale(.3);opacity:0}70%{opacity:1}100%{transform:rotateY(0) scale(1)}}
+#zeomDone .zd-tag{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;background:rgba(16,185,129,.16);border:1px solid rgba(52,211,153,.45);color:#6ee7b7;font-size:11px;font-weight:700;letter-spacing:.14em}
+#zeomDone .zd-tag b{width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399;animation:zdPulse 1.2s infinite}
+@keyframes zdPulse{50%{opacity:.35}}
+#zeomDone h1{margin:14px 0 6px;font-size:34px;line-height:1.1;font-weight:800;letter-spacing:-.01em;color:#fff;text-shadow:0 0 24px rgba(94,234,212,.35)}
+#zeomDone h1 span{color:#5eead4}
+#zeomDone .zd-sub{color:#9fbfba;font-size:13px}
+#zeomDone .zd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:22px 0 16px}
+#zeomDone .zd-grid div{padding:10px 6px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid rgba(94,234,212,.14)}
+#zeomDone .zd-grid small{display:block;font-size:9px;letter-spacing:.12em;color:#6f8f8a;margin-bottom:5px}
+#zeomDone .zd-grid strong{font:700 16px/1 "JetBrains Mono",Consolas,monospace;color:#e6fffa}
+#zeomDone .zd-check{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;font-size:11.5px;color:#a7d8cf}
+#zeomDone .zd-check span{opacity:0;animation:zdIn .35s forwards}
+#zeomDone .zd-check span::before{content:"✓ ";color:#34d399;font-weight:800}
+#zeomDone .zd-foot{margin-top:16px;font:11px Consolas,monospace;color:#5f7f7a}
+`;
+  setTimeout(() => {
+    const st = document.createElement("style");
+    st.textContent = css;
+    document.head.appendChild(st);
+    const fl = document.createElement("div");
+    fl.id = "zeomFlash";
+    document.body.appendChild(fl);
+    setTimeout(() => fl.remove(), 1300);
+
+    const root = document.createElement("div");
+    root.id = "zeomDone";
+    const checks = ["ZeomToken", "Staking", "Vesting", "Bridge", "Explorer", "Wallet SDK"];
+    root.innerHTML = `
+      <div class="zd-dim"></div>
+      <canvas></canvas>
+      <div class="zd-ring"></div><div class="zd-ring r2"></div>
+      <div class="zd-card">
+        <div class="zd-coin"><i>Z</i></div>
+        <div class="zd-tag"><b></b>MAINNET LIVE</div>
+        <h1><span>ZEOM</span> Mainnet Launched</h1>
+        <div class="zd-sub">제옴코인 v1.0.0 · Genesis block sealed · chain 7310</div>
+        <div class="zd-grid">
+          <div><small>BLOCK</small><strong id="zdBlock">#0</strong></div>
+          <div><small>VALIDATORS</small><strong>7/7</strong></div>
+          <div><small>TESTS</small><strong>138/138</strong></div>
+          <div><small>SUPPLY</small><strong>10B</strong></div>
+        </div>
+        <div class="zd-check">${checks.map((c, i) => `<span style="animation-delay:${1 + i * 0.16}s">${c}</span>`).join("")}</div>
+        <div class="zd-foot">0x5E0d1c94A7b3F2E8D61a90C4b7E2f3a8D9c04e01</div>
+      </div>`;
+    document.body.appendChild(root);
+
+    let b = 0;
+    setInterval(() => { b++; const el = document.getElementById("zdBlock"); if (el) el.textContent = "#" + b.toLocaleString(); }, 2000);
+
+    // 금빛 파티클
+    const cv = root.querySelector("canvas");
+    const ctx = cv.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+    ctx.scale(dpr, dpr);
+    const cx = innerWidth / 2, cy = innerHeight / 2 - 40;
+    const parts = Array.from({ length: 140 }, () => {
+      const a = Math.random() * Math.PI * 2, s = 3 + Math.random() * 9;
+      return { x: cx, y: cy, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 2, r: 1.2 + Math.random() * 2.6, life: 1, c: Math.random() < .55 ? "245,200,75" : "94,234,212" };
+    });
+    const t0 = performance.now();
+    (function frame(t) {
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      let alive = false;
+      parts.forEach((p) => {
+        if (p.life <= 0) return;
+        alive = true;
+        p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.vx *= 0.985; p.life -= 0.009;
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${p.c},${Math.max(0, p.life)})`;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      if (alive && t - t0 < 4000) requestAnimationFrame(frame);
+      else ctx.clearRect(0, 0, innerWidth, innerHeight);
+    })(t0);
+  }, o.delay);
+}
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") { const d = document.getElementById("zeomDone"); if (d) d.remove(); }
+}, true);
+
+
+const S = ZEOM_STAGE;
+const $ = (id) => document.getElementById(id);
+const rnd = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+const hex = (n) => Array.from({ length: n }, () => "0123456789abcdef"[rnd(0, 15)]).join("");
+let launched = false;
+
+/* ───────── 좌측 콘솔 ───────── */
+const C = {
+  1: {
+    path: "devnet / zeom-chain / overview", status: '<span class="env-dot" style="background:#f0b34b;box-shadow:none"></span>1 service degraded &nbsp; ⋮',
+    sub: "Single-node devnet · build v0.3.0-dev", btn: "Deploy revision",
+    navVal: "1", navCon: "02", navStk: "—", navBrg: "—", navRel: "0.3",
+    ms: [["Token core (ERC-20)", "done"], ["Genesis & devnet", "done"], ["PoS consensus", "wip"], ["Staking / vesting", ""], ["Bridge & wallet SDK", ""], ["Audit", ""], ["Mainnet", ""]],
+    height: 41862, tps: [1, 6], cards: (h, t) => [["BLOCK HEIGHT", h.toLocaleString(), "+1 / 3s"], ["TPS (1m)", t, "devnet"], ["VALIDATORS", "1 / 1", "solo"], ["CONTRACTS", "2", "unverified"]],
+    nodes: [["Wallet SDK", "ts", "zeom-js (planned)", "○ not started", "—", "orange", "#75879a"], ["RPC Gateway", "rust", "eth_* · zeom_*", "● 200 OK", "9 ms", "", ""], ["Mempool", "rust", "pending=12", "● ready", "1 ms", "purple", ""], ["Consensus", "PoS", "single proposer", "● solo mode", "3.0 s", "green", "#f0b34b"], ["EVM Execution", "revm", "cancun", "● ok", "14 ms", "red", ""], ["Indexer", "postgres", "decode receipts", "● crashloop", "—", "green", "#ef6b75"]],
+    health: [["zeom-node", "healthy", "1 pod"], ["zeom-rpc", "healthy", "1 pod"], ["zeom-indexer", "failing", "0 / 1"], ["zeom-faucet", "healthy", "1 pod"]],
+    addr: "0x9fE4…a6e0 (devnet)", rev: "v0.3.0-dev · 4c1a9e2",
+    rows: [["Status", "Draft"], ["Network", "devnet"], ["Holders", "3"], ["Tests", "41 passed"], ["Coverage", "38.2%"], ["Audit", "—"]]
+  },
+  2: {
+    path: "testnet / zeom-chain / overview", status: '<span class="env-dot"></span>Testnet operational &nbsp; ⋮',
+    sub: "Public testnet · build v0.7.2-rc", btn: "Deploy revision",
+    navVal: "4", navCon: "05", navStk: "428M", navBrg: "—", navRel: "0.7",
+    ms: [["Token core (ERC-20)", "done"], ["Genesis & devnet", "done"], ["PoS consensus", "done"], ["Staking / vesting", "done"], ["Bridge & wallet SDK", "wip"], ["Audit", ""], ["Mainnet", ""]],
+    height: 1184904, tps: [28, 66], cards: (h, t) => [["BLOCK HEIGHT", h.toLocaleString(), "+1 / 2s"], ["TPS (1m)", t, "testnet"], ["VALIDATORS", "4 / 4", "quorum 3"], ["STAKED", "428.2M", "ZEOM"]],
+    nodes: [["Wallet SDK", "ts", "zeom-js 0.4.0-beta", "● beta", "—", "orange", ""], ["RPC Gateway", "rust", "eth_* · zeom_*", "● 200 OK", "11 ms", "", ""], ["Mempool", "rust", "pending=48", "● ready", "1 ms", "purple", ""], ["Consensus", "PoS", "4 validators · VRF", "● finalized", "2.0 s", "green", ""], ["EVM Execution", "revm", "cancun", "● ok", "18 ms", "red", ""], ["Bridge Relayer", "rust", "lock / mint", "● pending", "—", "green", "#f0b34b"]],
+    health: [["zeom-validator", "healthy", "4 pods"], ["zeom-rpc", "healthy", "2 pods"], ["zeom-indexer", "healthy", "1 pod"], ["bridge-relayer", "pending", "0 / 1"]],
+    addr: "0x3Ab1…77c4 (testnet)", rev: "v0.7.2-rc · b81e07d",
+    rows: [["Status", "Testnet"], ["Network", "chain 731002"], ["Holders", "2,184"], ["Tests", "83 passed"], ["Coverage", "64.7%"], ["Audit", "scheduled"]]
+  },
+  3: {
+    path: "mainnet / zeom-chain / launch", status: '<span class="env-dot" style="background:#f0b34b;box-shadow:none"></span>Awaiting genesis &nbsp; ⋮',
+    sub: "Mainnet · build v1.0.0", btn: "Launch mainnet",
+    navVal: "7", navCon: "05", navStk: "—", navBrg: "ready", navRel: "1.0",
+    ms: [["Token core (ERC-20)", "done"], ["Genesis & devnet", "done"], ["PoS consensus", "done"], ["Staking / vesting", "done"], ["Bridge & wallet SDK", "done"], ["Audit", "done"], ["Mainnet", "wip"]],
+    height: 0, tps: [0, 0], cards: (h, t) => launched ? [["BLOCK HEIGHT", h.toLocaleString(), "+1 / 2s"], ["TPS (1m)", t, "mainnet"], ["VALIDATORS", "7 / 7", "quorum 5"], ["CHAIN ID", "7310", "mainnet"]] : [["BLOCK HEIGHT", "—", "genesis"], ["TPS (1m)", "—", "idle"], ["SIGNATURES", "6 / 7", "genesis"], ["CHAIN ID", "7310", "mainnet"]],
+    nodes: [["Wallet SDK", "ts", "zeom-js 1.0.0", "● published", "—", "orange", ""], ["RPC Gateway", "rust", "eth_* · zeom_*", "● standby", "—", "", "#75879a"], ["Mempool", "rust", "pending=0", "● standby", "—", "purple", "#75879a"], ["Consensus", "PoS", "7 validators · VRF", "● awaiting genesis", "—", "green", "#f0b34b"], ["EVM Execution", "revm", "cancun", "● standby", "—", "red", "#75879a"], ["Bridge Relayer", "rust", "lock / mint", "● standby", "—", "green", "#75879a"]],
+    health: [["zeom-validator", "init", "0 / 7"], ["zeom-rpc", "standby", "3 pods"], ["zeom-indexer", "standby", "1 pod"], ["bridge-relayer", "standby", "1 pod"]],
+    addr: "— (pending deployment)", rev: "v1.0.0 · 9e3f5a1 (signed)",
+    rows: [["Status", "Release"], ["Network", "chain 7310"], ["Holders", "—"], ["Tests", "138 passed"], ["Coverage", "97.4%"], ["Audit", "passed"]]
+  }
+}[S];
+
+let height = C.height;
+$("opsPath").textContent = C.path;
+$("opsStatus").innerHTML = C.status;
+$("conSub").textContent = "Live network graph · " + C.sub;
+$("deployBtn").textContent = C.btn;
+["navVal", "navCon", "navStk", "navBrg", "navRel"].forEach((k) => ($(k).textContent = C[k]));
+$("milestones").innerHTML = C.ms.map(([n, s]) => {
+  const dot = s === "done" ? '<span class="status-dot"></span>' : s === "wip" ? '<span class="status-dot warn"></span>' : '<span class="status-dot" style="background:#2a3542;box-shadow:none"></span>';
+  return `<div class="service" style="${s ? "" : "color:#55657a"}">${dot}${n}</div>`;
+}).join("");
+$("insAddr").textContent = C.addr;
+$("insRev").textContent = C.rev;
+function renderRows() {
+  $("insRows").innerHTML = C.rows.map(([k, v], i) => i === 0
+    ? `<div class="inspect-row"><span>${k}</span><span class="badge" style="${v === "Draft" ? "background:#3a2f17;color:#f0b34b" : ""}">${v}</span></div>`
+    : `<div class="inspect-row"><span>${k}</span><b>${v}</b></div>`).join("");
+}
+renderRows();
+
+function renderCards() {
+  const t = rnd(C.tps[0], C.tps[1]);
+  $("summary").innerHTML = C.cards(height, t).map(([a, b, c]) => `<div class="summary-card"><span>${a}</span><b>${b}</b><em>${c}</em></div>`).join("");
+}
+const POS = ["n1", "n2", "n3", "n4", "n5", "n6"];
+function renderFlow() {
+  const n = C.nodes;
+  const node = (i) => {
+    const [t, s, code, st, ms, col, stc] = n[i];
+    return `<div class="node ${col} ${POS[i]}"><div><div class="node-top"><h4>${t}</h4><small>${s}</small></div><div class="node-code">${code}</div></div><div class="node-foot"><span class="ok" style="${stc ? "color:" + stc : ""}">${st}</span><span>${ms}</span></div></div>`;
+  };
+  $("flow").innerHTML = node(0) + '<div class="arrow a1">→</div>' + node(1) + '<div class="arrow a2">→</div>' + node(2) + '<div class="down">↓</div>' + node(3) + '<div class="arrow a3">←</div>' + node(4) + '<div class="arrow a4">←</div>' + node(5);
+}
+function renderHealth() {
+  $("healthList").innerHTML = C.health.map(([a, b, c]) => {
+    const col = /fail/.test(b) ? "#ef6b75" : /pend|init|stand/.test(b) ? "#f0b34b" : "";
+    return `<div class="health-row"><strong>${a}</strong><span style="${col ? "color:" + col : ""}">${b}</span><span>${c}</span></div>`;
+  }).join("");
+}
+const traces = [];
+let lastTx = 0;
+const bars = Array.from({ length: 64 }, () => (S === 3 ? 0 : rnd(C.tps[0], C.tps[1] * 2)));
+function renderChart() {
+  const max = Math.max(10, ...bars);
+  $("chart").innerHTML = bars.map((v) => `<i style="height:${Math.max(2, (v / max) * 100)}%"></i>`).join("");
+  const avg = bars.reduce((a, c) => a + c, 0) / bars.length;
+  $("chartMeta").textContent = S === 3 && !launched ? "no blocks yet" : `avg ${avg.toFixed(1)} · max ${Math.max(...bars)}`;
+}
+function stamp() { return new Date().toLocaleTimeString("en-GB", { hour12: false }) + "." + String(new Date().getMilliseconds()).padStart(3, "0"); }
+function pushTrace(html) {
+  traces.push(`<div class="trace-line"><b>${stamp()}</b> ${html}</div>`);
+  while (traces.length > 5) traces.shift();
+  $("traceList").innerHTML = traces.join("");
+}
+function blockTrace() {
+  if (S === 3 && !launched) {
+    const o = [
+      `<i>genesis</i> signature collected validator=zeom-validator-${rnd(0, 5)} (6/7)`,
+      `<i>genesis</i> waiting for zeom-validator-6 signature`,
+      `<i>p2p</i> seed peers connected 6/6 latency_avg=${rnd(8, 20)}ms`
+    ];
+    pushTrace(o[rnd(0, o.length - 1)]);
+    return;
+  }
+  height += 1;
+  const v = S === 1 ? 0 : rnd(0, S === 2 ? 3 : 6);
+  lastTx = rnd(C.tps[0], C.tps[1] * 2);
+  pushTrace(`<i>#${height.toLocaleString()}</i> sealed by zeom-validator-${v} txs=${lastTx} gas=${(rnd(5, 290) / 10).toFixed(1)}M`);
+  renderCards();
+  bars.push(lastTx); bars.shift(); renderChart();
+}
+$("liveTag").textContent = S === 3 ? "● STANDBY" : `● LIVE · ${S === 1 ? "devnet" : "testnet"}`;
+if (S === 3) $("liveTag").style.color = "#f0b34b";
+renderCards(); renderFlow(); renderHealth(); renderChart();
+for (let i = 0; i < 5; i++) blockTrace();
+setInterval(blockTrace, S === 1 ? 3000 : 2000);
+
+/* ───────── VS Code ───────── */
+const FILES = {
+  1: { path: "crates/zeom-node/src/genesis.rs", name: "genesis.rs", branch: "feature/genesis-devnet", prob: "⓪ 3  ⚠ 11" },
+  2: { path: "crates/consensus/src/pos.rs", name: "pos.rs", branch: "feature/pos-validator-set", prob: "⓪ 1  ⚠ 4" },
+  3: { path: "crates/zeom-node/src/main.rs", name: "main.rs", branch: "release/v1.0.0", prob: "⓪ 0  ⚠ 0" }
+}[S];
+$("vsTitle").textContent = `${FILES.name} — zeom-chain`;
+$("sbLeft").innerHTML = `⑂ ${FILES.branch}${S < 3 ? "*" : ""} &nbsp; ${FILES.prob.replace("⓪", "✕")}`;
+$("probTab").textContent = S === 1 ? "PROBLEMS 14" : S === 2 ? "PROBLEMS 5" : "PROBLEMS 0";
+$("tabs").innerHTML = [FILES.name, S === 1 ? "lib.rs" : S === 2 ? "slashing.rs" : "config.rs", "Cargo.toml"].map((n, i) =>
+  `<div class="tab" style="${i ? "background:#181818;color:#8b8b8b" : ""}"><span style="color:${n.endsWith(".toml") ? "#9cdcfe" : "#dea584"}">${n.endsWith(".toml") ? "⚙" : "R"}</span>${n}</div>`).join("");
+
+const treeRows = [
+  ["▾ ZEOM-CHAIN", 0],
+  ["▾ crates", 1],
+  ["　▾ consensus", 1],
+  ["　　R pos.rs", 2],
+  ["　　R slashing.rs", 2],
+  ["　　R lib.rs", 1],
+  ["　▾ zeom-node", 1],
+  ["　　R genesis.rs", 1],
+  ["　　R main.rs", 1],
+  ["　　R config.rs", 1],
+  ["　▸ evm", 1],
+  ["　▸ p2p", 1],
+  ["　▸ staking", 2],
+  ["　▸ bridge", 3],
+  ["▸ contracts", 1],
+  ["▸ deploy", 1],
+  ["　Cargo.toml", 1],
+  ["　genesis.mainnet.json", 3]
+];
+$("tree").innerHTML = treeRows.filter((r) => r[1] <= S).map(([t]) => {
+  const active = t.trim().endsWith(FILES.name) ? " active" : "";
+  const ind = t.startsWith("▾ ZEOM") ? "" : " indent";
+  return `<div class="${ind.trim()}${active}">${t.replace("R ", '<span style="color:#dea584">R</span> ')}</div>`;
+}).join("");
+
+const CODE = {
+1: [
+"use std::{fs, path::Path};",
+"",
+"use anyhow::{bail, Context, Result};",
+"use serde::{Deserialize, Serialize};",
+"use zeom_primitives::{Address, BlockHash, U256};",
+"use zeom_crypto::keccak256;",
+"",
+"pub const CHAIN_ID_DEVNET: u64 = 731_001;",
+"pub const CHAIN_ID_MAINNET: u64 = 7_310;",
+"pub const ZEOM_DECIMALS: u8 = 18;",
+"",
+"#[derive(Debug, Clone, Serialize, Deserialize)]",
+"pub struct GenesisAccount {",
+"    pub address: Address,",
+"    pub balance: U256,",
+"    #[serde(default)]",
+"    pub code: Option<Vec<u8>>,",
+"}",
+"",
+"#[derive(Debug, Clone, Serialize, Deserialize)]",
+"pub struct GenesisValidator {",
+"    pub address: Address,",
+"    pub pubkey: [u8; 48],",
+"    pub self_stake: U256,",
+"}",
+"",
+"#[derive(Debug, Clone, Serialize, Deserialize)]",
+"pub struct Genesis {",
+"    pub chain_id: u64,",
+"    pub timestamp: u64,",
+"    pub gas_limit: u64,",
+"    pub epoch_length: u64,",
+"    pub accounts: Vec<GenesisAccount>,",
+"    pub validators: Vec<GenesisValidator>,",
+"}",
+"",
+"impl Genesis {",
+"    pub fn load(path: impl AsRef<Path>) -> Result<Self> {",
+"        let raw = fs::read_to_string(path.as_ref())",
+'            .with_context(|| format!("read genesis {:?}", path.as_ref()))?;',
+"        let genesis: Genesis = serde_json::from_str(&raw)?;",
+"        genesis.validate()?;",
+"        Ok(genesis)",
+"    }",
+"",
+"    pub fn validate(&self) -> Result<()> {",
+"        if self.validators.is_empty() {",
+'            bail!("genesis must contain at least one validator");',
+"        }",
+"        let total: U256 = self.accounts.iter().map(|a| a.balance).sum();",
+"        let max_supply = U256::from(10_000_000_000u64) * U256::exp10(ZEOM_DECIMALS as usize);",
+"        if total > max_supply {",
+'            bail!("genesis allocation {total} exceeds max supply {max_supply}");',
+"        }",
+"        Ok(())",
+"    }",
+"",
+"    pub fn hash(&self) -> BlockHash {",
+'        let encoded = serde_json::to_vec(self).expect("genesis serializes");',
+"        BlockHash::from(keccak256(&encoded))",
+"    }",
+"",
+"    // TODO(dc): vesting 계정 / 재단 multisig 분리",
+"}"
+],
+2: [
+"use std::collections::BTreeMap;",
+"",
+"use zeom_primitives::{Address, U256};",
+"use zeom_crypto::{vrf, Signature};",
+"use crate::{ConsensusError, Epoch, Height, Round};",
+"",
+"const MISSED_BLOCK_LIMIT: u32 = 500;",
+"const JAIL_DURATION: Height = 43_200;",
+"",
+"/// Stake-weighted proposer selection with a VRF seed per round.",
+"pub struct ValidatorSet {",
+"    validators: BTreeMap<Address, Validator>,",
+"    total_power: U256,",
+"    epoch: Epoch,",
+"}",
+"",
+"#[derive(Clone, Debug)]",
+"pub struct Validator {",
+"    pub address: Address,",
+"    pub voting_power: U256,",
+"    pub jailed_until: Option<Height>,",
+"    pub missed_blocks: u32,",
+"}",
+"",
+"impl ValidatorSet {",
+"    pub fn new(epoch: Epoch, validators: Vec<Validator>) -> Self {",
+"        let total_power = validators.iter().map(|v| v.voting_power).sum();",
+"        let validators = validators.into_iter().map(|v| (v.address, v)).collect();",
+"        Self { validators, total_power, epoch }",
+"    }",
+"",
+"    pub fn quorum(&self) -> U256 {",
+"        self.total_power * U256::from(2) / U256::from(3) + U256::from(1)",
+"    }",
+"",
+"    pub fn proposer(&self, height: Height, round: Round) -> Result<&Validator, ConsensusError> {",
+"        let seed = vrf::seed(self.epoch, height, round);",
+"        let mut target = U256::from_be_bytes(seed) % self.total_power;",
+"        for v in self.active() {",
+"            if target < v.voting_power {",
+"                return Ok(v);",
+"            }",
+"            target -= v.voting_power;",
+"        }",
+"        Err(ConsensusError::EmptyValidatorSet)",
+"    }",
+"",
+"    pub fn active(&self) -> impl Iterator<Item = &Validator> {",
+"        self.validators.values().filter(|v| v.jailed_until.is_none())",
+"    }",
+"",
+"    pub fn record_missed(&mut self, addr: &Address, height: Height) {",
+"        if let Some(v) = self.validators.get_mut(addr) {",
+"            v.missed_blocks += 1;",
+"            if v.missed_blocks >= MISSED_BLOCK_LIMIT {",
+"                v.jailed_until = Some(height + JAIL_DURATION);",
+"                self.total_power -= v.voting_power;",
+'                tracing::warn!(%addr, height, "validator jailed: missed blocks");',
+"            }",
+"        }",
+"    }",
+"",
+"    pub fn verify_commit(&self, votes: &[(Address, Signature)]) -> bool {",
+"        let power: U256 = votes",
+"            .iter()",
+"            .filter_map(|(a, _)| self.validators.get(a))",
+"            .map(|v| v.voting_power)",
+"            .sum();",
+"        power >= self.quorum()",
+"    }",
+"",
+"    // FIXME: double-sign slashing 은 evidence pool 붙인 다음에",
+"}"
+],
+3: [
+"use clap::Parser;",
+"use zeom_node::{config::NodeConfig, genesis::Genesis, Node};",
+"use zeom_telemetry::init_tracing;",
+"",
+"#[derive(Parser)]",
+'#[command(name = "zeom-node", version, about = "Zeom Chain full node")]',
+"struct Cli {",
+'    #[arg(long, default_value = "mainnet")]',
+"    network: String,",
+'    #[arg(long, default_value = "/data/zeom")]',
+"    datadir: std::path::PathBuf,",
+"    #[arg(long)]",
+"    validator_key: Option<std::path::PathBuf>,",
+'    #[arg(long, default_value = "0.0.0.0:30310")]',
+"    p2p_addr: String,",
+'    #[arg(long, default_value = "0.0.0.0:8545")]',
+"    rpc_addr: String,",
+"}",
+"",
+"#[tokio::main]",
+"async fn main() -> anyhow::Result<()> {",
+"    let cli = Cli::parse();",
+'    init_tracing("zeom-node")?;',
+"",
+'    let genesis = Genesis::load(cli.datadir.join("genesis.json"))?;',
+'    tracing::info!(chain_id = genesis.chain_id, hash = %genesis.hash(), "genesis loaded");',
+"",
+"    let config = NodeConfig::builder()",
+"        .network(&cli.network)",
+"        .datadir(&cli.datadir)",
+"        .p2p(cli.p2p_addr.parse()?)",
+"        .rpc(cli.rpc_addr.parse()?)",
+"        .validator_key(cli.validator_key.clone())",
+"        .build()?;",
+"",
+"    let node = Node::new(config, genesis).await?;",
+"    let handle = node.start().await?;",
+'    tracing::info!(version = env!("CARGO_PKG_VERSION"), "zeom-node started");',
+"",
+"    tokio::signal::ctrl_c().await?;",
+"    handle.shutdown().await?;",
+"    Ok(())",
+"}"
+]};
+const START = { 1: 45, 2: 47, 3: 38 };
+const code = CODE[S];
+
+const KW = new Set("use pub fn struct impl let mut if else for in return async await self Self match where const enum crate as dyn mod move ref static trait type unsafe while loop break continue".split(" "));
+const TY = new Set("Address BlockHash U256 Result Option Vec Path String Genesis GenesisAccount GenesisValidator ValidatorSet Validator Signature Height Round Epoch ConsensusError Item BTreeMap NodeConfig Node Cli Parser u8 u32 u64 usize bool".split(" "));
+function esc(v) { return v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function hl(line) {
+  if (/^\s*#\[/.test(line)) return `<span class="decor">${esc(line)}</span>`;
+  const re = /(\/\/.*$)|("[^"]*"?)|([A-Za-z_][A-Za-z0-9_]*!?)|(\d[\d_]*(?:u64|u8)?)|([\s\S])/g;
+  let m, h = "";
+  while ((m = re.exec(line))) {
+    if (m[1]) h += `<span class="comment">${esc(m[1])}</span>`;
+    else if (m[2]) h += `<span class="str">${esc(m[2])}</span>`;
+    else if (m[3]) {
+      const w = m[3];
+      if (w.endsWith("!")) h += `<span class="fn">${w}</span>`;
+      else if (KW.has(w)) h += `<span class="kw">${w}</span>`;
+      else if (TY.has(w)) h += `<span class="type">${w}</span>`;
+      else if (line[re.lastIndex] === "(") h += `<span class="fn">${w}</span>`;
+      else if (/^(Ok|Err|Some|None|true|false)$/.test(w)) h += `<span class="type">${w}</span>`;
+      else h += `<span class="var">${w}</span>`;
+    }
+    else if (m[4]) h += `<span class="num">${m[4]}</span>`;
+    else h += esc(m[5]);
+  }
+  return h;
+}
+
+let lines = code.slice(0, START[S]).map(hl);
+let gi = START[S], ci = 0, partial = "", lastKeyTime = 0;
+const codeArea = $("codeArea"), lineNumbers = $("lineNumbers");
+function renderCode() {
+  const r = [...lines];
+  if (gi < code.length) r.push(hl(partial));
+  lineNumbers.innerHTML = r.map((_, i) => i + 1).join("<br>");
+  codeArea.innerHTML = r.join("<br>") + '<span class="cursor"></span>';
+  $("linePos").textContent = r.length;
+  $("colPos").textContent = partial.length + 1;
+  requestAnimationFrame(() => {
+    const t = Math.max(0, codeArea.scrollHeight - codeArea.clientHeight);
+    codeArea.scrollTop = t; lineNumbers.scrollTop = t;
+  });
+}
+function advance() {
+  if (gi >= code.length) return;
+  const t = code[gi];
+  if (ci < t.length) partial += t[ci++];
+  else { lines.push(hl(t)); gi++; ci = 0; partial = ""; }
+  renderCode();
+}
+
+/* ───────── 터미널 ───────── */
+const term = $("terminalLog");
+const LOGS = {
+  1: [["CARGO", "check -p zeom-node", "Checking zeom-node v0.3.0"], ["WARN", "unused variable `epoch_seed`", "crates/consensus/src/pos.rs:211"], ["TEST", "cargo test -p zeom-node genesis", "running 9 tests"], ["OK", "test result: ok", "9 passed; 0 failed; 3 ignored"], ["NODE", "devnet block sealed", `height=#H validators=1`], ["CARGO", "clippy --workspace", "17 warnings emitted"], ["ERR", "zeom-indexer exited", "decode receipt: unexpected log topic length"], ["NODE", "rpc eth_blockNumber", "200 · 3 ms"]],
+  2: [["CARGO", "build --release -p zeom-node", "Compiling zeom-consensus v0.7.2"], ["TEST", "cargo test -p consensus", "running 46 tests"], ["OK", "test result: ok", "44 passed; 0 failed"], ["ERR", "pos::tests::double_sign_slash", "assertion failed: jailed_until.is_some()"], ["NODE", "testnet block finalized", `height=#H votes=4/4`], ["OK", "bench proposer_selection", "1.84 µs/iter (-6.1%)"], ["CARGO", "clippy -p consensus", "4 warnings emitted"], ["NODE", "p2p peers", "3 connected · 11 ms"]],
+  3: [["OK", "cargo test --workspace", "312 passed; 0 failed; 0 ignored"], ["OK", "cargo audit", "0 vulnerabilities found"], ["OK", "release build", "zeom-node 1.0.0 (9e3f5a1) sha256 ok"], ["NODE", "genesis status", "signatures 6/7 · waiting validator-6"], ["NODE", "p2p seed peers", "6/6 connected"]]
+}[S];
+const tagCls = { OK: "log-ok", CARGO: "log-mcp", TEST: "log-tool", NODE: "log-mcp", WARN: "log-tool", ERR: "" };
+let li = 0;
+function tlog(kind, a, b) {
+  const d = document.createElement("div");
+  d.className = "log-line";
+  const cls = tagCls[kind] || "";
+  const style = kind === "ERR" ? ' style="color:#f14c4c"' : kind === "WARN" ? ' style="color:#cca700"' : "";
+  d.innerHTML = `<span class="log-time">${new Date().toLocaleTimeString("en-GB", { hour12: false })}</span> <span class="${cls}"${style}>[${kind}]</span> <span class="log-detail">${a}</span> <span class="log-json">${b.replace("#H", "#" + height.toLocaleString())}</span>`;
+  term.appendChild(d);
+  while (term.children.length > 30) term.removeChild(term.firstChild);
+  term.scrollTop = term.scrollHeight;
+}
+function nextTlog() {
+  if (S === 3 && !launched) { const l = LOGS[li++ % LOGS.length]; tlog(...l); return; }
+  if (S === 3) { tlog("NODE", "block finalized", `height=#${height.toLocaleString()} votes=7/7`); return; }
+  tlog(...LOGS[li++ % LOGS.length]);
+}
+for (let i = 0; i < 12; i++) nextTlog();
+setInterval(nextTlog, 1300);
+
+/* ───────── 완료 ───────── */
+function launch() {
+  if (S !== 3 || launched) return;
+  while (gi < code.length) advance();
+  $("deployBtn").textContent = "Launching…";
+  zeomCelebrate({ delay: 2600 });
+  tlog("NODE", "zeomctl genesis sign --validator 6", "submitting signature");
+  setTimeout(() => tlog("OK", "genesis sealed", "signatures 7/7 · hash 0x3d7e91c4…a9c1"), 700);
+  setTimeout(() => {
+    launched = true;
+    height = 0;
+    tlog("OK", "block #0 (genesis) committed", "chain_id=7310");
+    C.nodes = C.nodes.map((n) => { const x = [...n]; x[6] = ""; return x; });
+    C.nodes[1][3] = "● 200 OK"; C.nodes[1][4] = "8 ms";
+    C.nodes[2][3] = "● ready"; C.nodes[2][4] = "1 ms";
+    C.nodes[3][3] = "● finalized"; C.nodes[3][4] = "2.0 s";
+    C.nodes[4][3] = "● ok"; C.nodes[4][4] = "12 ms";
+    C.nodes[5][3] = "● watching"; C.nodes[5][4] = "—";
+    C.health = [["zeom-validator", "healthy", "7 pods"], ["zeom-rpc", "healthy", "3 pods"], ["zeom-indexer", "healthy", "1 pod"], ["bridge-relayer", "healthy", "1 pod"]];
+    C.tps = [4, 22];
+    C.rows[0][1] = "Live"; C.rows[2][1] = "7";
+    $("insAddr").textContent = "0x5E0d…4e01";
+    renderRows(); renderFlow(); renderHealth(); renderCards();
+    $("opsStatus").innerHTML = '<span class="env-dot"></span>Mainnet operational &nbsp; ⋮';
+    $("opsPath").textContent = "mainnet / zeom-chain / overview";
+    $("liveTag").textContent = "● LIVE · mainnet";
+    $("liveTag").style.color = "";
+    $("deployBtn").textContent = "Mainnet live";
+    $("milestones").lastElementChild.style.color = "";
+    $("milestones").lastElementChild.querySelector(".status-dot").className = "status-dot";
+    blockTrace();
+  }, 1500);
+  setTimeout(() => tlog("OK", "zeom-node 1.0.0", "mainnet started · 7/7 validators online"), 2200);
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.altKey || e.ctrlKey || e.metaKey || ["F5", "F11", "F12"].includes(e.key)) return;
+  e.preventDefault();
+  if (S === 3 && e.key === "Enter") { launch(); return; }
+  const now = performance.now();
+  const gap = lastKeyTime ? now - lastKeyTime : 160;
+  lastKeyTime = now;
+  const n = gap < 45 ? 3 : gap < 80 ? 2 : 1;
+  for (let i = 0; i < n; i++) setTimeout(advance, i * 28);
+});
+codeArea.addEventListener("scroll", () => { lineNumbers.scrollTop = codeArea.scrollTop; });
+renderCode();
+</script>
+</body>
+</html>

@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>haven-chain — Visual Studio Code</title>
+<style>
+    :root {
+      --desktop-bg: #0a0f18;
+      --window-bg: #181818;
+      --window-border: rgba(255, 255, 255, 0.12);
+
+      --vscode-sidebar: #181818;
+      --vscode-activity: #181818;
+      --vscode-editor: #1e1e1e;
+      --vscode-panel: #181818;
+      --vscode-tab: #1f1f1f;
+      --vscode-blue: #007acc;
+
+      --docker-bg: #f7f8fa;
+      --docker-sidebar: #ffffff;
+      --docker-border: #e4e7ec;
+      --docker-text: #1f2937;
+      --docker-muted: #667085;
+      --docker-blue: #2496ed;
+
+      --green: #22c55e;
+      --yellow: #facc15;
+      --orange: #fb923c;
+      --red: #f87171;
+      --cyan: #22d3ee;
+      --purple: #c084fc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      color: #e5e7eb;
+      font-family:
+        Inter,
+        Pretendard,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(0, 122, 204, 0.13), transparent 30%),
+        radial-gradient(circle at 82% 72%, rgba(36, 150, 237, 0.12), transparent 28%),
+        linear-gradient(145deg, #090d15, #101827 65%, #080c13);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .desktop {
+      width: 100vw;
+      height: 100vh;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: minmax(600px, 1.35fr) minmax(460px, 0.9fr);
+      gap: 22px;
+    }
+
+    .app-window {
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--window-border);
+      border-radius: 14px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+    }
+
+    .window-topbar {
+      height: 38px;
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: 110px 1fr 110px;
+      align-items: center;
+      padding: 0 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: #202020;
+      font-size: 12px;
+      user-select: none;
+    }
+
+    .docker-window .window-topbar {
+      color: #344054;
+      border-bottom-color: var(--docker-border);
+      background: #ffffff;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 7px;
+    }
+
+    .traffic-light {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .traffic-light.red {
+      background: #ff5f57;
+    }
+
+    .traffic-light.yellow {
+      background: #febc2e;
+    }
+
+    .traffic-light.green {
+      background: #28c840;
+    }
+
+    .window-title {
+      overflow: hidden;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      opacity: 0.8;
+    }
+
+    .topbar-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      opacity: 0.7;
+    }
+
+    /* VS Code */
+
+    .vscode-window {
+      background: var(--vscode-editor);
+    }
+
+    .vscode-main {
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      flex: 1;
+      display: grid;
+      grid-template-columns: 48px 220px minmax(0, 1fr);
+    }
+
+    .activity-bar {
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      gap: 18px;
+      color: #858585;
+      border-right: 1px solid #2a2a2a;
+      background: var(--vscode-activity);
+    }
+
+    .activity-icon {
+      width: 48px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      font-size: 20px;
+      cursor: default;
+    }
+
+    .activity-icon.active {
+      color: #ffffff;
+    }
+
+    .activity-icon.active::before {
+      content: "";
+      width: 2px;
+      position: absolute;
+      inset: 0 auto 0 0;
+      background: #ffffff;
+    }
+
+    .explorer {
+      min-width: 0;
+      border-right: 1px solid #2a2a2a;
+      background: var(--vscode-sidebar);
+    }
+
+    .explorer-title {
+      height: 38px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      color: #bbbbbb;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+    }
+
+    .folder-title {
+      height: 28px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #d4d4d4;
+      font-size: 11px;
+      font-weight: 700;
+      background: #222222;
+    }
+
+    .file-tree {
+      padding: 5px 0;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .tree-row {
+      height: 25px;
+      padding-right: 8px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #cccccc;
+      white-space: nowrap;
+    }
+
+    .tree-row:hover,
+    .tree-row.selected {
+      background: #2a2d2e;
+    }
+
+    .indent-1 {
+      padding-left: 14px;
+    }
+
+    .indent-2 {
+      padding-left: 30px;
+    }
+
+    .indent-3 {
+      padding-left: 46px;
+    }
+
+    .folder-icon {
+      color: #dcb67a;
+    }
+
+    .js-icon {
+      color: #f7df1e;
+    }
+
+    .docker-icon {
+      color: #2496ed;
+    }
+
+    .json-icon {
+      color: #fbc02d;
+    }
+
+    .editor-area {
+      min-width: 0;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: 36px minmax(0, 0.78fr) 6px minmax(0, 1fr) 22px;
+      background: var(--vscode-editor);
+    }
+
+    .editor-tabs {
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+      border-bottom: 1px solid #2a2a2a;
+      background: #181818;
+    }
+
+    .editor-tab {
+      min-width: 145px;
+      padding: 0 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #a9a9a9;
+      border-right: 1px solid #2a2a2a;
+      font-size: 12px;
+      background: #181818;
+    }
+
+    .editor-tab.active {
+      color: #ffffff;
+      border-top: 1px solid var(--vscode-blue);
+      background: var(--vscode-tab);
+    }
+
+    .code-editor {
+      min-width: 0;
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+      overflow: auto;
+      overscroll-behavior: contain;
+      padding: 12px 0;
+      background: #1e1e1e;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .code-line {
+      min-width: 650px;
+      display: grid;
+      grid-template-columns: 42px 1fr;
+    }
+
+    .line-number {
+      padding-right: 12px;
+      color: #6e7681;
+      text-align: right;
+      user-select: none;
+    }
+
+    .code-text {
+      color: #d4d4d4;
+      white-space: pre;
+    }
+
+    .code-keyword {
+      color: #c586c0;
+    }
+
+    .code-command {
+      color: #dcdcaa;
+    }
+
+    .code-string {
+      color: #ce9178;
+    }
+
+    .code-comment {
+      color: #6a9955;
+    }
+
+    .code-option {
+      color: #9cdcfe;
+    }
+
+    .code-path {
+      color: #4ec9b0;
+    }
+
+
+    .typing-cursor {
+      width: 1px;
+      height: 15px;
+      display: inline-block;
+      margin-left: 1px;
+      vertical-align: -2px;
+      background: #f3f4f6;
+      animation: blink 0.8s steps(2, start) infinite;
+    }
+
+    .resize-handle {
+      border-top: 1px solid #313131;
+      border-bottom: 1px solid #313131;
+      background: #202020;
+    }
+
+    .terminal-panel {
+      min-width: 0;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: 34px minmax(0, 1fr);
+      background: var(--vscode-panel);
+    }
+
+    .terminal-header {
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #2a2a2a;
+      font-size: 11px;
+    }
+
+    .terminal-tabs {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: #969696;
+    }
+
+    .terminal-tab {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .terminal-tab.active {
+      color: #ffffff;
+    }
+
+    .terminal-tab.active::after {
+      content: "";
+      height: 1px;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: #ffffff;
+    }
+
+    .terminal-controls {
+      display: flex;
+      gap: 14px;
+      color: #a0a0a0;
+      font-size: 14px;
+    }
+
+    .terminal-output {
+      min-height: 0;
+      height: 100%;
+      overflow-y: auto;
+      padding: 10px 13px 20px;
+      color: #d4d4d4;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.55;
+      scrollbar-color: #424242 transparent;
+      scrollbar-width: thin;
+    }
+
+    .terminal-line {
+      min-height: 18px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      animation: terminal-line-in 0.18s ease-out;
+    }
+
+    .log-step {
+      color: #4fc1ff;
+      font-weight: 700;
+    }
+
+    .log-success {
+      color: #4ec9b0;
+    }
+
+    .log-warning {
+      color: #dcdcaa;
+    }
+
+    .log-command {
+      color: #d7ba7d;
+    }
+
+    .log-hash {
+      color: #c586c0;
+    }
+
+    .log-muted {
+      color: #858585;
+    }
+
+    .terminal-cursor {
+      width: 7px;
+      height: 14px;
+      display: inline-block;
+      vertical-align: -2px;
+      background: #d4d4d4;
+      animation: blink 1s steps(2, start) infinite;
+    }
+
+    .vscode-statusbar {
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #ffffff;
+      background: var(--vscode-blue);
+      font-size: 10px;
+    }
+
+    .status-group {
+      display: flex;
+      gap: 14px;
+    }
+
+    /* Docker Desktop */
+
+    .docker-window {
+      color: var(--docker-text);
+      background: var(--docker-bg);
+    }
+
+    .docker-main {
+      min-height: 0;
+      flex: 1;
+      display: grid;
+      grid-template-columns: 168px minmax(0, 1fr);
+      background: var(--docker-bg);
+    }
+
+    .docker-sidebar {
+      padding: 17px 10px;
+      border-right: 1px solid var(--docker-border);
+      background: var(--docker-sidebar);
+    }
+
+    .docker-brand {
+      padding: 0 10px 22px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--docker-blue);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .docker-whale {
+      font-size: 24px;
+    }
+
+    .docker-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .docker-nav-item {
+      height: 38px;
+      padding: 0 11px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #475467;
+      border-radius: 7px;
+      font-size: 12px;
+    }
+
+    .docker-nav-item.active {
+      color: #175cd3;
+      background: #eff8ff;
+      font-weight: 700;
+    }
+
+    .docker-nav-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    .docker-content {
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      padding: 22px;
+    }
+
+    .docker-content-header {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .docker-content-title h1 {
+      margin: 0 0 5px;
+      color: #101828;
+      font-size: 21px;
+    }
+
+    .docker-content-title p {
+      margin: 0;
+      color: var(--docker-muted);
+      font-size: 12px;
+    }
+
+    .engine-status {
+      padding: 7px 11px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #067647;
+      border: 1px solid #abefc6;
+      border-radius: 20px;
+      background: #ecfdf3;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .engine-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #12b76a;
+      box-shadow: 0 0 0 3px rgba(18, 183, 106, 0.12);
+    }
+
+    .build-card {
+      margin-bottom: 18px;
+      padding: 15px;
+      border: 1px solid var(--docker-border);
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 2px 5px rgba(16, 24, 40, 0.03);
+    }
+
+    .build-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .build-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #101828;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .build-spinner {
+      width: 17px;
+      height: 17px;
+      border: 2px solid #d1e9ff;
+      border-top-color: var(--docker-blue);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    .build-status {
+      color: #175cd3;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .build-progress-track {
+      height: 7px;
+      margin: 14px 0 9px;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #eaecf0;
+    }
+
+    .build-progress-bar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2496ed, #53b1fd);
+      transition: width 0.55s ease;
+    }
+
+    .build-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--docker-muted);
+      font-size: 10px;
+    }
+
+    .container-toolbar {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .container-toolbar strong {
+      color: #101828;
+      font-size: 13px;
+    }
+
+    .container-count {
+      color: var(--docker-muted);
+      font-size: 11px;
+    }
+
+    .container-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .container-row {
+      min-height: 74px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 30px minmax(120px, 1.2fr) minmax(100px, 0.9fr) 75px 38px;
+      align-items: center;
+      gap: 9px;
+      overflow: hidden;
+      border: 1px solid var(--docker-border);
+      border-radius: 9px;
+      background: #ffffff;
+      box-shadow: 0 2px 4px rgba(16, 24, 40, 0.025);
+      animation: container-in 0.45s ease-out;
+    }
+
+    .container-state-icon {
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: #eff8ff;
+      font-size: 13px;
+    }
+
+    .container-name {
+      min-width: 0;
+    }
+
+    .container-name strong {
+      display: block;
+      overflow: hidden;
+      color: #101828;
+      font-size: 11.5px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .container-name span,
+    .container-image {
+      display: block;
+      margin-top: 4px;
+      overflow: hidden;
+      color: var(--docker-muted);
+      font-size: 9.5px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .container-image {
+      margin-top: 0;
+      color: #475467;
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+
+    .state-badge {
+      width: fit-content;
+      padding: 4px 7px;
+      border-radius: 12px;
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .state-badge.creating {
+      color: #b54708;
+      background: #fffaeb;
+    }
+
+    .state-badge.running {
+      color: #067647;
+      background: #ecfdf3;
+    }
+
+    .state-badge.waiting {
+      color: #344054;
+      background: #f2f4f7;
+    }
+
+    .row-spinner {
+      width: 14px;
+      height: 14px;
+      margin: auto;
+      border: 2px solid #d1e9ff;
+      border-top-color: var(--docker-blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .row-check {
+      color: #12b76a;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .empty-state {
+      padding: 34px 15px;
+      color: var(--docker-muted);
+      border: 1px dashed #d0d5dd;
+      border-radius: 10px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.55);
+      font-size: 11px;
+    }
+
+    .build-complete .build-spinner {
+      border: none;
+      background: #12b76a;
+      animation: none;
+    }
+
+    .build-complete .build-spinner::after {
+      content: "✓";
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      font-size: 11px;
+      line-height: 17px;
+    }
+
+    .build-complete .build-status {
+      color: #067647;
+    }
+
+    @keyframes terminal-line-in {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes container-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 1100px) {
+      body {
+        overflow: auto;
+      }
+
+      .desktop {
+        height: auto;
+        min-height: 100vh;
+        grid-template-columns: 1fr;
+      }
+
+      .app-window {
+        min-height: 720px;
+      }
+
+      
+    }
+
+    @media (max-width: 720px) {
+      .desktop {
+        padding: 10px;
+      }
+
+      .vscode-main {
+        grid-template-columns: 42px 150px minmax(0, 1fr);
+      }
+
+      .docker-main {
+        grid-template-columns: 120px minmax(0, 1fr);
+      }
+
+      .container-row {
+        grid-template-columns: 26px 1fr 65px 30px;
+      }
+
+      .container-image {
+        display: none;
+      }
+    }
+  
+.desktop{grid-template-columns:minmax(600px,1.25fr) minmax(500px,1fr)}
+.docker-content{overflow-x:hidden}
+.engine-status{white-space:nowrap}
+.container-row{grid-template-columns:28px minmax(0,1.3fr) minmax(0,0.9fr) 84px 22px;gap:8px;min-height:62px;padding:10px 12px}
+.state-badge{white-space:nowrap}
+.code-line{min-width:0}
+</style>
+<!-- DW-SITE --><meta name="robots" content="noindex,nofollow,noarchive"><script>if("serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});</script><!-- DW-GA --><script>(function(){try{if(localStorage.getItem('dw-noga'))return;}catch(e){}window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','G-ZMQZ7X9F3J');var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-ZMQZ7X9F3J';(document.head||document.documentElement).appendChild(s);})();</script>
+</head>
+<body>
+  <main class="desktop">
+    <section class="app-window vscode-window">
+      <header class="window-topbar">
+        <div class="traffic-lights">
+          <span class="traffic-light red"></span>
+          <span class="traffic-light yellow"></span>
+          <span class="traffic-light green"></span>
+        </div>
+        <div class="window-title" id="winTitle">HavenToken.sol — haven-chain — Visual Studio Code</div>
+        <div class="topbar-actions"><span>◫</span><span>⌘</span></div>
+      </header>
+
+      <div class="vscode-main">
+        <aside class="activity-bar">
+          <div class="activity-icon active">⌘</div>
+          <div class="activity-icon">⌕</div>
+          <div class="activity-icon">⑂</div>
+          <div class="activity-icon">▷</div>
+          <div class="activity-icon">▦</div>
+        </aside>
+
+        <aside class="explorer">
+          <div class="explorer-title">EXPLORER</div>
+          <div class="folder-title"><span>⌄</span><span>HAVEN-CHAIN</span></div>
+          <div class="file-tree" id="fileTree"></div>
+        </aside>
+
+        <section class="editor-area">
+          <div class="editor-tabs" id="editorTabs"></div>
+          <div id="codeEditor" class="code-editor"></div>
+          <div class="resize-handle"></div>
+          <section class="terminal-panel">
+            <header class="terminal-header">
+              <div class="terminal-tabs">
+                <div id="problemsTab">PROBLEMS</div>
+                <div>OUTPUT</div>
+                <div>DEBUG CONSOLE</div>
+                <div class="terminal-tab active">TERMINAL</div>
+              </div>
+              <div class="terminal-controls"><span>＋</span><span>⌫</span><span>⋯</span></div>
+            </header>
+            <div id="terminalOutput" class="terminal-output"></div>
+          </section>
+          <footer class="vscode-statusbar">
+            <div class="status-group">
+              <span id="branchName">⑂ main</span>
+              <span>↻</span>
+              <span id="errCount">ⓧ 0</span>
+              <span id="warnCount">⚠ 0</span>
+            </div>
+            <div class="status-group">
+              <span id="cursorPos">Ln 1, Col 1</span>
+              <span id="indentInfo">Spaces: 4</span>
+              <span>UTF-8</span>
+              <span id="langName">Solidity</span>
+            </div>
+          </footer>
+        </section>
+      </div>
+    </section>
+
+    <section class="app-window docker-window">
+      <header class="window-topbar">
+        <div class="traffic-lights">
+          <span class="traffic-light red"></span>
+          <span class="traffic-light yellow"></span>
+          <span class="traffic-light green"></span>
+        </div>
+        <div class="window-title">Docker Desktop</div>
+        <div class="topbar-actions"><span>⚙</span><span>?</span></div>
+      </header>
+
+      <div class="docker-main">
+        <aside class="docker-sidebar">
+          <div class="docker-brand"><span class="docker-whale">🐳</span><span>Docker</span></div>
+          <nav class="docker-nav">
+            <div class="docker-nav-item active"><span class="docker-nav-icon">▣</span><span>Containers</span></div>
+            <div class="docker-nav-item"><span class="docker-nav-icon">◈</span><span>Images</span></div>
+            <div class="docker-nav-item"><span class="docker-nav-icon">◉</span><span>Volumes</span></div>
+            <div class="docker-nav-item"><span class="docker-nav-icon">▤</span><span>Builds</span></div>
+            <div class="docker-nav-item"><span class="docker-nav-icon">◌</span><span>Extensions</span></div>
+          </nav>
+        </aside>
+
+        <section class="docker-content">
+          <header class="docker-content-header">
+            <div class="docker-content-title">
+              <h1>Containers</h1>
+              <p>Local Docker Compose applications and containers</p>
+            </div>
+            <div class="engine-status"><span class="engine-dot"></span><span>Engine running</span></div>
+          </header>
+
+          <section id="buildCard" class="build-card">
+            <div class="build-card-top">
+              <div class="build-name">
+                <span id="buildSpinner" class="build-spinner"></span>
+                <div>
+                  <div id="projectName">haven-devnet</div>
+                  <div id="buildDescription" style="margin-top:3px;color:#667085;font-size:10px;font-weight:400;">Building Compose application</div>
+                </div>
+              </div>
+              <span id="buildStatus" class="build-status">BUILDING</span>
+            </div>
+            <div class="build-progress-track"><div id="buildProgressBar" class="build-progress-bar"></div></div>
+            <div class="build-meta">
+              <span id="buildStepText">Preparing build context</span>
+              <span id="buildElapsed">0.0s</span>
+            </div>
+          </section>
+
+          <div class="container-toolbar">
+            <strong id="projectName2">haven-devnet</strong>
+            <span id="containerCount" class="container-count">0 containers</span>
+          </div>
+          <div id="containerList" class="container-list"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+// stage: 1 = 초반 작업, 2 = 중반 작업, 3 = 마무리 (Enter 로 완료)
+const HAVEN_STAGE = (() => {
+  const q = new URLSearchParams(location.search).get("stage");
+  const h = (location.hash || "").replace("#", "");
+  const v = parseInt(q || h || "1", 10);
+  return [1, 2, 3].includes(v) ? v : 1;
+})();
+document.addEventListener("keydown", (e) => {
+  const d = e.code && e.code.startsWith("Digit") ? e.code.slice(5) : e.key;
+  if (e.altKey && ["1", "2", "3"].includes(d)) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    location.hash = "#" + d;
+    location.reload();
+  }
+}, true);
+
+// 완료 대화상자 (Enter "탁!" 이후) — Windows 스타일
+function havenCelebrate(opts) {
+  if (document.getElementById("havenDone")) return;
+  const o = Object.assign({ delay: 0 }, opts || {});
+  const css = `
+#havenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
+#havenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
+  box-shadow:0 32px 64px rgba(0,0,0,.37),0 2px 21px rgba(0,0,0,.27);overflow:hidden;animation:hdPop .18s cubic-bezier(.1,.9,.2,1)}
+@keyframes hdFade{from{opacity:0}}
+@keyframes hdPop{from{opacity:0;transform:scale(.96)}}
+#havenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
+#havenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
+#havenDone .hd-title .sp{flex:1}
+#havenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
+#havenDone .hd-x:hover{background:#c42b1c;color:#fff}
+#havenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
+#havenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
+#havenDone .hd-ok svg{width:18px;height:18px}
+#havenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
+#havenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
+#havenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
+#havenDone dd{margin:0;color:#1b1b1b}
+#havenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
+#havenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
+#havenDone .hd-btn:hover{background:#f6f6f6}
+#havenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
+#havenDone .hd-btn.pri:hover{background:#1b75c4}
+`;
+  setTimeout(() => {
+    const st = document.createElement("style");
+    st.textContent = css;
+    document.head.appendChild(st);
+    const root = document.createElement("div");
+    root.id = "havenDone";
+    const now = new Date();
+    const p2 = (n) => String(n).padStart(2, "0");
+    const ts = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
+    root.innerHTML = `
+      <div class="hd-win" role="dialog" aria-modal="true">
+        <div class="hd-title"><span class="ic">H</span><span>Haven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
+        <div class="hd-body">
+          <div class="hd-ok"><svg viewBox="0 0 16 16"><path d="M3.2 8.4l3 3 6.6-6.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <h2>배포가 완료되었습니다.</h2>
+            <p>해븐코인(HAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
+            <dl>
+              <dt>네트워크</dt><dd>Haven Mainnet (chain 7310)</dd>
+              <dt>검증 노드</dt><dd>7 / 7 온라인</dd>
+              <dt>테스트</dt><dd>138 / 138 통과</dd>
+              <dt>완료 시각</dt><dd>${ts}</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="hd-foot"><button class="hd-btn pri" data-close>확인</button><button class="hd-btn" data-close>닫기</button></div>
+      </div>`;
+    document.body.appendChild(root);
+    root.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => root.remove()));
+    root.querySelector(".hd-btn.pri").focus({ preventScroll: true });
+
+    // 제목 표시줄 드래그
+    const win = root.querySelector(".hd-win"), bar = root.querySelector(".hd-title");
+    let dx = 0, dy = 0, sx = 0, sy = 0, drag = false;
+    bar.addEventListener("mousedown", (e) => { if (e.target.closest("button")) return; drag = true; sx = e.clientX - dx; sy = e.clientY - dy; e.preventDefault(); });
+    addEventListener("mousemove", (e) => { if (!drag) return; dx = e.clientX - sx; dy = e.clientY - sy; win.style.transform = `translate(${dx}px,${dy}px)`; });
+    addEventListener("mouseup", () => { drag = false; });
+  }, o.delay);
+}
+document.addEventListener("keydown", (e) => {
+  const d = document.getElementById("havenDone");
+  if (!d) return;
+  if (e.key === "Escape" || e.key === "Enter" || e.key === " ") { d.remove(); }
+  e.stopPropagation(); e.preventDefault();
+}, true);
+
+
+const S = HAVEN_STAGE;
+const $ = (id) => document.getElementById(id);
+
+/* ───────────── 파일 트리 ───────────── */
+const tree = [
+  [1, "⌄", "folder", "contracts"],
+  [2, "⌄", "folder", "token"],
+  [3, "", "sol", "HavenToken.sol", 1],
+  [3, "", "sol", "IHavenToken.sol", 1],
+  [2, S >= 2 ? "⌄" : "›", "folder", "staking", 2],
+  [3, "", "sol", "HavenStaking.sol", 2],
+  [3, "", "sol", "HavenValidatorSet.sol", 2],
+  [2, "›", "folder", "vesting", 2],
+  [2, "›", "folder", "bridge", 3],
+  [2, "›", "folder", "interfaces", 1],
+  [1, "›", "folder", "node", 1],
+  [1, "›", "folder", "test", 1],
+  [1, S === 3 ? "⌄" : "›", "folder", "scripts", 1],
+  [2, "", "ts", "deploy-mainnet.ts", 3],
+  [1, "›", "folder", "config", 1],
+  [1, "", "docker", S === 1 ? "docker-compose.devnet.yml" : S === 2 ? "docker-compose.testnet.yml" : "docker-compose.mainnet.yml", 1],
+  [1, "", "toml", "foundry.toml", 1],
+  [1, "", "json", "package.json", 1],
+  [1, "", "md", "README.md", 1]
+];
+const activeFile = S === 1 ? "HavenToken.sol" : S === 2 ? "HavenStaking.sol" : "deploy-mainnet.ts";
+const iconMap = {
+  folder: '<span class="folder-icon">📁</span>',
+  sol: '<span style="color:#a78bfa">◆</span>',
+  ts: '<span style="color:#3b82f6;font-weight:700">TS</span>',
+  docker: '<span class="docker-icon">◆</span>',
+  toml: '<span>⚙</span>',
+  json: '<span class="json-icon">{ }</span>',
+  md: '<span style="color:#60a5fa">M↓</span>'
+};
+$("fileTree").innerHTML = tree
+  .filter((r) => (r[4] || 1) <= S)
+  .filter((r) => {
+    if (r[3] === "HavenStaking.sol" || r[3] === "HavenValidatorSet.sol") return S >= 2;
+    if (r[3] === "deploy-mainnet.ts") return S === 3;
+    return true;
+  })
+  .map((r) => `<div class="tree-row indent-${r[0]}${r[3] === activeFile ? " selected" : ""}">${r[1] ? `<span>${r[1]}</span>` : ""}${iconMap[r[2]]}<span>${r[3]}</span></div>`)
+  .join("");
+
+const tabsByStage = {
+  1: [["HavenToken.sol", "sol"], ["IHavenToken.sol", "sol"], ["foundry.toml", "toml"]],
+  2: [["HavenStaking.sol", "sol"], ["HavenValidatorSet.sol", "sol"], ["HavenStaking.t.sol", "sol"]],
+  3: [["deploy-mainnet.ts", "ts"], ["mainnet.ts", "ts"], ["docker-compose.mainnet.yml", "docker"]]
+};
+$("editorTabs").innerHTML = tabsByStage[S]
+  .map((t, i) => `<div class="editor-tab${i === 0 ? " active" : ""}">${iconMap[t[1]]}<span>${t[0]}</span>${i === 0 ? "<span>×</span>" : ""}</div>`)
+  .join("");
+$("winTitle").textContent = `${activeFile} — haven-chain — Visual Studio Code`;
+$("branchName").textContent = S === 1 ? "⑂ feature/token-core*" : S === 2 ? "⑂ feature/staking-vesting*" : "⑂ release/v1.0.0";
+$("errCount").textContent = S === 1 ? "ⓧ 3" : S === 2 ? "ⓧ 1" : "ⓧ 0";
+$("warnCount").textContent = S === 1 ? "⚠ 14" : S === 2 ? "⚠ 6" : "⚠ 0";
+$("problemsTab").textContent = S === 1 ? "PROBLEMS 17" : S === 2 ? "PROBLEMS 7" : "PROBLEMS";
+$("langName").textContent = S === 3 ? "TypeScript" : "Solidity";
+$("indentInfo").textContent = S === 3 ? "Spaces: 2" : "Spaces: 4";
+
+/* ───────────── 코드 ───────────── */
+const CODE = {
+1: [
+"// SPDX-License-Identifier: BUSL-1.1",
+"pragma solidity ^0.8.24;",
+"",
+'import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";',
+'import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";',
+'import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";',
+'import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";',
+"",
+"/// @title HAVEN — Haven Chain native utility token",
+"/// @notice Fixed max supply, role-gated minting, pausable transfers.",
+"contract HavenToken is ERC20, ERC20Permit, AccessControl, Pausable {",
+'    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");',
+'    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");',
+"",
+"    uint256 public constant MAX_SUPPLY = 10_000_000_000 ether;",
+"    uint256 public constant GENESIS_ALLOCATION = 2_500_000_000 ether;",
+"",
+"    error MaxSupplyExceeded(uint256 requested, uint256 available);",
+"    error ZeroAddress();",
+"",
+"    event TreasuryUpdated(address indexed previous, address indexed current);",
+"",
+"    address public treasury;",
+"",
+"    constructor(address admin, address treasury_)",
+'        ERC20("Haven Coin", "HAVEN")',
+'        ERC20Permit("Haven Coin")',
+"    {",
+"        if (admin == address(0) || treasury_ == address(0)) revert ZeroAddress();",
+"        _grantRole(DEFAULT_ADMIN_ROLE, admin);",
+"        _grantRole(MINTER_ROLE, admin);",
+"        _grantRole(PAUSER_ROLE, admin);",
+"        treasury = treasury_;",
+"        _mint(treasury_, GENESIS_ALLOCATION);",
+"    }",
+"",
+"    function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE) {",
+"        uint256 available = MAX_SUPPLY - totalSupply();",
+"        if (amount > available) revert MaxSupplyExceeded(amount, available);",
+"        _mint(to, amount);",
+"    }",
+"",
+"    function burn(uint256 amount) external {",
+"        _burn(msg.sender, amount);",
+"    }",
+"",
+"    function setTreasury(address next) external onlyRole(DEFAULT_ADMIN_ROLE) {",
+"        if (next == address(0)) revert ZeroAddress();",
+"        emit TreasuryUpdated(treasury, next);",
+"        treasury = next;",
+"    }",
+"",
+"    function pause() external onlyRole(PAUSER_ROLE) { _pause(); }",
+"    function unpause() external onlyRole(PAUSER_ROLE) { _unpause(); }",
+"",
+"    // TODO(dc): fee-on-transfer hook -> treasury (staking 모듈 붙인 뒤)",
+"    function _update(address from, address to, uint256 value)",
+"        internal",
+"        override",
+"        whenNotPaused",
+"    {",
+"        super._update(from, to, value);",
+"    }",
+"}"
+],
+2: [
+"// SPDX-License-Identifier: BUSL-1.1",
+"pragma solidity ^0.8.24;",
+"",
+'import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";',
+'import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";',
+'import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";',
+'import {IHavenValidatorSet} from "../interfaces/IHavenValidatorSet.sol";',
+"",
+"/// @title HavenStaking — delegated staking & epoch rewards",
+"contract HavenStaking is ReentrancyGuard {",
+"    using SafeERC20 for IERC20;",
+"",
+"    struct Stake {",
+"        uint128 amount;",
+"        uint64  since;",
+"        uint64  unlockAt;",
+"        uint256 rewardDebt;",
+"    }",
+"",
+"    IERC20 public immutable haven;",
+"    IHavenValidatorSet public immutable validators;",
+"",
+"    uint256 public constant EPOCH = 6 hours;",
+"    uint256 public constant UNBONDING_PERIOD = 14 days;",
+"    uint256 public constant ACC_PRECISION = 1e18;",
+"",
+"    uint256 public accRewardPerShare;",
+"    uint256 public totalStaked;",
+"    uint256 public lastRewardEpoch;",
+"",
+"    mapping(address => mapping(address => Stake)) public stakes; // delegator => validator",
+"",
+"    event Staked(address indexed user, address indexed validator, uint256 amount);",
+"    event Unbonding(address indexed user, address indexed validator, uint256 amount, uint64 unlockAt);",
+"    event RewardPaid(address indexed user, uint256 reward);",
+"",
+"    constructor(IERC20 haven_, IHavenValidatorSet validators_) {",
+"        haven = haven_;",
+"        validators = validators_;",
+"        lastRewardEpoch = block.timestamp / EPOCH;",
+"    }",
+"",
+"    function stake(address validator, uint256 amount) external nonReentrant {",
+'        require(validators.isActive(validator), "HAVEN: inactive validator");',
+"        _updatePool();",
+"        Stake storage s = stakes[msg.sender][validator];",
+"        _harvest(s);",
+"        haven.safeTransferFrom(msg.sender, address(this), amount);",
+"        s.amount += uint128(amount);",
+"        s.since = uint64(block.timestamp);",
+"        s.rewardDebt = (uint256(s.amount) * accRewardPerShare) / ACC_PRECISION;",
+"        totalStaked += amount;",
+"        emit Staked(msg.sender, validator, amount);",
+"    }",
+"",
+"    function unstake(address validator, uint256 amount) external nonReentrant {",
+"        Stake storage s = stakes[msg.sender][validator];",
+'        require(s.amount >= amount, "HAVEN: insufficient stake");',
+"        _updatePool();",
+"        _harvest(s);",
+"        s.amount -= uint128(amount);",
+"        s.unlockAt = uint64(block.timestamp + UNBONDING_PERIOD);",
+"        s.rewardDebt = (uint256(s.amount) * accRewardPerShare) / ACC_PRECISION;",
+"        totalStaked -= amount;",
+"        emit Unbonding(msg.sender, validator, amount, s.unlockAt);",
+"    }",
+"",
+"    function _updatePool() internal {",
+"        uint256 epoch = block.timestamp / EPOCH;",
+"        if (epoch <= lastRewardEpoch || totalStaked == 0) {",
+"            lastRewardEpoch = epoch;",
+"            return;",
+"        }",
+"        uint256 reward = validators.epochEmission() * (epoch - lastRewardEpoch);",
+"        accRewardPerShare += (reward * ACC_PRECISION) / totalStaked;",
+"        lastRewardEpoch = epoch;",
+"    }",
+"",
+"    function _harvest(Stake storage s) internal {",
+"        uint256 pending = (uint256(s.amount) * accRewardPerShare) / ACC_PRECISION - s.rewardDebt;",
+"        if (pending > 0) {",
+"            haven.safeTransfer(msg.sender, pending);",
+"            emit RewardPaid(msg.sender, pending);",
+"        }",
+"    }",
+"",
+"    // FIXME: unbonding 중 slash 반영 안 됨 -> test_SlashValidator_Double",
+"}"
+],
+3: [
+'import { ethers, network } from "hardhat";',
+'import { writeFileSync } from "fs";',
+'import { GENESIS, VALIDATORS, TREASURY_MULTISIG } from "../config/mainnet";',
+"",
+"async function main() {",
+'  if (network.name !== "haven-mainnet") throw new Error("wrong network");',
+"  const [deployer] = await ethers.getSigners();",
+"  console.log(`deployer  ${deployer.address}`);",
+"  console.log(`chainId   ${network.config.chainId}`);",
+"",
+'  const Token = await ethers.getContractFactory("HavenToken");',
+"  const haven = await Token.deploy(TREASURY_MULTISIG, TREASURY_MULTISIG);",
+"  await haven.waitForDeployment();",
+"",
+'  const ValidatorSet = await ethers.getContractFactory("HavenValidatorSet");',
+"  const vset = await ValidatorSet.deploy(VALIDATORS, GENESIS.epochEmission);",
+"  await vset.waitForDeployment();",
+"",
+'  const Staking = await ethers.getContractFactory("HavenStaking");',
+"  const staking = await Staking.deploy(await haven.getAddress(), await vset.getAddress());",
+"  await staking.waitForDeployment();",
+"",
+'  const Vesting = await ethers.getContractFactory("HavenVesting");',
+"  const vesting = await Vesting.deploy(await haven.getAddress(), GENESIS.vestingSchedule);",
+"  await vesting.waitForDeployment();",
+"",
+'  const Bridge = await ethers.getContractFactory("HavenBridge");',
+"  const bridge = await Bridge.deploy(await haven.getAddress(), GENESIS.relayers, 5);",
+"  await bridge.waitForDeployment();",
+"",
+"  await (await haven.grantRole(await haven.MINTER_ROLE(), await staking.getAddress())).wait();",
+"  await (await haven.grantRole(await haven.MINTER_ROLE(), await bridge.getAddress())).wait();",
+"",
+"  const addresses = {",
+"    HavenToken: await haven.getAddress(),",
+"    HavenValidatorSet: await vset.getAddress(),",
+"    HavenStaking: await staking.getAddress(),",
+"    HavenVesting: await vesting.getAddress(),",
+"    HavenBridge: await bridge.getAddress(),",
+"  };",
+'  writeFileSync("deployments/haven-mainnet.json", JSON.stringify(addresses, null, 2));',
+"  console.table(addresses);",
+"}",
+"",
+"main().catch((e) => { console.error(e); process.exit(1); });"
+]};
+const START_AT = { 1: 36, 2: 56, 3: 33 };
+const code = CODE[S];
+const codeEditor = $("codeEditor");
+
+function esc(v) { return v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+const KW = new Set("pragma solidity import from contract is function returns return constructor event error emit revert require if else struct mapping using for modifier override internal external public private view pure immutable constant indexed storage memory calldata async await const let new throw catch".split(" "));
+const TY = new Set("uint256 uint128 uint64 bytes32 address bool string IERC20 ERC20 ERC20Permit AccessControl Pausable ReentrancyGuard SafeERC20 IHavenValidatorSet Stake Error JSON".split(" "));
+function hl(line) {
+  const re = /(\/\/.*$)|("[^"]*"?|`[^`]*`?)|([A-Za-z_$][A-Za-z0-9_$]*)|(\d[\d_]*(?:e\d+)?)|([\s\S])/g;
+  let m, h = "";
+  while ((m = re.exec(line))) {
+    if (m[1]) h += `<span class="code-comment">${esc(m[1])}</span>`;
+    else if (m[2]) h += `<span class="code-string">${esc(m[2])}</span>`;
+    else if (m[3]) {
+      const w = m[3];
+      const call = line[re.lastIndex] === "(";
+      if (KW.has(w)) h += `<span class="code-keyword">${w}</span>`;
+      else if (TY.has(w)) h += `<span class="code-path">${w}</span>`;
+      else if (call) h += `<span class="code-command">${w}</span>`;
+      else h += w;
+    }
+    else if (m[4]) h += `<span style="color:#b5cea8">${m[4]}</span>`;
+    else h += esc(m[5]);
+  }
+  return h;
+}
+
+let done = code.slice(0, START_AT[S]);
+let lineIdx = START_AT[S];
+let charIdx = 0;
+let partial = "";
+let queue = 0;
+let timer = null;
+let lastKey = 0;
+
+function renderCode() {
+  const rows = done.map((l) => ({ h: hl(l), c: false }));
+  if (lineIdx < code.length) rows.push({ h: hl(partial), c: true });
+  else rows[rows.length - 1].c = true;
+  codeEditor.innerHTML = rows.map((r, i) => `<div class="code-line"><span class="line-number">${i + 1}</span><span class="code-text">${r.h}${r.c ? '<span class="typing-cursor"></span>' : ""}</span></div>`).join("");
+  $("cursorPos").textContent = `Ln ${rows.length}, Col ${(lineIdx < code.length ? partial.length : code[code.length - 1].length) + 1}`;
+  requestAnimationFrame(() => { codeEditor.scrollTop = codeEditor.scrollHeight; });
+}
+function typeOne() {
+  if (lineIdx >= code.length) { queue = 0; return; }
+  const target = code[lineIdx];
+  if (charIdx < target.length) { partial += target[charIdx++]; }
+  else { done.push(target); lineIdx++; charIdx = 0; partial = ""; }
+  renderCode();
+}
+function runQueue() {
+  if (queue <= 0) { timer = null; return; }
+  queue--; typeOne();
+  timer = setTimeout(runQueue, 28);
+}
+
+/* ───────────── 터미널 ───────────── */
+const out = $("terminalOutput");
+function line(html) {
+  const d = document.createElement("div");
+  d.className = "terminal-line";
+  d.innerHTML = html || "&nbsp;";
+  out.appendChild(d);
+  while (out.children.length > 160) out.removeChild(out.firstChild);
+  out.scrollTop = out.scrollHeight;
+}
+const P = (branch) => `<span class="log-success">➜</span> <span class="log-muted">haven-chain</span> <span class="log-hash">git:(${branch})</span>`;
+const branch = S === 1 ? "feature/token-core" : S === 2 ? "feature/staking-vesting" : "release/v1.0.0";
+
+const PRE = {
+1: [
+  `${P(branch)} <span class="log-command">forge build</span>`,
+  '<span class="log-muted">[⠊] Compiling...</span>',
+  '<span class="log-muted">[⠒] Compiling 47 files with Solc 0.8.24</span>',
+  '<span class="log-success">[⠢] Solc 0.8.24 finished in 3.82s</span>',
+  '<span class="log-warning">Compiler run successful with warnings:</span>',
+  '<span class="log-warning">Warning (2072): Unused local variable.</span>',
+  '<span class="log-muted">  --&gt; contracts/token/HavenToken.sol:58:9</span>',
+  "",
+  `${P(branch)} <span class="log-command">forge test --summary</span>`,
+  '<span class="log-muted">Ran 6 test suites in 1.94s (3.12s CPU time)</span>',
+  '<span class="log-muted">╭──────────────────────┬────────┬────────┬─────────╮</span>',
+  '<span class="log-muted">│ Test Suite           │ Passed │ Failed │ Skipped │</span>',
+  '<span class="log-muted">├──────────────────────┼────────┼────────┼─────────┤</span>',
+  '<span class="log-muted">│</span> HavenTokenTest        <span class="log-muted">│</span> <span class="log-success">    24</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenPermitTest       <span class="log-muted">│</span> <span class="log-success">    11</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> GenesisConfigTest    <span class="log-muted">│</span> <span class="log-success">     6</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       3 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenStakingTest      <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     38</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenVestingTest      <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     27</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenBridgeTest       <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     29</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">╰──────────────────────┴────────┴────────┴─────────╯</span>',
+  "",
+  `${P(branch)} <span class="log-command">docker compose -f docker-compose.devnet.yml up --build</span>`
+],
+2: [
+  `${P(branch)} <span class="log-command">forge test --summary</span>`,
+  '<span class="log-muted">Ran 6 test suites in 4.71s (9.03s CPU time)</span>',
+  '<span class="log-muted">╭──────────────────────┬────────┬────────┬─────────╮</span>',
+  '<span class="log-muted">│ Test Suite           │ Passed │ Failed │ Skipped │</span>',
+  '<span class="log-muted">├──────────────────────┼────────┼────────┼─────────┤</span>',
+  '<span class="log-muted">│</span> HavenTokenTest        <span class="log-muted">│</span> <span class="log-success">    24</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenPermitTest       <span class="log-muted">│</span> <span class="log-success">    11</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> GenesisConfigTest    <span class="log-muted">│</span> <span class="log-success">     9</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenStakingTest      <span class="log-muted">│</span> <span class="log-success">    31</span> <span class="log-muted">│</span> <span style="color:#f87171">     2</span> <span class="log-muted">│</span> <span class="log-warning">      5</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenVestingTest      <span class="log-muted">│</span> <span class="log-success">     8</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     19</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenBridgeTest       <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     29</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">╰──────────────────────┴────────┴────────┴─────────╯</span>',
+  '<span style="color:#f87171">Failing tests:</span>',
+  '<span style="color:#f87171">[FAIL: assertion failed: 4.82e21 != 4.80e21] test_SlashValidator_Double() (gas: 412887)</span>',
+  '<span style="color:#f87171">[FAIL: HAVEN: insufficient stake] test_RewardAccrual_AfterUnbonding() (gas: 298114)</span>',
+  "",
+  `${P(branch)} <span class="log-command">docker compose -f docker-compose.testnet.yml up --build</span>`
+],
+3: [
+  `${P(branch)} <span class="log-command">forge test --summary</span>`,
+  '<span class="log-muted">Ran 6 test suites in 6.88s (14.20s CPU time)</span>',
+  '<span class="log-muted">╭──────────────────────┬────────┬────────┬─────────╮</span>',
+  '<span class="log-muted">│ Test Suite           │ Passed │ Failed │ Skipped │</span>',
+  '<span class="log-muted">├──────────────────────┼────────┼────────┼─────────┤</span>',
+  '<span class="log-muted">│</span> HavenTokenTest        <span class="log-muted">│</span> <span class="log-success">    24</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenPermitTest       <span class="log-muted">│</span> <span class="log-success">    11</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> GenesisConfigTest    <span class="log-muted">│</span> <span class="log-success">     9</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenStakingTest      <span class="log-muted">│</span> <span class="log-success">    38</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenVestingTest      <span class="log-muted">│</span> <span class="log-success">    27</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HavenBridgeTest       <span class="log-muted">│</span> <span class="log-success">    29</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">╰──────────────────────┴────────┴────────┴─────────╯</span>',
+  "",
+  `${P(branch)} <span class="log-command">forge coverage --report summary | tail -2</span>`,
+  '<span class="log-muted">| File            | % Lines          | % Statements     | % Branches     |</span>',
+  '| Total           | <span class="log-success">97.41% (865/888)</span> | <span class="log-success">96.88% (1024/1057)</span> | <span class="log-success">93.10% (162/174)</span> |',
+  "",
+  `${P(branch)} <span class="log-command">slither . --filter-paths node_modules</span>`,
+  '<span class="log-success">INFO:Slither:. analyzed (52 contracts with 94 detectors), 0 high, 0 medium, 3 informational</span>',
+  "",
+  `${P(branch)} <span class="log-command">docker compose -f docker-compose.mainnet.yml up -d</span>`
+]};
+
+/* ───────────── 도커 ───────────── */
+const CONTAINERS = {
+1: [
+  ["haven-devnet-node-0", "validator · chainId 731001", "haven-node:0.3.0-dev"],
+  ["haven-devnet-rpc-1", "json-rpc :8545", "haven-rpc:0.3.0-dev"],
+  ["haven-devnet-postgres-1", "indexer db", "postgres:16-alpine"],
+  ["haven-devnet-redis-1", "cache", "redis:7.4-alpine"]
+],
+2: [
+  ["haven-testnet-validator-0", "validator · chainId 731002", "haven-node:0.7.2-rc"],
+  ["haven-testnet-validator-1", "validator", "haven-node:0.7.2-rc"],
+  ["haven-testnet-validator-2", "validator", "haven-node:0.7.2-rc"],
+  ["haven-testnet-validator-3", "validator", "haven-node:0.7.2-rc"],
+  ["haven-testnet-rpc-1", "json-rpc :8545", "haven-rpc:0.7.2-rc"],
+  ["haven-testnet-indexer-1", "block indexer", "haven-indexer:0.7.2-rc"],
+  ["haven-testnet-explorer-1", "explorer :4000", "haven-explorer:0.6.0"],
+  ["haven-testnet-postgres-1", "indexer db", "postgres:16-alpine"]
+],
+3: [
+  ["haven-mainnet-validator-0", "validator · chainId 7310", "haven-node:1.0.0"],
+  ["haven-mainnet-validator-1", "validator", "haven-node:1.0.0"],
+  ["haven-mainnet-validator-2", "validator", "haven-node:1.0.0"],
+  ["haven-mainnet-validator-3", "validator", "haven-node:1.0.0"],
+  ["haven-mainnet-validator-4", "validator", "haven-node:1.0.0"],
+  ["haven-mainnet-validator-5", "validator", "haven-node:1.0.0"],
+  ["haven-mainnet-validator-6", "validator", "haven-node:1.0.0"],
+  ["haven-mainnet-rpc-1", "json-rpc :8545", "haven-rpc:1.0.0"],
+  ["haven-mainnet-indexer-1", "block indexer", "haven-indexer:1.0.0"],
+  ["haven-mainnet-explorer-1", "explorer :443", "haven-explorer:1.0.0"],
+  ["haven-mainnet-bridge-relayer-1", "bridge relayer", "haven-relayer:1.0.0"]
+]};
+const project = S === 1 ? "haven-devnet" : S === 2 ? "haven-testnet" : "haven-mainnet";
+$("projectName").textContent = project;
+$("projectName2").textContent = project;
+const list = $("containerList");
+const rows = {};
+function setRow(name, state) {
+  const r = rows[name];
+  if (!r) return;
+  const b = r.querySelector(".state-badge");
+  const ic = r.lastElementChild;
+  ic.style.color = "";
+  if (state === "run") { b.className = "state-badge running"; b.textContent = "Running"; ic.className = "row-check"; ic.textContent = "✓"; }
+  if (state === "start") { b.className = "state-badge creating"; b.textContent = "Starting"; ic.className = "row-spinner"; ic.textContent = ""; }
+  if (state === "wait") { b.className = "state-badge waiting"; b.textContent = "Created"; ic.className = "row-check"; ic.style.color = "#98a2b3"; ic.textContent = "◷"; }
+  if (state === "exit") { b.className = "state-badge creating"; b.textContent = "Exited (1)"; ic.className = "row-check"; ic.style.color = "#f04438"; ic.textContent = "!"; }
+}
+function addRow(c, state) {
+  if (rows[c[0]]) return;
+  const el = document.createElement("article");
+  el.className = "container-row";
+  el.innerHTML = `<div class="container-state-icon">◆</div><div class="container-name"><strong>${c[0]}</strong><span>${c[1]}</span></div><div class="container-image">${c[2]}</div><span class="state-badge creating">Starting</span><span class="row-spinner"></span>`;
+  list.appendChild(el);
+  rows[c[0]] = el;
+  const n = Object.keys(rows).length;
+  $("containerCount").textContent = `${n} container${n === 1 ? "" : "s"}`;
+  setRow(c[0], state || "start");
+}
+
+const L = {
+  step: (a, b) => `<span class="log-step">${a}</span> ${b}`,
+  ok: (t) => `<span class="log-success">${t}</span>`,
+  mu: (t) => `<span class="log-muted">${t}</span>`,
+  wa: (t) => `<span class="log-warning">${t}</span>`
+};
+
+const EVENTS = {
+1: [
+  [6, "Loading Compose definition", [L.mu("[+] Building 0.0s (0/1)"), L.step("[+]", "Building services with BuildKit")]],
+  [18, "Resolving base images", [L.step("[node internal]", "load metadata for docker.io/library/rust:1.81-slim"), L.mu(" => sha256:<span class='log-hash'>4be1c0a92d7e</span>")]],
+  [34, "Compiling haven-node (release)", [L.step("[node 4/8]", "RUN cargo build --release -p haven-node"), L.mu("   Compiling haven-consensus v0.3.0 (/src/crates/consensus)"), L.mu("   Compiling haven-evm v0.3.0 (/src/crates/evm)"), L.wa("warning: unused variable: `epoch_seed` --> crates/consensus/src/pos.rs:211:13")]],
+  [52, "Starting infrastructure", [L.ok("✔ Network haven-devnet_default Created"), L.ok("✔ postgres Pulled"), L.ok("✔ redis Pulled")], [2, 3]],
+  [70, "Starting devnet validator", [L.mu("    Finished `release` profile [optimized] target(s) in 1m 48s"), L.step("[node]", "exporting to image haven-node:0.3.0-dev")], [0]],
+  [86, "Starting JSON-RPC", [L.step("[rpc]", "exporting to image haven-rpc:0.3.0-dev"), L.ok("✔ Container haven-devnet-node-0 Started")], [1]],
+  [100, "Devnet running · single validator", [L.ok("✔ Container haven-devnet-rpc-1 Started"), L.mu("haven-devnet-node-0  | INFO genesis loaded chain_id=731001 validators=1"), L.mu("haven-devnet-node-0  | INFO ⛏  sealed block #1  txs=0  hash=0x9a1c…e3f0")], null, true]
+],
+2: [
+  [5, "Loading Compose definition", [L.mu("[+] Building 0.0s (0/4)"), L.step("[+]", "Building services with BuildKit")]],
+  [15, "Resolving base images", [L.step("[validator internal]", "load metadata for docker.io/library/rust:1.81-slim"), L.mu(" => CACHED [validator 2/8] WORKDIR /src")]],
+  [28, "Compiling haven-node (release)", [L.step("[validator 4/8]", "RUN cargo build --release -p haven-node"), L.mu("   Compiling haven-consensus v0.7.2 (/src/crates/consensus)"), L.mu("   Compiling haven-staking v0.7.2 (/src/crates/staking)"), L.mu("   Compiling haven-p2p v0.7.2 (/src/crates/p2p)")]],
+  [44, "Starting infrastructure", [L.ok("✔ Network haven-testnet_default Created"), L.ok("✔ postgres Pulled")], [7]],
+  [60, "Starting validators", [L.mu("    Finished `release` profile [optimized] target(s) in 2m 31s"), L.ok("✔ Container haven-testnet-validator-0 Started"), L.ok("✔ Container haven-testnet-validator-1 Started")], [0, 1]],
+  [72, "Starting validators", [L.ok("✔ Container haven-testnet-validator-2 Started"), L.ok("✔ Container haven-testnet-validator-3 Started"), L.mu("haven-testnet-validator-0  | INFO p2p peers=3 quorum=3/4")], [2, 3]],
+  [84, "Starting RPC / indexer", [L.ok("✔ Container haven-testnet-rpc-1 Started"), L.ok("✔ Container haven-testnet-indexer-1 Started")], [4, 5]],
+  [93, "Starting explorer", [L.step("[explorer]", "next build"), L.mu(" ✓ Compiled successfully")], [6]],
+  [100, "Testnet running · 4 validators", [L.ok("✔ Container haven-testnet-explorer-1 Started"), L.mu("haven-testnet-validator-2  | INFO ⛏  sealed block #184,902  txs=37  epoch=740"), L.wa("haven-testnet-indexer-1    | WARN reorg depth=1 at #184,901, re-indexing")], null, true]
+]};
+
+let t0 = performance.now();
+let elapsedTimer = setInterval(() => { $("buildElapsed").textContent = ((performance.now() - t0) / 1000).toFixed(1) + "s"; }, 100);
+function progress(p, step) { $("buildProgressBar").style.width = p + "%"; $("buildStepText").textContent = step; }
+function finishCard(status, desc, step) {
+  $("buildCard").classList.add("build-complete");
+  $("buildStatus").textContent = status;
+  $("buildDescription").textContent = desc;
+  $("buildStepText").textContent = step;
+  clearInterval(elapsedTimer);
+}
+
+function playEvents(evts, onDone) {
+  let i = 0;
+  function next() {
+    if (i >= evts.length) { onDone && onDone(); return; }
+    const [p, step, logs, idx, last] = evts[i++];
+    progress(p, step);
+    logs.forEach((l, k) => setTimeout(() => line(l), k * 160));
+    if (idx) setTimeout(() => idx.forEach((n, k) => setTimeout(() => {
+      const c = CONTAINERS[S][n]; addRow(c, "start");
+      setTimeout(() => setRow(c[0], "run"), 1500 + k * 200);
+    }, k * 260)), 420);
+    if (last) { setTimeout(() => { next(); }, 900); return; }
+    setTimeout(next, 1250 + Math.random() * 650);
+  }
+  next();
+}
+
+let liveTimer = null;
+function liveNodeLogs(prefixes, height, extra) {
+  let h = height;
+  liveTimer = setInterval(() => {
+    const who = prefixes[Math.floor(Math.random() * prefixes.length)];
+    h += 1;
+    const tx = Math.floor(Math.random() * (extra ? 90 : 12));
+    const hash = Math.random().toString(16).slice(2, 6) + "…" + Math.random().toString(16).slice(2, 6);
+    const msgs = [
+      `INFO ⛏  sealed block #${h.toLocaleString()}  txs=${tx}  hash=0x${hash}`,
+      `INFO committed block #${(h - 1).toLocaleString()} round=0 votes=${extra ? extra : "1/1"}`,
+      `INFO txpool pending=${Math.floor(Math.random() * 40)} queued=${Math.floor(Math.random() * 6)}`
+    ];
+    line(L.mu(`${who.padEnd(26, " ")}| ${msgs[Math.floor(Math.random() * msgs.length)]}`));
+  }, 1700);
+}
+
+/* ───────────── 단계별 실행 ───────────── */
+PRE[S].forEach((l) => line(l));
+renderCode();
+
+if (S === 1) {
+  playEvents(EVENTS[1], () => {
+    finishCard("RUNNING", "Compose application is running", "1 / 1 validators online");
+    liveNodeLogs(["haven-devnet-node-0"], 1, null);
+  });
+}
+if (S === 2) {
+  playEvents(EVENTS[2], () => {
+    finishCard("RUNNING", "Compose application is running", "4 / 4 validators online");
+    liveNodeLogs(["haven-testnet-validator-0", "haven-testnet-validator-1", "haven-testnet-validator-2", "haven-testnet-validator-3"], 184902, "3/4");
+  });
+}
+
+let launched = false;
+if (S === 3) {
+  clearInterval(elapsedTimer);
+  $("buildElapsed").textContent = "";
+  progress(100, "Waiting for genesis · 0 / 7 validators signed");
+  $("buildStatus").textContent = "STANDBY";
+  $("buildDescription").textContent = "Containers created · genesis not started";
+  $("buildSpinner").style.animation = "spin 2.4s linear infinite";
+  CONTAINERS[3].forEach((c) => addRow(c, "wait"));
+  line(L.ok("✔ Network haven-mainnet_default Created"));
+  CONTAINERS[3].forEach((c) => line(L.ok(`✔ Container ${c[0]} Created`)));
+  line("");
+  line(`${P(branch)} <span class="log-command">npx hardhat run scripts/deploy-mainnet.ts --network haven-mainnet</span><span class="terminal-cursor"></span>`);
+}
+
+function launch() {
+  if (S !== 3) { havenCelebrate({ delay: 500 }); return; }
+  if (launched) return;
+  launched = true;
+  havenCelebrate({ delay: 5900 });
+  const cur = out.querySelector(".terminal-cursor");
+  if (cur) cur.remove();
+  while (lineIdx < code.length) typeOne();
+  $("buildSpinner").style.animation = "";
+  $("buildStatus").textContent = "STARTING";
+  $("buildDescription").textContent = "Starting validators";
+  const seq = [
+    [0, L.mu("Compiled 52 Solidity files successfully (evm target: cancun).")],
+    [300, L.mu("deployer  0x7f3A…C21e")],
+    [450, L.mu("chainId   7310")],
+    [900, L.ok("✔ HavenToken          deployed  0x5E0d1c94A7b3F2E8D61a90C4b7E2f3a8D9c04e01")],
+    [1300, L.ok("✔ HavenValidatorSet   deployed  0x91bC07e3A2d4F68c0B5e1D7a3F9c2E84b6A1d702")],
+    [1700, L.ok("✔ HavenStaking        deployed  0x2Fa84D16c9E0b3A7f5D2e8C14b9A6d0E3f7C5b31")],
+    [2100, L.ok("✔ HavenVesting        deployed  0xC3e7A90f1B4d26E8a5F0c9D3b7E1a64F2d8B0e95")],
+    [2500, L.ok("✔ HavenBridge         deployed  0x6aD2f8E14c7B90a3E5d1F6b2C8a0e47D9f3B1c58")],
+    [2900, L.mu("granted MINTER_ROLE → HavenStaking, HavenBridge")],
+    [3200, L.mu("written deployments/haven-mainnet.json")],
+    [3600, ""],
+    [3700, L.mu("haven-mainnet-validator-0  | INFO genesis signed 7/7  chain_id=7310")],
+    [4100, L.mu("haven-mainnet-validator-0  | INFO ⛏  sealed block #0 (genesis)  hash=0x3d7e…a9c1")],
+    [4500, L.mu("haven-mainnet-validator-3  | INFO ⛏  sealed block #1  txs=6  hash=0xb04f…17de")],
+    [4900, L.ok("✔ haven-mainnet-explorer-1  ready  https://scan.havenchain.io")],
+    [5300, ""],
+    [5400, L.ok("HAVEN v1.0.0 — mainnet deployment complete.")],
+    [5600, `${P("release/v1.0.0")} <span class="terminal-cursor"></span>`]
+  ];
+  seq.forEach(([t, l]) => setTimeout(() => line(l), t));
+  CONTAINERS[3].forEach((c, k) => {
+    setTimeout(() => setRow(c[0], "start"), 3600 + k * 110);
+    setTimeout(() => setRow(c[0], "run"), 4300 + k * 140);
+  });
+  setTimeout(() => $("buildStepText").textContent = "Genesis signed · 7 / 7 validators", 3800);
+  setTimeout(() => {
+    finishCard("RUNNING", "Mainnet is live", "7 / 7 validators online · block #1");
+    liveNodeLogs(["haven-mainnet-validator-0", "haven-mainnet-validator-2", "haven-mainnet-validator-5", "haven-mainnet-rpc-1"], 1, "7/7");
+  }, 6000);
+}
+
+/* ───────────── 키 입력 ───────────── */
+document.addEventListener("keydown", (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey || ["F5", "F11", "F12", "Escape"].includes(e.key)) return;
+  e.preventDefault();
+  if (e.key === "Enter") { launch(); return; }
+  const now = performance.now();
+  const gap = lastKey ? now - lastKey : 150;
+  lastKey = now;
+  queue += gap < 48 ? 3 : gap < 85 ? 2 : 1;
+  if (!timer) runQueue();
+});
+  </script>
+</body>
+</html>

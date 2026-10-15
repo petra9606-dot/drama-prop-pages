@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>haven-node — live-stream.log</title>
+<style>
+    :root {
+      --background: #070b10;
+      --panel: #0a1118;
+      --border: rgba(123, 158, 178, 0.17);
+
+      --text-main: #b3c0ca;
+      --text-sub: #71828f;
+      --text-dim: #485965;
+
+      --cyan: #3db7c7;
+      --blue: #5d9fd5;
+      --green: #5dcc87;
+      --purple: #a18bd5;
+      --yellow: #d7aa52;
+      --red: #e26873;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--background);
+    }
+
+    body {
+      font-family:
+        "JetBrains Mono",
+        "Consolas",
+        "SFMono-Regular",
+        "Courier New",
+        monospace;
+      color: var(--text-main);
+    }
+
+    .terminal {
+      position: relative;
+      display: grid;
+      grid-template-rows: 34px 56px minmax(0, 1fr) 25px;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle at 82% 4%,
+          rgba(28, 114, 137, 0.12),
+          transparent 34%
+        ),
+        linear-gradient(
+          180deg,
+          #0a1017 0%,
+          #070b10 100%
+        );
+    }
+
+    .terminal::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+      opacity: 0.022;
+
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 3px,
+        rgba(255, 255, 255, 0.14) 4px
+      );
+    }
+
+    /* 상단 창 영역 */
+
+    .title-bar {
+      position: relative;
+      z-index: 2;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 15px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7, 12, 18, 0.9);
+    }
+
+    .title-left {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .window-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .window-button {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .window-button:nth-child(1) {
+      background: #945b61;
+    }
+
+    .window-button:nth-child(2) {
+      background: #a68b4d;
+    }
+
+    .window-button:nth-child(3) {
+      background: #4e9e70;
+    }
+
+    .terminal-path {
+      color: #738793;
+      font-size: 9px;
+      letter-spacing: 0.07em;
+    }
+
+    .online-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+
+      color: #738591;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+
+    .online-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(93, 204, 135, 0.6);
+      animation: pulse 2.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    /* 시스템 지표 */
+
+    .summary-bar {
+      position: relative;
+      z-index: 2;
+
+      display: grid;
+      grid-template-columns:
+        minmax(135px, 1.25fr)
+        repeat(4, minmax(100px, 1fr));
+
+      background: rgba(10, 17, 24, 0.84);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+
+      min-width: 0;
+      padding: 0 14px;
+      border-right: 1px solid rgba(123, 158, 178, 0.1);
+    }
+
+    .summary-item:last-child {
+      border-right: 0;
+    }
+
+    .summary-label {
+      color: #526572;
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+    }
+
+    .summary-value {
+      color: #b9c6cf;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .summary-unit {
+      color: #596a76;
+      font-size: 8px;
+    }
+
+    .healthy {
+      color: var(--green);
+    }
+
+    .mini-bar {
+      width: 100%;
+      max-width: 115px;
+      height: 2px;
+      overflow: hidden;
+      background: #17222b;
+    }
+
+    .mini-fill {
+      width: 50%;
+      height: 100%;
+      background: var(--cyan);
+      transition: width 0.6s ease;
+    }
+
+    .mini-fill.blue {
+      background: var(--blue);
+    }
+
+    /* 로그 화면 */
+
+    .log-window {
+      position: relative;
+      z-index: 2;
+
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      padding: 7px 12px 5px;
+
+      background: rgba(5, 9, 14, 0.34);
+    }
+
+    .log-header,
+    .log-line {
+      display: grid;
+
+      /*
+        시간과 레벨을 제외한 나머지 공간을
+        메시지가 전부 사용하도록 설정
+      */
+      grid-template-columns: 112px 66px minmax(0, 1fr);
+      column-gap: 10px;
+    }
+
+    .log-header {
+      height: 20px;
+      padding: 0 5px;
+
+      color: #445662;
+      font-size: 8px;
+      line-height: 20px;
+      letter-spacing: 0.08em;
+
+      border-bottom: 1px solid rgba(123, 158, 178, 0.09);
+    }
+
+    #logs {
+      width: 100%;
+      height: calc(100% - 20px);
+      overflow: hidden;
+    }
+
+    .log-line {
+      align-items: start;
+      width: 100%;
+      min-height: 17px;
+      padding: 0 5px;
+
+      font-size: clamp(9px, 0.69vw, 12px);
+      line-height: 17px;
+
+      opacity: 0;
+      transform: translateY(2px);
+      animation: appear 0.18s ease-out forwards;
+    }
+
+    @keyframes appear {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .time {
+      width: 112px;
+      color: #5b7180;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .label {
+      width: 66px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /*
+      오른쪽 메시지를 잘라내지 않고
+      화면 끝까지 표시
+    */
+
+    .message {
+      min-width: 0;
+      overflow: visible;
+      color: #aebac3;
+      white-space: nowrap;
+    }
+
+    .info .label {
+      color: #67aabd;
+    }
+
+    .api .label,
+    .network .label {
+      color: var(--cyan);
+    }
+
+    .database .label,
+    .cache .label {
+      color: var(--green);
+    }
+
+    .auth .label {
+      color: var(--purple);
+    }
+
+    .build .label,
+    .trace .label {
+      color: var(--blue);
+    }
+
+    .success .label {
+      color: #67d38f;
+    }
+
+    .success .message {
+      color: #9dcdb0;
+    }
+
+    .warn .label {
+      color: var(--yellow);
+    }
+
+    .warn .message {
+      color: #c7b184;
+    }
+
+    .error .label {
+      color: var(--red);
+    }
+
+    .error .message {
+      color: #dd8991;
+    }
+
+    .key {
+      color: #54becd;
+    }
+
+    .value {
+      color: #80ce9c;
+    }
+
+    .number {
+      color: #dfa66c;
+    }
+
+    .path {
+      color: #72aee0;
+    }
+
+    .method {
+      color: #a895df;
+    }
+
+    .muted {
+      color: #657984;
+    }
+
+    /* 하단 상태 영역 */
+
+    .footer {
+      position: relative;
+      z-index: 2;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 14px;
+      border-top: 1px solid var(--border);
+      background: rgba(7, 12, 18, 0.94);
+
+      color: #566976;
+      font-size: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .footer-group {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .footer-highlight {
+      color: #55a4b0;
+    }
+
+    @media (max-width: 800px) {
+      .summary-bar {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .summary-item:first-child {
+        display: none;
+      }
+
+      .log-header,
+      .log-line {
+        grid-template-columns: 102px 60px minmax(0, 1fr);
+        column-gap: 8px;
+      }
+
+      .time {
+        width: 102px;
+      }
+
+      .label {
+        width: 60px;
+      }
+    }
+  
+.log-header,.log-line{grid-template-columns:112px 92px minmax(0,1fr)}
+.label{width:92px}
+</style>
+<!-- DW-SITE --><meta name="robots" content="noindex,nofollow,noarchive"><script>if("serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});</script><!-- DW-GA --><script>(function(){try{if(localStorage.getItem('dw-noga'))return;}catch(e){}window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','G-ZMQZ7X9F3J');var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-ZMQZ7X9F3J';(document.head||document.documentElement).appendChild(s);})();</script>
+</head>
+<body>
+  <main class="terminal">
+    <header class="title-bar">
+      <div class="title-left">
+        <div class="window-buttons"><span class="window-button"></span><span class="window-button"></span><span class="window-button"></span></div>
+        <div class="terminal-path" id="path"></div>
+      </div>
+      <div class="online-status"><span class="online-dot" id="onDot"></span><span id="onText">CONNECTED</span></div>
+    </header>
+
+    <section class="summary-bar">
+      <div class="summary-item">
+        <div class="summary-label">NETWORK STATUS</div>
+        <div class="summary-row"><span class="summary-value healthy" id="netStatus">-</span><span class="summary-unit" id="netUnit">-</span></div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">BLOCK HEIGHT</div>
+        <div class="summary-row"><span class="summary-value" id="heightValue">-</span><span class="summary-unit" id="blockTime">-</span></div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">TPS</div>
+        <div class="summary-row"><span class="summary-value" id="tpsValue">0</span><span class="summary-unit">TX/S</span></div>
+        <div class="mini-bar"><div class="mini-fill" id="tpsBar" style="width:0%"></div></div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">PEERS</div>
+        <div class="summary-row"><span class="summary-value" id="peerValue">0</span><span class="summary-unit" id="peerUnit">CONNECTED</span></div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">CPU LOAD</div>
+        <div class="summary-row"><span class="summary-value" id="cpuValue">0</span><span class="summary-unit">%</span></div>
+        <div class="mini-bar"><div class="mini-fill blue" id="cpuBar" style="width:0%"></div></div>
+      </div>
+    </section>
+
+    <section class="log-window">
+      <div class="log-header"><span>TIMESTAMP</span><span>MODULE</span><span>EVENT / CONTEXT / METADATA</span></div>
+      <div id="logs"></div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-group"><span class="footer-highlight" id="fNode">-</span><span id="fNet">-</span><span id="fVer">-</span></div>
+      <div class="footer-group"><span>stream active</span><span>UTF-8</span><span>LF</span></div>
+    </footer>
+  </main>
+
+<script>
+// stage: 1 = 초반 작업, 2 = 중반 작업, 3 = 마무리 (Enter 로 완료)
+const HAVEN_STAGE = (() => {
+  const q = new URLSearchParams(location.search).get("stage");
+  const h = (location.hash || "").replace("#", "");
+  const v = parseInt(q || h || "1", 10);
+  return [1, 2, 3].includes(v) ? v : 1;
+})();
+document.addEventListener("keydown", (e) => {
+  const d = e.code && e.code.startsWith("Digit") ? e.code.slice(5) : e.key;
+  if (e.altKey && ["1", "2", "3"].includes(d)) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    location.hash = "#" + d;
+    location.reload();
+  }
+}, true);
+
+// 완료 대화상자 (Enter "탁!" 이후) — Windows 스타일
+function havenCelebrate(opts) {
+  if (document.getElementById("havenDone")) return;
+  const o = Object.assign({ delay: 0 }, opts || {});
+  const css = `
+#havenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
+#havenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
+  box-shadow:0 32px 64px rgba(0,0,0,.37),0 2px 21px rgba(0,0,0,.27);overflow:hidden;animation:hdPop .18s cubic-bezier(.1,.9,.2,1)}
+@keyframes hdFade{from{opacity:0}}
+@keyframes hdPop{from{opacity:0;transform:scale(.96)}}
+#havenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
+#havenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
+#havenDone .hd-title .sp{flex:1}
+#havenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
+#havenDone .hd-x:hover{background:#c42b1c;color:#fff}
+#havenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
+#havenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
+#havenDone .hd-ok svg{width:18px;height:18px}
+#havenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
+#havenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
+#havenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
+#havenDone dd{margin:0;color:#1b1b1b}
+#havenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
+#havenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
+#havenDone .hd-btn:hover{background:#f6f6f6}
+#havenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
+#havenDone .hd-btn.pri:hover{background:#1b75c4}
+`;
+  setTimeout(() => {
+    const st = document.createElement("style");
+    st.textContent = css;
+    document.head.appendChild(st);
+    const root = document.createElement("div");
+    root.id = "havenDone";
+    const now = new Date();
+    const p2 = (n) => String(n).padStart(2, "0");
+    const ts = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
+    root.innerHTML = `
+      <div class="hd-win" role="dialog" aria-modal="true">
+        <div class="hd-title"><span class="ic">H</span><span>Haven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
+        <div class="hd-body">
+          <div class="hd-ok"><svg viewBox="0 0 16 16"><path d="M3.2 8.4l3 3 6.6-6.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <h2>배포가 완료되었습니다.</h2>
+            <p>해븐코인(HAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
+            <dl>
+              <dt>네트워크</dt><dd>Haven Mainnet (chain 7310)</dd>
+              <dt>검증 노드</dt><dd>7 / 7 온라인</dd>
+              <dt>테스트</dt><dd>138 / 138 통과</dd>
+              <dt>완료 시각</dt><dd>${ts}</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="hd-foot"><button class="hd-btn pri" data-close>확인</button><button class="hd-btn" data-close>닫기</button></div>
+      </div>`;
+    document.body.appendChild(root);
+    root.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => root.remove()));
+    root.querySelector(".hd-btn.pri").focus({ preventScroll: true });
+
+    // 제목 표시줄 드래그
+    const win = root.querySelector(".hd-win"), bar = root.querySelector(".hd-title");
+    let dx = 0, dy = 0, sx = 0, sy = 0, drag = false;
+    bar.addEventListener("mousedown", (e) => { if (e.target.closest("button")) return; drag = true; sx = e.clientX - dx; sy = e.clientY - dy; e.preventDefault(); });
+    addEventListener("mousemove", (e) => { if (!drag) return; dx = e.clientX - sx; dy = e.clientY - sy; win.style.transform = `translate(${dx}px,${dy}px)`; });
+    addEventListener("mouseup", () => { drag = false; });
+  }, o.delay);
+}
+document.addEventListener("keydown", (e) => {
+  const d = document.getElementById("havenDone");
+  if (!d) return;
+  if (e.key === "Escape" || e.key === "Enter" || e.key === " ") { d.remove(); }
+  e.stopPropagation(); e.preventDefault();
+}, true);
+
+
+const S = HAVEN_STAGE;
+const $ = (id) => document.getElementById(id);
+const rnd = (a, b) => Math.random() * (b - a) + a;
+const ri = (a, b) => Math.floor(rnd(a, b + 1));
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const hex = (n) => Array.from({ length: n }, () => "0123456789abcdef"[ri(0, 15)]).join("");
+const K = (k, v, cls = "value") => `<span class="key">${k}</span>=<span class="${cls}">${v}</span>`;
+const N = (v) => `<span class="number">${v}</span>`;
+const M = (v) => `<span class="muted">${v}</span>`;
+
+const CFG = {
+  1: { path: "devnet / haven-devnet-node-0 / live-stream.log", node: "haven-devnet-node-0", net: "devnet · chain 731001", ver: "haven-node 0.3.0-dev", height: 41862, vals: 1, peers: 0, tps: [0, 4], bt: "3.0s" },
+  2: { path: "testnet / haven-validator-0 / live-stream.log", node: "haven-validator-0", net: "testnet · chain 731002", ver: "haven-node 0.7.2-rc", height: 1184904, vals: 4, peers: 3, tps: [24, 68], bt: "2.0s" },
+  3: { path: "mainnet / haven-validator-0 / live-stream.log", node: "haven-validator-0", net: "mainnet · chain 7310", ver: "haven-node 1.0.0", height: 0, vals: 7, peers: 6, tps: [3, 26], bt: "2.0s" }
+}[S];
+let height = CFG.height;
+let launched = S !== 3;
+$("path").textContent = CFG.path;
+$("fNode").textContent = CFG.node;
+$("fNet").textContent = CFG.net;
+$("fVer").textContent = CFG.ver;
+
+function setStatus() {
+  if (S === 1) { $("netStatus").textContent = "DEVNET"; $("netUnit").textContent = "1 / 1 VALIDATOR"; }
+  if (S === 2) { $("netStatus").textContent = "HEALTHY"; $("netUnit").textContent = "4 / 4 VALIDATORS"; }
+  if (S === 3 && !launched) { $("netStatus").textContent = "GENESIS"; $("netStatus").style.color = "var(--yellow)"; $("netUnit").textContent = "6 / 7 SIGNED"; }
+  if (S === 3 && launched) { $("netStatus").textContent = "LIVE"; $("netStatus").style.color = ""; $("netUnit").textContent = "7 / 7 VALIDATORS"; }
+  $("heightValue").textContent = S === 3 && !launched ? "—" : "#" + height.toLocaleString();
+  $("blockTime").textContent = S === 3 && !launched ? "PENDING" : CFG.bt + " AVG";
+}
+
+/* ───────── 로그 템플릿 ───────── */
+const vName = () => `haven-validator-${ri(0, CFG.vals - 1)}`;
+const normal = [
+  () => { height++; setStatus(); return ["build", "CONSENSUS", `Block proposed  ${K("height", height)}  ${K("round", 0, "number")}  ${K("proposer", S === 1 ? "haven-devnet-node-0" : vName())}  ${K("txs", ri(CFG.tps[0], CFG.tps[1] * 2), "number")}`]; },
+  () => ["success", "COMMIT", `Block finalized  ${K("height", height)}  hash=${M("0x" + hex(10) + "…" + hex(4))}  votes=${N(S === 1 ? "1/1" : S === 2 ? ri(3, 4) + "/4" : "7/7")}  elapsed=${N(ri(140, 420) + "ms")}`],
+  () => ["info", "EVM", `Block executed  ${K("height", height)}  gas_used=${N(ri(90000, 12800000).toLocaleString())}  gas_limit=${N("30,000,000")}  state_root=${M("0x" + hex(8) + "…")}`],
+  () => ["network", "P2P", S === 1 ? `Peer discovery  ${K("peers", 0, "number")}  mode=${M("single-validator")}  bootnodes=${N(0)}` : `Gossip round complete  ${K("peers", CFG.peers, "number")}  inbound=${N(ri(1, 3))}  outbound=${N(ri(1, 3))}  latency_avg=${N(ri(6, 38) + "ms")}`],
+  () => ["api", "RPC", `<span class="method">${pick(["eth_call", "eth_getBalance", "eth_blockNumber", "eth_sendRawTransaction", "haven_getValidators", "eth_getLogs"])}</span>  status=${N(200)}  duration=${N(ri(1, 48) + "ms")}  client=${M("10.42." + ri(0, 3) + "." + ri(10, 240))}`],
+  () => ["cache", "MEMPOOL", `Txpool updated  pending=${N(ri(0, S === 1 ? 12 : 90))}  queued=${N(ri(0, 9))}  rejected=${N(0)}  base_fee=${N(ri(1, 9) + " gwei")}`],
+  () => ["auth", "STAKING", `Epoch checkpoint  ${K("epoch", Math.floor(height / 1600))}  active_set=${N(CFG.vals)}  bonded=${N(S === 1 ? "0" : S === 2 ? "428.2M" : "1.92B")} HAVEN  apr=${N(S === 1 ? "—" : "8.4%")}`],
+  () => ["trace", "PAYLOAD", `{ <span class="key">"hash"</span>: <span class="value">"0x${hex(12)}"</span>, <span class="key">"from"</span>: <span class="value">"0x${hex(4)}…${hex(4)}"</span>, <span class="key">"method"</span>: <span class="value">"${pick(["transfer", "stake", "approve", "claimReward", "delegate"])}"</span>, <span class="key">"value"</span>: <span class="number">${ri(1, 50000)}</span>, <span class="key">"status"</span>: <span class="number">1</span> }`]
+];
+const warns = {
+  1: [
+    ["warn", "WARN", `Indexer lagging behind head  ${K("head", height)}  indexed=${N(height - 2210)}  ${K("reason", "decode error", "value")}`],
+    ["warn", "WARN", `No peers available — running in single-validator mode`],
+    ["warn", "WARN", `Gas estimate fallback used  ${K("method", "permit")}  reason=${M("revert data empty")}`]
+  ],
+  2: [
+    ["warn", "WARN", `Short reorg detected  depth=${N(1)}  at=${N(height - 1)}  re-indexing`],
+    ["warn", "WARN", `Slashing evidence check skipped  reason=${M("evidence pool not wired")}`],
+    ["warn", "WARN", `Bridge relayer unreachable  target=${M("haven-bridge-relayer-0:9100")}  retry_in=${N("30s")}`]
+  ],
+  3: [["warn", "WARN", `Peer latency above baseline  peer=${M(vName())}  rtt=${N(ri(80, 140) + "ms")}`]]
+};
+const errors = {
+  1: [
+    ["error", "ERROR", `haven-indexer panicked: decode receipt at block ${height - 3}: unexpected log topic length 5`],
+    ["error", "ERROR", `Container haven-indexer restarted (14)  backoff=${N("5m0s")}`]
+  ],
+  2: [
+    ["error", "ERROR", `test_SlashValidator_Double: assertion failed: 4.82e21 != 4.80e21`]
+  ]
+};
+const genesisLogs = [
+  () => ["info", "INIT", `Genesis loaded  chain_id=${N(7310)}  sha256=${M("3d7e91c4…a9c1")}  alloc=${N("2.5B")} HAVEN`],
+  () => ["network", "P2P", `Seed peers connected  ${K("peers", "6/6", "number")}  latency_avg=${N(ri(8, 18) + "ms")}`],
+  () => ["auth", "GENESIS", `Waiting for validator signatures  signed=${N("6/7")}  missing=${M("haven-validator-6")}`],
+  () => ["info", "KEYSTORE", `Validator key loaded  pubkey=${M("0x" + hex(6) + "…" + hex(4))}`],
+  () => ["cache", "MEMPOOL", `Txpool idle  pending=${N(0)}  (chain not started)`]
+];
+
+/* ───────── 렌더링 ───────── */
+const logEl = $("logs");
+function time(off = 0) {
+  const d = new Date(Date.now() + off);
+  return d.toTimeString().slice(0, 8) + "." + String(d.getMilliseconds()).padStart(3, "0");
+}
+function maxLines() { return Math.max(10, Math.floor(logEl.clientHeight / 17)); }
+function add([type, label, msg], opt = {}) {
+  const line = document.createElement("div");
+  line.className = `log-line ${type}`;
+  if (opt.still) { line.style.opacity = "1"; line.style.transform = "none"; line.style.animation = "none"; }
+  line.innerHTML = `<span class="time">${time(opt.off || 0)}</span><span class="label">[${label}]</span><span class="message">${msg}</span>`;
+  logEl.appendChild(line);
+  while (logEl.children.length > maxLines()) logEl.removeChild(logEl.firstElementChild);
+}
+function nextLog() {
+  if (S === 3 && !launched) return pick(genesisLogs)();
+  const r = Math.random();
+  if (errors[S] && r < 0.025) return pick(errors[S]);
+  if (r < (S === 1 ? 0.12 : S === 2 ? 0.08 : 0.02)) return pick(warns[S]);
+  return pick(normal)();
+}
+function fill() {
+  logEl.innerHTML = "";
+  const n = maxLines();
+  for (let i = 0; i < n; i++) add(nextLog(), { still: true, off: -(n - i) * 720 });
+}
+let holding = false;
+function loop() {
+  if (!holding) add(nextLog());
+  setTimeout(loop, rnd(650, 1150));
+}
+function metrics() {
+  const tps = launched ? ri(CFG.tps[0], CFG.tps[1]) : 0;
+  const cpu = rnd(S === 1 ? 6 : 18, S === 1 ? 14 : 39);
+  $("tpsValue").textContent = tps;
+  $("tpsBar").style.width = Math.min(95, tps * 1.3) + "%";
+  $("cpuValue").textContent = cpu.toFixed(1);
+  $("cpuBar").style.width = cpu + "%";
+  $("peerValue").textContent = CFG.peers;
+  $("peerUnit").textContent = S === 1 ? "SOLO MODE" : "CONNECTED";
+}
+
+/* ───────── 완료 ───────── */
+function launch() {
+  if (S !== 3) { havenCelebrate({ delay: 500 }); return; }
+  if (S !== 3 || launched || holding) return;
+  holding = true;
+  havenCelebrate({ delay: 3400 });
+  const seq = [
+    ["auth", "GENESIS", `Signature received  validator=${M("haven-validator-6")}  signed=${N("7/7")}`],
+    ["success", "GENESIS", `Genesis sealed  chain_id=${N(7310)}  hash=${M("0x3d7e91c4…a9c1")}  validators=${N(7)}`],
+    ["success", "COMMIT", `Block finalized  ${K("height", 0)}  <span class="value">(genesis)</span>  votes=${N("7/7")}`],
+    ["build", "CONSENSUS", `Block proposed  ${K("height", 1)}  ${K("round", 0, "number")}  ${K("proposer", "haven-validator-3")}  ${K("txs", 6, "number")}`],
+    ["success", "COMMIT", `Block finalized  ${K("height", 1)}  hash=${M("0xb04f72a1…17de")}  votes=${N("7/7")}  elapsed=${N("212ms")}`],
+    ["success", "NODE", `Haven mainnet is live  version=${N("1.0.0")}  validators=${N("7/7")}  rpc=${M("https://rpc.havenchain.io")}`]
+  ];
+  seq.forEach((l, i) => setTimeout(() => {
+    add(l);
+    if (i === 2) { launched = true; height = 0; setStatus(); metrics(); }
+    if (i === 4) { height = 1; setStatus(); }
+    if (i === seq.length - 1) holding = false;
+  }, 300 + i * 550));
+}
+document.addEventListener("keydown", (e) => {
+  if (e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key === "Enter") { e.preventDefault(); launch(); }
+});
+
+setStatus();
+metrics();
+fill();
+window.addEventListener("resize", fill);
+setInterval(metrics, 1800);
+setTimeout(loop, 700);
+</script>
+</body>
+</html>

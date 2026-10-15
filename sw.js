@@ -22,7 +22,7 @@ function sameOriginCacheable(url) {
   if (p === "/sw.js") return false;
   if (p.startsWith("/dl/")) return false;
   if (p.startsWith("/.netlify/functions/")) {
-    return p === "/.netlify/functions/file" || p === "/.netlify/functions/catalog" || p === "/.netlify/functions/thumb" || p === "/.netlify/functions/app-file" || p === "/.netlify/functions/apps";
+    return p === "/.netlify/functions/file" || p === "/.netlify/functions/catalog" || p === "/.netlify/functions/thumb" || p === "/.netlify/functions/app-file" || p === "/.netlify/functions/apps" || p === "/.netlify/functions/docs" || p === "/.netlify/functions/doc-file";
   }
   return true;
 }

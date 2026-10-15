@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cluster Console — Pod Log Monitor</title>
+<style>
+:root{
+  --bg:#060708;
+  --panel:#0d0f11;
+  --panel2:#111418;
+  --line:#2a2e33;
+  --text:#f4f4f4;
+  --muted:#9ea4ab;
+  --green:#57d68d;
+  --red:#ff626c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#050607;color:var(--text);font-family:Consolas,Monaco,"Courier New",monospace}
+body{
+  background:
+    radial-gradient(circle at 14% 8%,rgba(87,214,141,.05),transparent 28%),
+    radial-gradient(circle at 88% 92%,rgba(255,255,255,.025),transparent 34%),
+    #050607;
+}
+.desktop{height:100vh;padding:22px;position:relative}
+.k9s-window{
+  height:100%;
+  border:1px solid #353a40;
+  border-radius:12px;
+  overflow:hidden;
+  background:var(--panel);
+  box-shadow:0 30px 80px rgba(0,0,0,.58);
+  display:grid;
+  grid-template-rows:42px 42px 1fr 26px;
+}
+.titlebar{
+  display:grid;
+  grid-template-columns:120px 1fr 180px;
+  align-items:center;
+  padding:0 14px;
+  background:#171a1e;
+  border-bottom:1px solid var(--line);
+  font-size:11px;
+}
+.lights{display:flex;gap:7px}
+.light{width:10px;height:10px;border-radius:50%}
+.r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
+.title{text-align:center;color:#d8dadd}
+.right{text-align:right;color:#a3a8ae}
+.header{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  padding:0 14px;
+  background:#0f1215;
+  border-bottom:1px solid var(--line);
+  font-size:11px;
+}
+.brand{display:flex;gap:14px;align-items:center}
+.brand strong{font-size:14px}
+.ctx{color:var(--green)}
+.summary{display:flex;gap:18px;color:#adb3ba}
+.summary b{color:#fff}
+.workspace{
+  min-height:0;
+  display:grid;
+  grid-template-columns:43% 57%;
+}
+.pods{
+  min-width:0;
+  border-right:1px solid var(--line);
+  display:grid;
+  grid-template-rows:32px 28px 1fr;
+  background:#0c0e10;
+}
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 11px;
+  background:#111418;
+  border-bottom:1px solid var(--line);
+  font-size:10px;
+}
+.section-head span{color:#9ea5ad}
+.pod-header,.pod-row{
+  display:grid;
+  grid-template-columns:minmax(190px,1.8fr) 76px 54px 70px 70px;
+  gap:8px;
+  align-items:center;
+  padding:0 10px;
+  font-size:10px;
+}
+.pod-header{
+  color:#8f969e;
+  border-bottom:1px solid #24282d;
+}
+.pod-list{overflow:hidden}
+.pod-row{
+  height:35px;
+  border-bottom:1px solid #202328;
+  color:#e6e6e6;
+  transition:.25s ease;
+}
+.pod-row:hover{background:#15191d}
+.pod-row.active{
+  background:#edf1f4;
+  color:#08090a;
+}
+.pod-row.active .muted{color:#4a5057}
+.status{display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.dot.red{background:var(--red)}
+.muted{color:#8e959d}
+.logs{
+  min-width:0;
+  display:grid;
+  grid-template-rows:32px 31px 1fr;
+  background:#090b0d;
+}
+.log-tools{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 11px;
+  border-bottom:1px solid var(--line);
+  background:#111418;
+  font-size:10px;
+}
+.filters{display:flex;gap:15px;color:#a1a7ae}
+.filters b{color:#fff}
+.log-meta{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:0 11px;
+  border-bottom:1px solid #22262b;
+  color:#9ba2aa;
+  font-size:10px;
+}
+.live{color:var(--green);display:flex;align-items:center;gap:6px}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.2s infinite}
+.log-output{
+  padding:10px 12px 18px;
+  overflow:hidden;
+  scroll-behavior:smooth;
+  font-size:10.5px;
+  line-height:1.55;
+}
+.log-line{
+  min-height:17px;
+  white-space:pre-wrap;
+  animation:logIn .18s ease;
+}
+.white{color:#f4f4f4}
+.green{color:var(--green)}
+.red{color:var(--red)}
+.footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 10px;
+  background:#171a1e;
+  border-top:1px solid var(--line);
+  color:#aab0b7;
+  font-size:9px;
+}
+.keys{display:flex;gap:13px}
+.keys b{color:#fff;font-weight:normal}
+.terminal-overlay{
+  position:absolute;
+  z-index:5;
+  top:58px;
+  right:54px;
+  width:455px;
+  height:178px;
+  border:1px solid #42484f;
+  border-radius:9px;
+  overflow:hidden;
+  background:#090b0d;
+  box-shadow:0 18px 44px rgba(0,0,0,.6);
+  display:grid;
+  grid-template-rows:31px 1fr;
+}
+.terminal-title{
+  display:grid;
+  grid-template-columns:70px 1fr 70px;
+  align-items:center;
+  padding:0 10px;
+  background:#171a1e;
+  border-bottom:1px solid #31363c;
+  font-size:9px;
+}
+.terminal-title .lights .light{width:8px;height:8px}
+.terminal-name{text-align:center;color:#d8dade}
+.terminal-output{
+  overflow:hidden;
+  padding:9px 11px 12px;
+  font-size:9.5px;
+  line-height:1.48;
+  scroll-behavior:smooth;
+}
+.term-line{min-height:14px;white-space:pre-wrap;animation:logIn .18s ease}
+.badge{
+  display:inline-block;
+  padding:2px 7px;
+  border:1px solid rgba(87,214,141,.45);
+  border-radius:10px;
+  color:var(--green);
+}
+@keyframes pulse{50%{opacity:.35}}
+@keyframes logIn{from{opacity:0;transform:translateY(3px)}}
+@media(max-width:1050px){body{overflow:auto}.desktop{min-width:1040px}}
+
+.terminal-overlay{top:auto;bottom:52px;right:44px;width:470px}
+</style>
+<!-- DW-SITE --><meta name="robots" content="noindex,nofollow,noarchive"><script>if("serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});</script><!-- DW-GA --><script>(function(){try{if(localStorage.getItem('dw-noga'))return;}catch(e){}window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','G-ZMQZ7X9F3J');var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-ZMQZ7X9F3J';(document.head||document.documentElement).appendChild(s);})();</script>
+</head>
+<body>
+<div class="desktop">
+  <section class="k9s-window">
+    <header class="titlebar">
+      <div class="lights"><i class="light r"></i><i class="light y"></i><i class="light g"></i></div>
+      <div class="title">Cluster Console — Pod Log Monitor</div>
+      <div class="right">Context: <span class="ctx" id="ctx">-</span></div>
+    </header>
+
+    <div class="header">
+      <div class="brand">
+        <strong>HAVEN CI</strong>
+        <span>Namespace: <b>haven-ci</b></span>
+        <span>Pipeline: <b id="pipe">-</b></span>
+        <span>Ref: <b id="ref">-</b></span>
+      </div>
+      <div class="summary">
+        <span>Pods <b id="podCount">0</b></span>
+        <span>Running <b id="runningCount">0</b></span>
+        <span>Succeeded <b id="doneCount">0</b></span>
+        <span>Failed <b id="failCount">0</b></span>
+        <span>CPU <b id="totalCpu">0m</b></span>
+      </div>
+    </div>
+
+    <main class="workspace">
+      <section class="pods">
+        <div class="section-head"><b>Pods</b><span id="pipeId">-</span></div>
+        <div class="pod-header"><span>NAME</span><span>STATUS</span><span>READY</span><span>CPU</span><span>AGE</span></div>
+        <div class="pod-list" id="podList"></div>
+      </section>
+      <section class="logs">
+        <div class="log-tools">
+          <b id="selectedTitle">Logs</b>
+          <div class="filters"><span>Container <b id="cname">runner</b></span><span>Tail <b>200</b></span><span>Follow <b>on</b></span></div>
+        </div>
+        <div class="log-meta">
+          <span class="live"><i></i>streaming</span>
+          <span id="podMeta"></span>
+          <span>timestamps enabled</span>
+        </div>
+        <div class="log-output" id="logOutput"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="keys">
+        <span><b>↑↓</b> Navigate</span><span><b>Enter</b> Select</span><span><b>l</b> Logs</span>
+        <span><b>s</b> Shell</span><span><b>d</b> Describe</span><span><b>q</b> Quit</span>
+      </div>
+      <span class="badge">Connected</span>
+    </footer>
+  </section>
+
+  <section class="terminal-overlay">
+    <header class="terminal-title">
+      <div class="lights"><i class="light r"></i><i class="light y"></i><i class="light g"></i></div>
+      <div class="terminal-name">haven-ci — zsh</div>
+      <div></div>
+    </header>
+    <div class="terminal-output" id="termOutput"></div>
+  </section>
+</div>
+
+<script>
+// stage: 1 = 초반 작업, 2 = 중반 작업, 3 = 마무리 (Enter 로 완료)
+const HAVEN_STAGE = (() => {
+  const q = new URLSearchParams(location.search).get("stage");
+  const h = (location.hash || "").replace("#", "");
+  const v = parseInt(q || h || "1", 10);
+  return [1, 2, 3].includes(v) ? v : 1;
+})();
+document.addEventListener("keydown", (e) => {
+  const d = e.code && e.code.startsWith("Digit") ? e.code.slice(5) : e.key;
+  if (e.altKey && ["1", "2", "3"].includes(d)) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    location.hash = "#" + d;
+    location.reload();
+  }
+}, true);
+
+// 완료 대화상자 (Enter "탁!" 이후) — Windows 스타일
+function havenCelebrate(opts) {
+  if (document.getElementById("havenDone")) return;
+  const o = Object.assign({ delay: 0 }, opts || {});
+  const css = `
+#havenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
+#havenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
+  box-shadow:0 32px 64px rgba(0,0,0,.37),0 2px 21px rgba(0,0,0,.27);overflow:hidden;animation:hdPop .18s cubic-bezier(.1,.9,.2,1)}
+@keyframes hdFade{from{opacity:0}}
+@keyframes hdPop{from{opacity:0;transform:scale(.96)}}
+#havenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
+#havenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
+#havenDone .hd-title .sp{flex:1}
+#havenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
+#havenDone .hd-x:hover{background:#c42b1c;color:#fff}
+#havenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
+#havenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
+#havenDone .hd-ok svg{width:18px;height:18px}
+#havenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
+#havenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
+#havenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
+#havenDone dd{margin:0;color:#1b1b1b}
+#havenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
+#havenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
+#havenDone .hd-btn:hover{background:#f6f6f6}
+#havenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
+#havenDone .hd-btn.pri:hover{background:#1b75c4}
+`;
+  setTimeout(() => {
+    const st = document.createElement("style");
+    st.textContent = css;
+    document.head.appendChild(st);
+    const root = document.createElement("div");
+    root.id = "havenDone";
+    const now = new Date();
+    const p2 = (n) => String(n).padStart(2, "0");
+    const ts = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
+    root.innerHTML = `
+      <div class="hd-win" role="dialog" aria-modal="true">
+        <div class="hd-title"><span class="ic">H</span><span>Haven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
+        <div class="hd-body">
+          <div class="hd-ok"><svg viewBox="0 0 16 16"><path d="M3.2 8.4l3 3 6.6-6.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <h2>배포가 완료되었습니다.</h2>
+            <p>해븐코인(HAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
+            <dl>
+              <dt>네트워크</dt><dd>Haven Mainnet (chain 7310)</dd>
+              <dt>검증 노드</dt><dd>7 / 7 온라인</dd>
+              <dt>테스트</dt><dd>138 / 138 통과</dd>
+              <dt>완료 시각</dt><dd>${ts}</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="hd-foot"><button class="hd-btn pri" data-close>확인</button><button class="hd-btn" data-close>닫기</button></div>
+      </div>`;
+    document.body.appendChild(root);
+    root.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => root.remove()));
+    root.querySelector(".hd-btn.pri").focus({ preventScroll: true });
+
+    // 제목 표시줄 드래그
+    const win = root.querySelector(".hd-win"), bar = root.querySelector(".hd-title");
+    let dx = 0, dy = 0, sx = 0, sy = 0, drag = false;
+    bar.addEventListener("mousedown", (e) => { if (e.target.closest("button")) return; drag = true; sx = e.clientX - dx; sy = e.clientY - dy; e.preventDefault(); });
+    addEventListener("mousemove", (e) => { if (!drag) return; dx = e.clientX - sx; dy = e.clientY - sy; win.style.transform = `translate(${dx}px,${dy}px)`; });
+    addEventListener("mouseup", () => { drag = false; });
+  }, o.delay);
+}
+document.addEventListener("keydown", (e) => {
+  const d = document.getElementById("havenDone");
+  if (!d) return;
+  if (e.key === "Escape" || e.key === "Enter" || e.key === " ") { d.remove(); }
+  e.stopPropagation(); e.preventDefault();
+}, true);
+
+
+const S = HAVEN_STAGE;
+const $ = (id) => document.getElementById(id);
+const ri = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const hex = (n) => Array.from({ length: n }, () => "0123456789abcdef"[ri(0, 15)]).join("");
+let launched = false;
+
+const CFG = {
+  1: { ctx: "haven-dev", pipe: "#214", ref: "feature/token-core@4c1a9e2" },
+  2: { ctx: "haven-stage", pipe: "#612", ref: "feature/staking-vesting@b81e07d" },
+  3: { ctx: "haven-prod", pipe: "#1048", ref: "release/v1.0.0@9e3f5a1" }
+}[S];
+$("ctx").textContent = CFG.ctx;
+$("pipe").textContent = CFG.pipe;
+$("ref").textContent = CFG.ref;
+$("pipeId").textContent = "pipeline " + CFG.pipe;
+
+const suf = () => hex(5);
+// [name, status, ready, cpu, age, kind]
+let pods = [];
+if (S === 1) pods = [
+  [`forge-test-${suf()}`, "Running", "1/1", 310, "2m", "forge"],
+  [`cargo-test-node-${suf()}`, "Running", "1/1", 880, "2m", "cargo"],
+  [`fuzz-haventoken-${suf()}`, "Running", "1/1", 940, "6m", "fuzz"],
+  [`slither-scan-${suf()}`, "Completed", "0/1", 0, "9m", "slither"],
+  [`indexer-it-${suf()}`, "Error", "0/1", 0, "4m", "indexer"],
+  [`deploy-devnet-${suf()}`, "Pending", "0/1", 0, "1m", "deploy"]
+];
+if (S === 2) pods = [
+  [`forge-test-${suf()}`, "Running", "1/1", 420, "3m", "forge"],
+  [`cargo-test-consensus-${suf()}`, "Running", "1/1", 1120, "3m", "cargo"],
+  [`fuzz-havenstaking-${suf()}`, "Running", "1/1", 980, "11m", "fuzz"],
+  [`invariant-vesting-${suf()}`, "Running", "1/1", 760, "8m", "invariant"],
+  [`e2e-testnet-${suf()}`, "Error", "0/1", 0, "5m", "e2e"],
+  [`slither-scan-${suf()}`, "Completed", "0/1", 0, "14m", "slither"],
+  [`bridge-it-${suf()}`, "Pending", "0/1", 0, "38m", "bridge"],
+  [`deploy-testnet-${suf()}`, "Completed", "0/1", 0, "1h", "deploy"]
+];
+if (S === 3) pods = [
+  [`forge-test-${suf()}`, "Completed", "0/1", 0, "24m", "forge"],
+  [`cargo-test-workspace-${suf()}`, "Completed", "0/1", 0, "24m", "cargo"],
+  [`fuzz-all-${suf()}`, "Completed", "0/1", 0, "22m", "fuzz"],
+  [`invariant-suite-${suf()}`, "Completed", "0/1", 0, "22m", "invariant"],
+  [`e2e-mainnet-fork-${suf()}`, "Completed", "0/1", 0, "17m", "e2e"],
+  [`slither-scan-${suf()}`, "Completed", "0/1", 0, "24m", "slither"],
+  [`release-sign-${suf()}`, "Completed", "0/1", 0, "11m", "sign"],
+  [`deploy-mainnet-${suf()}`, "Running", "1/1", 40, "3m", "deploy"]
+];
+
+const list = $("podList");
+let selected = S === 3 ? pods.length - 1 : 0;
+function render() {
+  list.innerHTML = pods.map((p, i) => {
+    const bad = /Error|Fail/.test(p[1]);
+    const dotCls = bad ? "dot red" : "dot";
+    const dotStyle = /Pending|Waiting|Completed/.test(p[1]) ? (p[1] === "Completed" ? "background:#8e959d" : "background:#e2b84b") : "";
+    return `<div class="pod-row ${i === selected ? "active" : ""}" data-index="${i}">
+      <span>${p[0]}</span>
+      <span class="status"><i class="${dotCls}" style="${dotStyle}"></i>${p[1]}</span>
+      <span>${p[2]}</span>
+      <span class="muted">${p[3] ? p[3] + "m" : "0m"}</span>
+      <span class="muted">${p[4]}</span>
+    </div>`;
+  }).join("");
+  list.querySelectorAll(".pod-row").forEach((r) => r.addEventListener("click", () => select(+r.dataset.index)));
+  $("podCount").textContent = pods.length;
+  $("runningCount").textContent = pods.filter((p) => p[1] === "Running").length;
+  $("doneCount").textContent = pods.filter((p) => p[1] === "Completed").length;
+  $("failCount").textContent = pods.filter((p) => p[1] === "Error").length;
+  $("totalCpu").textContent = pods.reduce((a, p) => a + p[3], 0) + "m";
+}
+
+/* ───────── 로그 내용 ───────── */
+const FORGE_TESTS = {
+  1: ["HavenTokenTest:test_Mint_ByMinter", "HavenTokenTest:test_Mint_RevertsAboveMaxSupply", "HavenTokenTest:test_Burn_ReducesSupply", "HavenTokenTest:test_Pause_BlocksTransfer", "HavenPermitTest:test_Permit_ValidSignature", "HavenPermitTest:test_Permit_ExpiredDeadline", "GenesisConfigTest:test_GenesisAllocation"],
+  2: ["HavenStakingTest:test_Stake_UpdatesPool", "HavenStakingTest:test_Unstake_StartsUnbonding", "HavenStakingTest:test_Reward_AccruesPerEpoch", "HavenStakingTest:test_Harvest_PaysPending", "HavenVestingTest:test_Cliff_NoRelease", "HavenVestingTest:test_Linear_Release", "HavenTokenTest:test_Mint_ByMinter"],
+  3: ["HavenBridgeTest:test_Lock_EmitsEvent", "HavenBridgeTest:test_Mint_RequiresQuorum", "HavenStakingTest:test_SlashValidator_Double", "HavenVestingTest:test_Revoke_ReturnsUnvested"]
+};
+function logFor(p) {
+  const k = p[5];
+  if (k === "forge") {
+    if (S === 2 && Math.random() < 0.12) return ["red", `[FAIL: assertion failed: 4.82e21 != 4.80e21] HavenStakingTest:test_SlashValidator_Double() (gas: ${ri(380000, 420000)})`];
+    return ["green", `[PASS] ${pick(FORGE_TESTS[S])}() (gas: ${ri(18000, 310000).toLocaleString()})`];
+  }
+  if (k === "cargo") return Math.random() < 0.8
+    ? ["white", `test ${pick(["genesis::tests::validate_rejects_empty_set", "genesis::tests::hash_is_stable", "pos::tests::proposer_weighted", "pos::tests::quorum_two_thirds", "p2p::tests::gossip_dedup", "evm::tests::base_fee_adjusts"])} ... ok`]
+    : ["white", `   Compiling ${pick(["haven-consensus", "haven-evm", "haven-p2p", "haven-staking"])} v${S === 1 ? "0.3.0" : "0.7.2"}`];
+  if (k === "fuzz" || k === "invariant") return ["white", `[${k === "fuzz" ? "FUZZ" : "INVARIANT"}] ${pick(["totalSupply <= MAX_SUPPLY", "sum(stakes) == totalStaked", "vested <= allocation", "balanceOf(this) >= totalStaked"])} runs=${ri(1000, 65536).toLocaleString()} calls=${ri(10000, 900000).toLocaleString()} reverts=${ri(0, 900)} ✓`];
+  if (k === "slither") return ["white", `INFO:Detectors: ${pick(["naming-convention", "solc-version", "too-many-digits", "immutable-states"])} — informational`];
+  if (k === "indexer") return Math.random() < 0.5 ? ["red", `panicked at 'decode receipt: unexpected log topic length 5', src/decoder.rs:${ri(80, 140)}:17`] : ["white", `indexing block ${ri(41800, 41870)} txs=${ri(0, 6)}`];
+  if (k === "e2e") return Math.random() < 0.3 ? ["red", `✗ bridge round-trip (lock → mint → burn → release)  Error: relayer not reachable`] : ["green", `✓ ${pick(["transfer HAVEN between EOAs", "delegate to validator-2", "claim staking reward after epoch", "vesting cliff respected"])} (${ri(800, 4200)}ms)`];
+  if (k === "bridge") return ["white", `waiting for PersistentVolumeClaim "relayer-keys" to be bound`];
+  if (k === "deploy") {
+    if (S === 1) return ["white", `0/1 nodes are available: waiting for devnet node readiness`];
+    if (S === 2) return ["white", `deploy finished · HavenStaking 0x3Ab1…77c4 verified on testnet explorer`];
+    return launched ? ["green", `block #${ri(2, 40)} finalized votes=7/7`] : ["white", `awaiting approval: production deploy requires 2 approvals (1/2)`];
+  }
+  if (k === "sign") return ["green", `artifact signed haven-node-1.0.0-linux-amd64.tar.gz sha256=${hex(12)}…`];
+  return ["white", "heartbeat ok"];
+}
+function doneLog(p) {
+  const k = p[5];
+  const m = {
+    forge: ["green", "Ran 6 test suites: 138 tests passed, 0 failed, 0 skipped (138 total tests)"],
+    cargo: ["green", "test result: ok. 312 passed; 0 failed; 0 ignored; finished in 41.82s"],
+    fuzz: ["green", "fuzz campaign finished: 1,048,576 runs, 0 counterexamples"],
+    invariant: ["green", "invariant suite finished: 24/24 invariants held"],
+    e2e: ["green", "e2e: 42 passing (6m 12s)"],
+    slither: ["white", S === 3 ? "52 contracts analyzed: 0 high, 0 medium, 3 informational" : `47 contracts analyzed: 0 high, ${S === 1 ? 4 : 1} medium, 11 informational`],
+    sign: ["green", "release v1.0.0 signed by 3/3 keyholders"],
+    deploy: ["green", "deploy finished · testnet contracts verified"]
+  };
+  return m[k] || ["white", "completed"];
+}
+
+const out = $("logOutput");
+function addLog(cls, text, ts) {
+  const d = document.createElement("div");
+  d.className = "log-line " + cls;
+  d.textContent = `${(ts || new Date()).toISOString()} ${text}`;
+  out.appendChild(d);
+  while (out.children.length > 34) out.removeChild(out.firstChild);
+  out.scrollTop = out.scrollHeight;
+}
+function history() {
+  out.innerHTML = "";
+  const p = pods[selected];
+  const now = Date.now();
+  for (let i = 0; i < 24; i++) {
+    const [c, t] = logFor(p);
+    addLog(c, t, new Date(now - (24 - i) * 900));
+  }
+  if (p[1] === "Completed") addLog(...doneLog(p));
+}
+function select(i) {
+  selected = i;
+  const p = pods[i];
+  $("selectedTitle").textContent = "Logs: " + p[0];
+  $("podMeta").textContent = "pod/" + p[0];
+  $("cname").textContent = p[5] === "deploy" ? "deployer" : "runner";
+  render();
+  history();
+}
+function emit() {
+  const p = pods[selected];
+  if (S === 3 && launched) { setTimeout(emit, 600); return; }
+  if (p[1] === "Running" || p[1] === "Error" || p[1] === "Pending") addLog(...logFor(p));
+  setTimeout(emit, 480 + Math.random() * 650);
+}
+
+/* ───────── 터미널 ───────── */
+const term = $("termOutput");
+function tl(cls, msg) {
+  const d = document.createElement("div");
+  d.className = "term-line " + cls;
+  d.textContent = msg;
+  term.appendChild(d);
+  while (term.children.length > 11) term.removeChild(term.firstChild);
+  term.scrollTop = term.scrollHeight;
+}
+const TERM = {
+  1: [["white", "➜ haven-chain git push origin feature/token-core"], ["green", "To github.com:pharaoh-lab/haven-chain.git  9b2d4f0..4c1a9e2"], ["white", "➜ haven-chain havenci watch #214"], ["green", "pipeline #214 · 6 jobs · 3 running"], ["red", "job indexer-it failed (exit 101)"]],
+  2: [["white", "➜ haven-chain git push origin feature/staking-vesting"], ["green", "To github.com:pharaoh-lab/haven-chain.git  71fa0c3..b81e07d"], ["white", "➜ haven-chain havenci watch #612"], ["green", "pipeline #612 · 8 jobs · 4 running"], ["red", "job e2e-testnet failed: bridge round-trip"]],
+  3: [["white", "➜ haven-chain git tag -s v1.0.0 -m \"Haven mainnet\""], ["white", "➜ haven-chain git push origin v1.0.0"], ["green", "* [new tag]  v1.0.0 -> v1.0.0"], ["white", "➜ haven-chain havenci watch #1048"], ["green", "pipeline #1048 · 7/8 jobs succeeded"], ["white", "deploy-mainnet: awaiting approval (1/2)"], ["white", "➜ haven-chain havenci approve #1048 --job deploy-mainnet"]]
+}[S];
+let ti = 0;
+function termTick() {
+  if (ti < TERM.length) { tl(...TERM[ti++]); setTimeout(termTick, 600 + Math.random() * 400); }
+}
+
+/* ───────── 완료 ───────── */
+function launch() {
+  if (S !== 3) { havenCelebrate({ delay: 500 }); return; }
+  if (S !== 3 || launched) return;
+  launched = true;
+  havenCelebrate({ delay: 5500 });
+  const p = pods[pods.length - 1];
+  select(pods.length - 1);
+  tl("green", "✔ approved by dongchan.bae (2/2)");
+  const seq = [
+    ["white", "approval 2/2 received — starting production deploy"],
+    ["white", "deploying HavenToken ... 0x5E0d1c94A7b3F2E8D61a90C4b7E2f3a8D9c04e01"],
+    ["white", "deploying HavenValidatorSet ... 0x91bC07e3A2d4F68c0B5e1D7a3F9c2E84b6A1d702"],
+    ["white", "deploying HavenStaking ... 0x2Fa84D16c9E0b3A7f5D2e8C14b9A6d0E3f7C5b31"],
+    ["white", "deploying HavenVesting ... 0xC3e7A90f1B4d26E8a5F0c9D3b7E1a64F2d8B0e95"],
+    ["white", "deploying HavenBridge ... 0x6aD2f8E14c7B90a3E5d1F6b2C8a0e47D9f3B1c58"],
+    ["green", "genesis sealed signatures=7/7 chain_id=7310"],
+    ["green", "block #0 (genesis) finalized votes=7/7"],
+    ["green", "block #1 finalized votes=7/7"],
+    ["green", "explorer verification complete: 5/5 contracts verified"],
+    ["green", "deploy finished · HAVEN mainnet v1.0.0 is live"]
+  ];
+  p[3] = 620; render();
+  seq.forEach((l, i) => setTimeout(() => addLog(...l), 300 + i * 420));
+  setTimeout(() => {
+    p[1] = "Completed"; p[2] = "0/1"; p[3] = 0; render();
+    tl("green", "pipeline #1048 · 8/8 jobs succeeded");
+    tl("white", "➜ haven-chain");
+  }, 300 + seq.length * 420 + 400);
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key === "ArrowDown") { e.preventDefault(); select((selected + 1) % pods.length); }
+  if (e.key === "ArrowUp") { e.preventDefault(); select((selected - 1 + pods.length) % pods.length); }
+  if (e.key === "Enter") { e.preventDefault(); launch(); }
+});
+
+select(selected);
+emit();
+termTick();
+setInterval(() => {
+  pods.forEach((p) => { if (p[1] === "Running") p[3] = Math.max(20, p[3] + ri(-60, 60)); });
+  render();
+}, 1500);
+</script>
+</body>
+</html>

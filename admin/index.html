@@ -94,6 +94,11 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
 .scene{font-weight:900;font-size:14px}.name{font-weight:800;font-size:15px}
 .meta{font-size:11px;color:#7e899f;margin-top:5px}.flags{font-size:10px;margin-top:5px}
 .pin{color:#f0be65}.hidden{color:#9a87d7}.trash{color:#d77a7a}.memo-flag{color:#ffb06b}
+.dcrumb{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted);margin:14px 0 6px}.dcrumb a{color:#9fb5ff;cursor:pointer}
+.dico{width:44px;height:50px;border-radius:7px;display:grid;place-items:center;font:800 10px/1 inherit;color:#fff}
+.dico.hwp{background:#2a7de1}.dico.docx,.dico.doc{background:#2b5797}.dico.pdf{background:#d9453b}.dico.xlsx,.dico.xls{background:#1f7a46}.dico.img{background:#8a5cd6}.dico.etc{background:#4a5568}.dico.dir{background:#c9962c;font-size:18px}
+#docProg{display:none;margin-top:12px;background:#101625;border:1px solid #26314a;border-radius:12px;padding:12px 14px;font-size:13px}#docProg.on{display:block}
+#docProg .pbar{height:8px;background:#1a2235;border-radius:4px;overflow:hidden;margin-top:8px}#docProg .pbar i{display:block;height:100%;width:0;background:#7590ff;transition:width .2s}
 .group-title{font-size:12px;font-weight:900;color:#9fb5ff;letter-spacing:.06em;margin:18px 0 2px}
 .item.off .name,.item.off .scene{opacity:.45}
 .item-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
@@ -206,6 +211,7 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
     <button data-v="items"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>자료 관리</button>
     <button data-v="memo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>메모<span class="cnt" id="memoCnt"></span></button>
     <button data-v="apps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>앱·게임</button>
+    <button data-v="docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>서류</button>
     <button data-v="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>기록</button>
     <button data-v="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>소식</button>
   </nav>
@@ -290,6 +296,20 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
         <button class="btn" id="appNew">＋ 새 앱·게임 올리기</button>
       </div>
       <div id="appList" style="margin-top:10px"><div class="status">불러오는 중...</div></div>
+    </div>
+  </section>
+
+  <section class="view" id="v-docs">
+    <div class="panel">
+      <div class="toolbar">
+        <div><h1 style="font-size:22px">소품 서류</h1><div class="sub" style="margin:3px 0 0">여기서 올리면 사이트 <b>피라밋 › 소품 서류</b>에 바로 보입니다. 폴더째 끌어다 놓으면 폴더 구조 그대로 올라가요.<br>한글·워드 파일은 <b>같은 이름의 PDF</b>를 함께 올리면 그 PDF가 미리보기로 붙습니다.</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn secondary" id="docNewFolder">＋ 새 폴더</button><button class="btn secondary" id="docPickFiles">📄 파일 올리기</button><button class="btn" id="docPickDir">📂 폴더 올리기</button></div>
+      </div>
+      <input type="file" id="docFiles" multiple hidden><input type="file" id="docDir" webkitdirectory multiple hidden>
+      <label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:12px;color:var(--muted);cursor:pointer;width:max-content"><input type="checkbox" id="docSkipOld" checked style="width:auto;margin:0;flex:0 0 auto"> '이전'·'전전'·'전' 폴더는 빼고 올리기</label>
+      <div id="docProg"><div id="docProgT"></div><div class="pbar"><i id="docProgB"></i></div></div>
+      <div class="dcrumb" id="docCrumb"></div>
+      <div id="docList"><div class="status">불러오는 중...</div></div>
     </div>
   </section>
 
@@ -430,6 +450,7 @@ function go(v){
   if(v==='memo')loadMemos();
   if(v==='log')loadActivity();
   if(v==='apps')loadApps();
+  if(v==='docs')loadDocs();
 }
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(b)go(b.dataset.v);});
 document.querySelectorAll('.stat[data-go]').forEach(s=>s.addEventListener('click',()=>go(s.dataset.go)));
@@ -547,6 +568,7 @@ window.addEventListener('dragover',e=>{if(!hasFiles(e))return;e.preventDefault()
 window.addEventListener('drop',e=>{
   if(!hasFiles(e))return;e.preventDefault();dragDepth=0;$('#dragcover').classList.remove('on');
   if($('#appModal').classList.contains('show'))return;
+  if(view==='docs'&&!document.querySelector('.modal.show')){docsDrop(e.dataTransfer);return;}
   const row=rowTarget(e);clearRowDrop();
   if(e.target.closest('#rdrop')||$('#replaceModal').classList.contains('show')){setReplaceFile(e.dataTransfer.files[0]);return;}
   if(row){if(row.dataset.sid)openStaticReplace(row.dataset.sid,e.dataTransfer.files[0]);else openReplace(row.dataset.key,e.dataTransfer.files[0]);return;}
@@ -558,6 +580,7 @@ function updateCover(e){
   clearRowDrop();
   if($('#appModal').classList.contains('show')){$('#dragcover').classList.remove('on');return;}
   if($('#replaceModal').classList.contains('show')){$('#rdrop').classList.add('over');$('#dragcover').classList.remove('on');return;}
+  $('#dragcover div').textContent=view==='docs'?'놓으면 지금 보고 있는 폴더에 서류가 올라갑니다':'놓으면 업로드 목록에 추가됩니다';
   const row=rowTarget(e);
   if(row){row.classList.add('dropok');$('#dragcover').classList.remove('on');return;}
   if(e.target.closest?.('#drop')){$('#drop').classList.add('over');$('#dragcover').classList.remove('on');return;}
@@ -922,6 +945,123 @@ $('#thumbMissing').onclick=async()=>{
   b.disabled=false;b.textContent='🖼 빠진 미리보기 사진 만들기';toast('미리보기 사진을 만들었습니다');
 };
 
+
+/* ── 소품 서류 ── */
+let docs={folders:[],files:[]},docCur='';
+const DOC_API='/.netlify/functions/admin-docs';
+const dExt=n=>{const m=String(n).match(/\.([a-z0-9]{1,5})$/i);return m?m[1].toLowerCase():'';};
+const dKind=n=>{const e=dExt(n);if(/^(png|jpe?g|webp|gif)$/.test(e))return'img';if(/^hwpx?$/.test(e))return'hwp';if(/^(pdf|docx|doc|xlsx|xls)$/.test(e))return e;return'etc';};
+const dNum=s=>{const m=String(s||'').match(/\d+/);return m?+m[0]:999;};
+const dFolder=id=>docs.folders.find(f=>f.id===id);
+const dKids=id=>docs.folders.filter(f=>f.parent===id).sort((a,b)=>(dNum(a.part)-dNum(b.part))||(dNum(a.scene)-dNum(b.scene))||(a.order-b.order)||a.name.localeCompare(b.name,'ko',{numeric:true}));
+const dFiles=id=>docs.files.filter(f=>f.folder===id).sort((a,b)=>(a.order-b.order)||a.name.localeCompare(b.name,'ko',{numeric:true}));
+const dDeep=id=>dFiles(id).length+dKids(id).reduce((n,k)=>n+dDeep(k.id),0);
+const dFileUrl=(f,kind,dl)=>`/.netlify/functions/doc-file?id=${encodeURIComponent(f.id)}${kind==='preview'?'&kind=preview':''}${dl?'&dl=1':''}&v=${Date.now()}`;
+async function loadDocs(){
+  try{const r=await fetch(DOC_API,{cache:'no-store'});if(r.status===401){location.reload();return;}docs=await r.json();if(docCur&&!dFolder(docCur))docCur='';renderDocs();}catch{$('#docList').innerHTML='<div class="status">불러오지 못했습니다.</div>';}
+}
+function renderDocs(){
+  const path=[];for(let f=dFolder(docCur);f;f=dFolder(f.parent))path.unshift(f);
+  $('#docCrumb').innerHTML=`<a data-dgo="">전체</a>`+path.map(p=>` › <a data-dgo="${esc(p.id)}">${esc(p.name)}</a>`).join('')+(docCur?` <a class="btn secondary small" target="_blank" href="/pyramid/docs/#f=${esc(docCur)}" style="margin-left:8px">사이트에서 보기</a>`:` <a class="btn secondary small" target="_blank" href="/pyramid/docs/" style="margin-left:8px">사이트에서 보기</a>`);
+  const sub=dKids(docCur),fl=dFiles(docCur);
+  if(!sub.length&&!fl.length){$('#docList').innerHTML=`<div class="status" style="padding:24px 0">${docCur?'빈 폴더입니다. 파일을 끌어다 놓거나 위 버튼으로 올려 주세요.':'아직 서류가 없습니다. 「📂 폴더 올리기」로 서류 폴더를 통째로 올려 보세요.'}</div>`;return;}
+  $('#docList').innerHTML=sub.map(f=>`<div class="item${f.visible?'':' off'}" data-dfolder="${esc(f.id)}" style="grid-template-columns:56px minmax(180px,1fr) auto">
+      <div class="dico dir" data-dopen style="cursor:pointer">📁</div>
+      <div data-dopen style="cursor:pointer"><div class="name">${esc(f.name)}</div><div class="meta">${esc([f.part,f.scene].filter(Boolean).join(' '))}${f.part||f.scene?' · ':''}서류 ${dDeep(f.id)}개${dKids(f.id).length?` · 폴더 ${dKids(f.id).length}개`:''}</div>${f.visible?'':'<div class="flags"><span class="hidden">● 숨김</span></div>'}</div>
+      <div class="item-actions"><button class="btn secondary small" data-dact="open">열기</button><button class="btn secondary small" data-dact="rename">이름</button><button class="btn secondary small" data-dact="up">↑</button><button class="btn secondary small" data-dact="down">↓</button><button class="btn ${f.visible?'danger':'ok'} small" data-dact="vis">${f.visible?'숨김':'다시 표시'}</button><button class="btn danger small" data-dact="del">삭제</button></div></div>`).join('')+
+    fl.map(f=>{const k=dKind(f.name),need=!f.preview&&!/^(pdf|img)$/.test(k);return`<div class="item${f.visible?'':' off'}" data-dfile="${esc(f.id)}" style="grid-template-columns:56px minmax(180px,1fr) auto">
+      <div class="dico ${k}">${esc((dExt(f.name)||'FILE').toUpperCase().slice(0,4))}</div>
+      <div><div class="name">${esc(f.name)}</div><div class="meta">${fmtSize(f.size||0)} · ${esc((f.at||'').slice(0,10))}</div>
+        <div class="flags">${f.preview?`<span class="ov">● 미리보기 PDF</span> `:need?'<span class="trash">● 미리보기 없음 (PDF 붙이기)</span> ':''}${f.visible?'':'<span class="hidden">● 숨김</span>'}</div></div>
+      <div class="item-actions">${f.preview||!need?`<a class="btn secondary small" target="_blank" href="${esc(dFileUrl(f,f.preview?'preview':'orig'))}">보기</a>`:''}<a class="btn secondary small" href="${esc(dFileUrl(f,'orig',true))}">받기</a><button class="btn secondary small" data-dact="pdf">${f.preview?'PDF 바꾸기':'PDF 붙이기'}</button><button class="btn secondary small" data-dact="replace">교체</button><button class="btn secondary small" data-dact="rename">이름</button><button class="btn secondary small" data-dact="up">↑</button><button class="btn secondary small" data-dact="down">↓</button><button class="btn ${f.visible?'danger':'ok'} small" data-dact="vis">${f.visible?'숨김':'다시 표시'}</button><button class="btn danger small" data-dact="del">삭제</button></div></div>`;}).join('');
+}
+$('#docCrumb').addEventListener('click',e=>{const a=e.target.closest('[data-dgo]');if(a){docCur=a.dataset.dgo;renderDocs();}});
+function pickOne(accept){return new Promise(ok=>{const i=document.createElement('input');i.type='file';if(accept)i.accept=accept;i.onchange=()=>ok(i.files[0]||null);i.click();});}
+$('#docList').addEventListener('click',async e=>{
+  const fr=e.target.closest('[data-dfolder]'),fi=e.target.closest('[data-dfile]');
+  const b=e.target.closest('[data-dact]'),act=b?b.dataset.dact:(e.target.closest('[data-dopen]')?'open':'');
+  if(!act)return;
+  if(fr){const f=dFolder(fr.dataset.dfolder);if(!f)return;
+    if(act==='open'){docCur=f.id;renderDocs();scrollTo(0,0);return;}
+    let body;
+    if(act==='rename'){const n=prompt('폴더 이름 (예: 2부 41씬 용남동 부동산 매매서류)',f.name);if(!n||n.trim()===f.name)return;body={action:'folder-update',id:f.id,name:n.trim()};}
+    else if(act==='vis')body={action:'folder-update',id:f.id,visible:!f.visible};
+    else if(act==='del'){const n=dDeep(f.id);if(!confirm(`'${f.name}' 폴더를 삭제할까요?${n?`\n안에 있는 서류 ${n}개도 함께 지워지며 되돌릴 수 없습니다.`:''}`))return;body={action:'folder-delete',id:f.id};}
+    else body={action:'move',kind:'folder',id:f.id,dir:act==='up'?-1:1};
+    if(await apiPost(DOC_API,body)){await loadDocs();toast(act==='del'?'삭제했습니다':'반영했습니다');}
+    return;}
+  if(fi){const f=docs.files.find(x=>x.id===fi.dataset.dfile);if(!f)return;
+    if(act==='pdf'||act==='replace'){
+      const file=await pickOne(act==='pdf'?'.pdf,application/pdf,image/*':'');if(!file)return;
+      if(act==='replace'&&dExt(file.name)!==dExt(f.name)&&!confirm(`다른 형식(${dExt(file.name)||'?'})의 파일이에요. 그래도 교체할까요?`))return;
+      try{showDocProg(`${file.name} 올리는 중...`,0);
+        if(act==='pdf')await sendFile(`${DOC_API}?op=preview&id=${encodeURIComponent(f.id)}`,{},file);
+        else await sendFile(`${DOC_API}?op=upload&folder=${encodeURIComponent(f.folder)}`,{name:f.name},file);
+        hideDocProg();await loadDocs();toast(act==='pdf'?'미리보기를 붙였습니다':'교체했습니다');
+      }catch(err){hideDocProg();alert(err.message);}
+      return;}
+    let body;
+    if(act==='rename'){const n=prompt('파일 이름',f.name);if(!n||n.trim()===f.name)return;body={action:'file-update',id:f.id,name:n.trim()};}
+    else if(act==='vis')body={action:'file-update',id:f.id,visible:!f.visible};
+    else if(act==='del'){if(!confirm(`'${f.name}'을(를) 삭제할까요? 되돌릴 수 없습니다.`))return;body={action:'file-delete',id:f.id};}
+    else body={action:'move',kind:'file',id:f.id,dir:act==='up'?-1:1};
+    if(await apiPost(DOC_API,body)){await loadDocs();toast(act==='del'?'삭제했습니다':'반영했습니다');}
+  }
+});
+$('#docNewFolder').addEventListener('click',async()=>{
+  const n=prompt('새 폴더 이름 (예: 3부 12씬 법원 판결문)\n이름에 「N부 N씬」이 있으면 사이트에서 부·씬별로 정리됩니다.');if(!n||!n.trim())return;
+  const j=await apiPost(DOC_API,{action:'folder-create',name:n.trim(),parent:docCur});if(j){await loadDocs();toast('폴더를 만들었습니다');}
+});
+$('#docPickFiles').addEventListener('click',()=>$('#docFiles').click());
+$('#docPickDir').addEventListener('click',()=>$('#docDir').click());
+$('#docFiles').addEventListener('change',e=>{const l=[...e.target.files].map(f=>({file:f,path:''}));e.target.value='';uploadDocs(l);});
+$('#docDir').addEventListener('change',e=>{const l=[...e.target.files].map(f=>({file:f,path:(f.webkitRelativePath||'').split('/').slice(0,-1).join('/')}));e.target.value='';uploadDocs(l);});
+async function docsDrop(dt){
+  const entries=[...(dt.items||[])].map(i=>i.webkitGetAsEntry&&i.webkitGetAsEntry()).filter(Boolean);
+  if(!entries.length)return uploadDocs([...dt.files].map(f=>({file:f,path:''})));
+  const out=[];
+  const readAll=r=>new Promise(ok=>{const acc=[];const step=()=>r.readEntries(es=>{if(!es.length)return ok(acc);acc.push(...es);step();},()=>ok(acc));step();});
+  async function walk(en,dir){
+    if(en.isFile){const f=await new Promise(ok=>en.file(ok,()=>ok(null)));if(f)out.push({file:f,path:dir});}
+    else if(en.isDirectory){const p=dir?dir+'/'+en.name:en.name;for(const c of await readAll(en.createReader()))await walk(c,p);}
+  }
+  for(const en of entries)await walk(en,'');
+  uploadDocs(out);
+}
+function showDocProg(t,pct){$('#docProg').classList.add('on');$('#docProgT').textContent=t;$('#docProgB').style.width=(pct||0)+'%';}
+function hideDocProg(){$('#docProg').classList.remove('on');}
+let docBusy=false;
+async function uploadDocs(list){
+  if(docBusy)return alert('올리는 중입니다. 끝난 뒤에 다시 해 주세요.');
+  const OLD=/^(이전|전전|전)(\s*(버전|본|파일|자료))?$/;
+  list=list.filter(x=>!/^(desktop\.ini|thumbs\.db|\.ds_store)$/i.test(x.file.name)&&!/^~\$|^\._/.test(x.file.name));
+  if($('#docSkipOld').checked)list=list.filter(x=>!x.path.split('/').some(seg=>OLD.test(seg.trim())));
+  // 「서류 제작」처럼 전체를 감싼 바깥 폴더 하나는 벗겨서 올린다
+  const tops=new Set(list.map(x=>x.path.split('/')[0]));
+  if(!docCur&&tops.size===1&&[...tops][0]&&list.some(x=>x.path.includes('/'))&&!/\d\s*[부씬]/.test([...tops][0]))list.forEach(x=>{x.path=x.path.split('/').slice(1).join('/');});
+  const big=list.filter(x=>x.file.size>20*1024*1024);list=list.filter(x=>x.file.size<=20*1024*1024);
+  if(!list.length){if(big.length)alert('20MB가 넘는 파일은 올릴 수 없습니다:\n'+big.map(x=>x.file.name).join('\n'));return;}
+  // 같은 폴더에 같은 이름의 PDF가 있으면 미리보기로 붙인다
+  const base=n=>n.replace(/\.[^.]+$/,'').toLowerCase();
+  const main=[],pdfFor=new Map();
+  for(const x of list){
+    if(dExt(x.file.name)==='pdf'&&list.some(y=>y!==x&&y.path===x.path&&dExt(y.file.name)!=='pdf'&&base(y.file.name)===base(x.file.name)))pdfFor.set(x.path+'\n'+base(x.file.name),x.file);
+    else main.push(x);
+  }
+  if(!confirm(`서류 ${main.length}개를 올릴까요?${pdfFor.size?`\n(미리보기 PDF ${pdfFor.size}개 함께)`:''}${big.length?`\n20MB 넘는 ${big.length}개는 빠집니다.`:''}\n같은 폴더에 같은 이름이 있으면 새 파일로 교체됩니다.`))return;
+  docBusy=true;const fails=[];let i=0;const total=main.length;
+  for(const x of main){
+    i++;showDocProg(`${i}/${total} · ${x.path?x.path+' / ':''}${x.file.name}`,Math.round((i-1)/total*100));
+    try{
+      const j=await sendFile(`${DOC_API}?op=upload&folder=${encodeURIComponent(docCur)}`,{path:x.path,name:x.file.name},x.file);
+      const pdf=pdfFor.get(x.path+'\n'+base(x.file.name));
+      if(pdf&&dExt(x.file.name)!=='pdf')await sendFile(`${DOC_API}?op=preview&id=${encodeURIComponent(j.id)}`,{},pdf);
+    }catch(err){if(/로그인/.test(err.message)){docBusy=false;return;}fails.push(x.file.name+' — '+err.message);}
+  }
+  docBusy=false;showDocProg(`완료 · ${total-fails.length}개 올림`,100);setTimeout(hideDocProg,2500);
+  await loadDocs();
+  if(fails.length)alert('못 올린 파일:\n'+fails.join('\n'));else toast(`서류 ${total}개를 올렸습니다`);
+}
 /* ── 앱 · 게임 카드 ── */
 let apps=[];
 const STATIC_GROUPS=['준우 게임','배동찬 게임'];
