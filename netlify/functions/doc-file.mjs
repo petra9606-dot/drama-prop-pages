@@ -5,23 +5,23 @@ import { isAdmin } from "../lib/auth.mjs";
 
 export default async (req) => {
   const url = new URL(req.url);
-  const id = url.searchParams.get("id") || "", kind = url.searchParams.get("kind") === "preview" ? "preview" : "orig";
+  const id = url.searchParams.get("id") || "", k = url.searchParams.get("kind"), kind = k === "preview" || k === "thumb" ? k : "orig";
   const store = uploadsStore();
   const d = await readDocs(store);
   const f = d.files.find((x) => x.id === id);
   if (!f) return new Response("Not found", { status: 404 });
   if (f.visible === false && !isAdmin(req)) return new Response("Not found", { status: 404 });
-  const meta = kind === "preview" ? f.preview : f;
+  const meta = kind === "preview" ? f.preview : kind === "thumb" ? (f.thumb && { type: "image/jpeg" }) : f;
   if (!meta) return new Response("No preview", { status: 404 });
   const data = await store.get(docKey(id, kind), { type: "arrayBuffer" });
   if (data === null) return new Response("Not found", { status: 404 });
-  const name = kind === "preview" ? (meta.name || f.name.replace(/\.[^.]+$/, "") + ".pdf") : f.name;
+  const name = kind === "thumb" ? "thumb.jpg" : kind === "preview" ? (meta.name || f.name.replace(/\.[^.]+$/, "") + ".pdf") : f.name;
   const dl = url.searchParams.get("dl") === "1";
   const body = data.byteLength > 5 * 1024 * 1024 ? new Response(data).body : data;
   return new Response(body, { headers: {
     "Content-Type": meta.type || "application/octet-stream",
     "Content-Disposition": `${dl ? "attachment" : "inline"}; filename*=UTF-8''${encodeURIComponent(name)}`,
-    "Cache-Control": "public, max-age=300",
+    "Cache-Control": kind === "thumb" ? "public, max-age=604800, immutable" : "public, max-age=300",
     "X-Robots-Tag": "noindex, nofollow, noarchive"
   } });
 };

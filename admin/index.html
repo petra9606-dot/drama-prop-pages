@@ -303,7 +303,7 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
     <div class="panel">
       <div class="toolbar">
         <div><h1 style="font-size:22px">소품 서류</h1><div class="sub" style="margin:3px 0 0">여기서 올리면 사이트 <b>피라밋 › 소품 서류</b>에 바로 보입니다. 폴더째 끌어다 놓으면 폴더 구조 그대로 올라가요.<br>한글·워드 파일은 <b>같은 이름의 PDF</b>를 함께 올리면 그 PDF가 미리보기로 붙습니다.</div></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn secondary" id="docNewFolder">＋ 새 폴더</button><button class="btn secondary" id="docPickFiles">📄 파일 올리기</button><button class="btn" id="docPickDir">📂 폴더 올리기</button></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn secondary" id="docThumbs" style="display:none">🖼 미리보기 사진 만들기</button><button class="btn secondary" id="docNewFolder">＋ 새 폴더</button><button class="btn secondary" id="docPickFiles">📄 파일 올리기</button><button class="btn" id="docPickDir">📂 폴더 올리기</button></div>
       </div>
       <input type="file" id="docFiles" multiple hidden><input type="file" id="docDir" webkitdirectory multiple hidden>
       <label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:12px;color:var(--muted);cursor:pointer;width:max-content"><input type="checkbox" id="docSkipOld" checked style="width:auto;margin:0;flex:0 0 auto"> '이전'·'전전'·'전' 폴더는 빼고 올리기</label>
@@ -961,6 +961,7 @@ async function loadDocs(){
   try{const r=await fetch(DOC_API,{cache:'no-store'});if(r.status===401){location.reload();return;}docs=await r.json();if(docCur&&!dFolder(docCur))docCur='';renderDocs();}catch{$('#docList').innerHTML='<div class="status">불러오지 못했습니다.</div>';}
 }
 function renderDocs(){
+  paintThumbBtn();
   const path=[];for(let f=dFolder(docCur);f;f=dFolder(f.parent))path.unshift(f);
   $('#docCrumb').innerHTML=`<a data-dgo="">전체</a>`+path.map(p=>` › <a data-dgo="${esc(p.id)}">${esc(p.name)}</a>`).join('')+(docCur?` <a class="btn secondary small" target="_blank" href="/pyramid/docs/#f=${esc(docCur)}" style="margin-left:8px">사이트에서 보기</a>`:` <a class="btn secondary small" target="_blank" href="/pyramid/docs/" style="margin-left:8px">사이트에서 보기</a>`);
   const sub=dKids(docCur),fl=dFiles(docCur);
@@ -995,8 +996,8 @@ $('#docList').addEventListener('click',async e=>{
       const file=await pickOne(act==='pdf'?'.pdf,application/pdf,image/*':'');if(!file)return;
       if(act==='replace'&&dExt(file.name)!==dExt(f.name)&&!confirm(`다른 형식(${dExt(file.name)||'?'})의 파일이에요. 그래도 교체할까요?`))return;
       try{showDocProg(`${file.name} 올리는 중...`,0);
-        if(act==='pdf')await sendFile(`${DOC_API}?op=preview&id=${encodeURIComponent(f.id)}`,{},file);
-        else await sendFile(`${DOC_API}?op=upload&folder=${encodeURIComponent(f.folder)}`,{name:f.name},file);
+        if(act==='pdf'){await sendFile(`${DOC_API}?op=preview&id=${encodeURIComponent(f.id)}`,{},file);await makeDocThumb(f.id,file,dKind(file.name)==='pdf');}
+        else{await sendFile(`${DOC_API}?op=upload&folder=${encodeURIComponent(f.folder)}`,{name:f.name},file);const tk=dKind(file.name);if(!f.preview&&(tk==='pdf'||tk==='img'))await makeDocThumb(f.id,file,tk==='pdf');}
         hideDocProg();await loadDocs();toast(act==='pdf'?'미리보기를 붙였습니다':'교체했습니다');
       }catch(err){hideDocProg();alert(err.message);}
       return;}
@@ -1056,12 +1057,52 @@ async function uploadDocs(list){
       const j=await sendFile(`${DOC_API}?op=upload&folder=${encodeURIComponent(docCur)}`,{path:x.path,name:x.file.name},x.file);
       const pdf=pdfFor.get(x.path+'\n'+base(x.file.name));
       if(pdf&&dExt(x.file.name)!=='pdf')await sendFile(`${DOC_API}?op=preview&id=${encodeURIComponent(j.id)}`,{},pdf);
+      const tk=dKind(x.file.name);
+      if(pdf)await makeDocThumb(j.id,pdf,true);else if(tk==='pdf'||tk==='img')await makeDocThumb(j.id,x.file,tk==='pdf');
     }catch(err){if(/로그인/.test(err.message)){docBusy=false;return;}fails.push(x.file.name+' — '+err.message);}
   }
   docBusy=false;showDocProg(`완료 · ${total-fails.length}개 올림`,100);setTimeout(hideDocProg,2500);
   await loadDocs();
   if(fails.length)alert('못 올린 파일:\n'+fails.join('\n'));else toast(`서류 ${total}개를 올렸습니다`);
 }
+
+/* ── 서류 미리보기 사진 (사이트에서 마우스를 올리면 보이는 작은 사진) ── */
+let pdfjsP;
+function loadPdfJs(){return pdfjsP||(pdfjsP=new Promise((ok,no)=>{if(window.pdfjsLib)return ok(window.pdfjsLib);const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';sc.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';ok(window.pdfjsLib);};sc.onerror=()=>{pdfjsP=null;no(new Error('pdf.js 로드 실패'));};document.head.appendChild(sc);}));}
+async function thumbBlobFrom(src,isPdf){
+  // src: Blob 또는 URL
+  const W=360;let canvas=document.createElement('canvas');
+  if(isPdf){
+    const lib=await loadPdfJs();
+    const data=src instanceof Blob?new Uint8Array(await src.arrayBuffer()):undefined;
+    const doc=await lib.getDocument(data?{data,cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',cMapPacked:true}:{url:src,cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',cMapPacked:true}).promise;
+    const page=await doc.getPage(1);const vp0=page.getViewport({scale:1});const vp=page.getViewport({scale:W/vp0.width});
+    canvas.width=Math.round(vp.width);canvas.height=Math.round(vp.height);
+    const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+    await page.render({canvasContext:ctx,viewport:vp}).promise;doc.destroy();
+  }else{
+    const url=src instanceof Blob?URL.createObjectURL(src):src;
+    const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url;});
+    const sc=Math.min(1,W/img.naturalWidth);canvas.width=Math.round(img.naturalWidth*sc);canvas.height=Math.round(img.naturalHeight*sc);
+    const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    if(src instanceof Blob)URL.revokeObjectURL(url);
+  }
+  if(canvas.height>canvas.width*1.6){const c2=document.createElement('canvas');c2.width=canvas.width;c2.height=Math.round(canvas.width*1.6);c2.getContext('2d').drawImage(canvas,0,0);canvas=c2;}
+  return await new Promise(ok=>canvas.toBlob(ok,'image/jpeg',.72));
+}
+async function makeDocThumb(id,src,isPdf){
+  try{const b=await thumbBlobFrom(src,isPdf);if(!b)return false;await sendFile(`${DOC_API}?op=thumb&id=${encodeURIComponent(id)}`,{},new File([b],'thumb.jpg',{type:'image/jpeg'}));return true;}catch(e){console.warn('thumb',e);return false;}
+}
+const thumbSource=f=>f.preview?{url:`/.netlify/functions/doc-file?id=${encodeURIComponent(f.id)}&kind=preview`,pdf:/pdf/.test(f.preview.type||'')}:(dKind(f.name)==='pdf'?{url:`/.netlify/functions/doc-file?id=${encodeURIComponent(f.id)}`,pdf:true}:dKind(f.name)==='img'?{url:`/.netlify/functions/doc-file?id=${encodeURIComponent(f.id)}`,pdf:false}:null);
+const needThumb=()=>docs.files.filter(f=>!f.thumb&&thumbSource(f));
+function paintThumbBtn(){const n=needThumb().length;const b=$('#docThumbs');b.style.display=n?'':'none';b.textContent=`🖼 미리보기 사진 만들기 (${n}개)`;}
+$('#docThumbs').addEventListener('click',async()=>{
+  if(docBusy)return;const list=needThumb();if(!list.length)return;
+  docBusy=true;let ok=0,i=0;
+  for(const f of list){i++;showDocProg(`미리보기 사진 ${i}/${list.length} · ${f.name}`,Math.round((i-1)/list.length*100));const s=thumbSource(f);if(await makeDocThumb(f.id,s.url,s.pdf))ok++;}
+  docBusy=false;showDocProg(`완료 · 사진 ${ok}개 만듦`,100);setTimeout(hideDocProg,2000);await loadDocs();
+  toast(ok===list.length?'미리보기 사진을 모두 만들었습니다':`${list.length-ok}개는 만들지 못했습니다`);
+});
 /* ── 앱 · 게임 카드 ── */
 let apps=[];
 const STATIC_GROUPS=['준우 게임','배동찬 게임'];

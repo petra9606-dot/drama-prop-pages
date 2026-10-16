@@ -36,18 +36,28 @@ export default async (req) => {
     if (req.method !== "POST") return json({ ok: false }, 405);
 
     const op = url.searchParams.get("op");
-    if (op === "upload" || op === "preview") {
+    if (op === "upload" || op === "preview" || op === "thumb") {
       const form = await req.formData();
       const f = await fileFromForm(form, store);
       if (!f) return json({ ok: false, error: "파일이 없습니다." }, 400);
       if (f.size > MAX_FILE) return json({ ok: false, error: "파일당 20MB까지 올릴 수 있습니다." }, 413);
       const d = await readDocs(store);
       const now = new Date().toISOString();
+      if (op === "thumb") {
+        const file = d.files.find((x) => x.id === url.searchParams.get("id"));
+        if (!file) return json({ ok: false, error: "파일을 찾을 수 없습니다." }, 404);
+        if (f.size > 600 * 1024) return json({ ok: false, error: "미리보기 사진이 너무 큽니다." }, 413);
+        await store.set(docKey(file.id, "thumb"), f.data);
+        file.thumb = { at: now };
+        await writeDocs(store, d);
+        return json({ ok: true, id: file.id });
+      }
       if (op === "preview") {
         const file = d.files.find((x) => x.id === url.searchParams.get("id"));
         if (!file) return json({ ok: false, error: "파일을 찾을 수 없습니다." }, 404);
         await store.set(docKey(file.id, "preview"), f.data);
         file.preview = { type: typeOf(f.name, f.type), size: f.size, name: f.name, at: now };
+        delete file.thumb;
         await writeDocs(store, d);
         return json({ ok: true, id: file.id });
       }
@@ -62,6 +72,7 @@ export default async (req) => {
       if (!file) { file = { id: newId("d"), folder: parent, name, order: Date.now() + d.files.length, visible: true }; d.files.push(file); }
       await store.set(docKey(file.id), f.data);
       Object.assign(file, { size: f.size, type: typeOf(name, f.type), at: now });
+      if (!file.preview) delete file.thumb;
       await writeDocs(store, d);
       await logActivity(store, { action: isNew ? "서류 올림" : "서류 교체", title: name, detail: path.join(" / ") || (d.folders.find((x) => x.id === parent)?.name || "") });
       return json({ ok: true, id: file.id, folder: parent, replaced: !isNew });
@@ -87,7 +98,7 @@ export default async (req) => {
     if (b.action === "folder-delete") {
       const ids = descendants(d, b.id);
       const gone = d.files.filter((x) => ids.has(x.folder));
-      for (const x of gone) { await store.delete(docKey(x.id)).catch(() => {}); await store.delete(docKey(x.id, "preview")).catch(() => {}); }
+      for (const x of gone) for (const k of ["orig", "preview", "thumb"]) await store.delete(docKey(x.id, k)).catch(() => {});
       const name = d.folders.find((x) => x.id === b.id)?.name || "";
       d.files = d.files.filter((x) => !ids.has(x.folder)); d.folders = d.folders.filter((x) => !ids.has(x.id));
       await writeDocs(store, d);
@@ -105,7 +116,8 @@ export default async (req) => {
     if (b.action === "file-delete" || b.action === "preview-delete") {
       const f = d.files.find((x) => x.id === b.id); if (!f) return json({ ok: false, error: "파일을 찾을 수 없습니다." }, 404);
       await store.delete(docKey(f.id, "preview")).catch(() => {});
-      if (b.action === "preview-delete") { delete f.preview; await writeDocs(store, d); return json({ ok: true }); }
+      await store.delete(docKey(f.id, "thumb")).catch(() => {});
+      if (b.action === "preview-delete") { delete f.preview; delete f.thumb; await writeDocs(store, d); return json({ ok: true }); }
       await store.delete(docKey(f.id)).catch(() => {});
       d.files = d.files.filter((x) => x !== f);
       await writeDocs(store, d);

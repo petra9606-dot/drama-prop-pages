@@ -1,6 +1,6 @@
 // 소품 서류 — 폴더/파일 목록과 파일 저장 위치
 export const DOCS_KEY = "__meta/docs.json";
-export const docKey = (id, kind = "orig") => `__meta/docs/${id}/${kind === "preview" ? "preview" : "orig"}`;
+export const docKey = (id, kind = "orig") => `__meta/docs/${id}/${kind === "preview" || kind === "thumb" ? kind : "orig"}`;
 export const newId = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 export async function readDocs(store) {
   try { const v = await store.get(DOCS_KEY, { type: "json" }); if (v && Array.isArray(v.folders) && Array.isArray(v.files)) return v; } catch {}
@@ -21,7 +21,8 @@ export function publicTree(d, all = false) {
   const folders = d.folders.filter((f) => all || !hidden.has(f.id)).map(({ id, name, parent, order, part, scene, visible, at }) => ({ id, name, parent: parent || "", order: order || 0, part: part || "", scene: scene || "", visible: visible !== false, at }));
   const files = d.files.filter((f) => all || (f.visible !== false && !hidden.has(f.folder))).map((f) => ({
     id: f.id, folder: f.folder || "", name: f.name, size: f.size, type: f.type || "", order: f.order || 0, at: f.at, visible: f.visible !== false,
-    preview: f.preview ? { type: f.preview.type, size: f.preview.size, name: f.preview.name } : null
+    preview: f.preview ? { type: f.preview.type, size: f.preview.size, name: f.preview.name } : null,
+    thumb: f.thumb ? f.thumb.at : ""
   }));
   return { folders, files };
 }
