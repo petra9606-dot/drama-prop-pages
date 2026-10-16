@@ -1,7 +1,9 @@
 
 import { uploadsStore, readFlags, merge, isInternalKey } from "../lib/flags.mjs";
+import { siteDenied } from "../lib/site-gate.mjs";
 
 export default async (req) => {
+  const denied = siteDenied(req); if (denied) return denied; // 사이트 입장 비밀번호
   const url = new URL(req.url);
   const project = url.searchParams.get("project") || "";
   const part = url.searchParams.get("part") || "";

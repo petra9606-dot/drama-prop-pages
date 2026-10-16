@@ -1,8 +1,10 @@
 
 import { uploadsStore, readFlags, merge, isInternalKey } from "../lib/flags.mjs";
 import { injectBytes } from "../lib/inject.mjs";
+import { siteDenied } from "../lib/site-gate.mjs";
 
 export default async (req) => {
+  const denied = siteDenied(req); if (denied) return denied; // 사이트 입장 비밀번호
   const url = new URL(req.url);
   const key = url.searchParams.get("key") || "";
   if (!key) return new Response("Missing key", { status:400 });

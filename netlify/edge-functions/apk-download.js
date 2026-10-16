@@ -1,8 +1,10 @@
 // APK 내려받기: 관리자에서 조각으로 올린 큰 APK 파일을 순서대로 이어서 보낸다
 import { getStore } from "@netlify/blobs";
+import { gateOK } from "../lib/site-gate-edge.js";
 
 export default async (request) => {
   try {
+    if (!(await gateOK(request))) return; // 입장 전이면 site-gate 가 처리
     const m = new URL(request.url).pathname.match(/^\/dl\/([A-Za-z0-9]+)\//);
     if (!m) return new Response("Not found", { status: 404 });
     const store = getStore({ name: "disolveworks-uploads" });

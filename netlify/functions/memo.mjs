@@ -2,6 +2,7 @@
 import { getStore } from "@netlify/blobs";
 import { createHash } from "node:crypto";
 import { isAdmin } from "../lib/auth.mjs";
+import { siteDenied } from "../lib/site-gate.mjs";
 
 const INDEX_KEY = "__index.json";
 const store = () => getStore({ name: "disolveworks-memos", consistency: "strong" });
@@ -35,6 +36,7 @@ async function save(s, doc) {
 }
 
 export default async (req) => {
+  const denied = siteDenied(req); if (denied) return denied; // 사이트 입장 비밀번호
   const s = store();
   const url = new URL(req.url);
 

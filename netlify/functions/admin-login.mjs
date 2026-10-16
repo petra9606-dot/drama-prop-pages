@@ -1,5 +1,5 @@
-
 import { passwordOK, makeCookie } from "../lib/auth.mjs";
+import { makeSiteCookie } from "../lib/site-gate.mjs";
 
 export default async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
@@ -10,7 +10,9 @@ export default async (req) => {
   if (!passwordOK(body.password)) {
     return Response.json({ ok:false, error:"비밀번호가 올바르지 않습니다." }, { status:401 });
   }
-  return Response.json({ ok:true }, {
-    headers: { "Set-Cookie": makeCookie(), "Cache-Control":"no-store" }
-  });
+  const headers = new Headers({ "Cache-Control":"no-store" });
+  headers.append("Set-Cookie", makeCookie());
+  const site = makeSiteCookie(); // 관리자는 사이트 입장 비밀번호를 따로 넣지 않아도 되게
+  if (site) headers.append("Set-Cookie", site);
+  return Response.json({ ok:true }, { headers });
 };

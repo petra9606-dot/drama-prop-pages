@@ -2,8 +2,10 @@
 import { uploadsStore } from "../lib/flags.mjs";
 import { readDocs, docKey } from "../lib/docs.mjs";
 import { isAdmin } from "../lib/auth.mjs";
+import { siteDenied } from "../lib/site-gate.mjs";
 
 export default async (req) => {
+  const denied = siteDenied(req); if (denied) return denied; // 사이트 입장 비밀번호
   const url = new URL(req.url);
   const id = url.searchParams.get("id") || "", k = url.searchParams.get("kind"), kind = k === "preview" || k === "thumb" ? k : "orig";
   const store = uploadsStore();
@@ -21,7 +23,7 @@ export default async (req) => {
   return new Response(body, { headers: {
     "Content-Type": meta.type || "application/octet-stream",
     "Content-Disposition": `${dl ? "attachment" : "inline"}; filename*=UTF-8''${encodeURIComponent(name)}`,
-    "Cache-Control": kind === "thumb" ? "public, max-age=604800, immutable" : "public, max-age=300",
+    "Cache-Control": kind === "thumb" ? "private, max-age=604800, immutable" : "private, max-age=300",
     "X-Robots-Tag": "noindex, nofollow, noarchive"
   } });
 };
