@@ -3,11 +3,11 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { isAdmin } from "./auth.mjs";
 
-const COOKIE = "dw_site";
-const MAX_AGE = 60 * 60 * 24 * 30;
-
-const sitePassword = () => (process.env.DISOLVE_SITE_PASSWORD || "").trim();
-const token = (pw) => createHmac("sha256", pw).update("site:disolveworks").digest("hex");
+const COOKIE = "dw_pass";
+const env = (k) => (process.env[k] || "").trim();
+const pwFor = (kind) => (kind === "m" ? env("DISOLVE_SITE_PASSWORD") : kind === "g" ? env("DISOLVE_GUEST_PASSWORD") : "");
+const gateEnabled = () => !!(env("DISOLVE_SITE_PASSWORD") || env("DISOLVE_GUEST_PASSWORD"));
+const sign = (pw, kind, exp) => createHmac("sha256", pw).update(`site:${kind}:${exp}`).digest("hex");
 
 function cookieValue(req) {
   const raw = req.headers.get("cookie") || "";
@@ -21,9 +21,13 @@ function safeEqual(a, b) {
 }
 
 export function isVisitor(req) {
-  const pw = sitePassword();
-  if (!pw) return true; // 잠금 기능 꺼짐
-  return safeEqual(cookieValue(req), token(pw));
+  if (!gateEnabled()) return true; // 잠금 기능 꺼짐
+  const parts = cookieValue(req).split(".");
+  if (parts.length !== 3) return false;
+  const [kind, expStr, sig] = parts;
+  const pw = pwFor(kind), exp = Number(expStr);
+  if (!pw || !Number.isFinite(exp) || exp < Date.now() / 1000) return false;
+  return safeEqual(sig, sign(pw, kind, exp));
 }
 
 // 입장하지 않은 요청이면 401 응답을, 괜찮으면 null 을 돌려준다. (관리자 로그인 상태는 통과)
@@ -32,8 +36,10 @@ export function siteDenied(req) {
   return new Response("Unauthorized", { status: 401, headers: { "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow" } });
 }
 
-// 관리자 로그인 시 사이트 입장 쿠키도 함께 준다 (비밀번호가 설정된 경우만)
+// 관리자 로그인 시 멤버 입장 쿠키도 함께 준다 (브라우저를 닫으면 사라짐)
 export function makeSiteCookie() {
-  const pw = sitePassword();
-  return pw ? `${COOKIE}=${encodeURIComponent(token(pw))}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${MAX_AGE}` : "";
+  const pw = pwFor("m");
+  if (!pw) return "";
+  const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+  return `${COOKIE}=${encodeURIComponent(`m.${exp}.${sign(pw, "m", exp)}`)}; HttpOnly; Secure; SameSite=Lax; Path=/`;
 }

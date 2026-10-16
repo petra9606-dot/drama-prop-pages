@@ -1,8 +1,10 @@
 // 사이트 입장 비밀번호 화면.
-// 환경변수 DISOLVE_SITE_PASSWORD 가 설정돼 있으면, 그 비밀번호를 입력한 기기만 사이트를 볼 수 있다.
+// 멤버(DISOLVE_SITE_PASSWORD) / 손님(DISOLVE_GUEST_PASSWORD) 비밀번호 중 하나를 넣어야 사이트를 볼 수 있다.
+//  - "비밀번호 기억하기"를 끄면: 브라우저를 닫을 때까지만
+//  - 켜면: 멤버는 계속(1년), 손님은 하루
 // /admin/ 은 자체 관리자 로그인이 있으므로 그대로 열어 둔다.
 import { getStore } from "@netlify/blobs";
-import { sitePassword, gateOK, makeSiteCookie, clearSiteCookie, safeEqual } from "../lib/site-gate-edge.js";
+import { gateEnabled, gateOK, matchPassword, makeSiteCookie, clearSiteCookie } from "../lib/site-gate-edge.js";
 
 const OPEN = [/^\/admin(\/|$)/, /^\/sw\.js$/, /^\/robots\.txt$/, /^\/favicon\.ico$/];
 const MAX_FAILS = 10;               // 같은 IP에서
@@ -24,10 +26,12 @@ background:#0e1424;color:#e7ecf6;font-family:'Apple SD Gothic Neo','Malgun Gothi
 box-shadow:0 18px 50px rgba(0,0,0,.45)}
 h1{font-size:15px;letter-spacing:.24em;color:#9fb0d4;font-weight:700;margin-bottom:6px}
 p{font-size:13px;color:#8a97b5;margin-bottom:18px}
-input{width:100%;padding:13px 14px;font-size:20px;letter-spacing:.35em;text-align:center;border-radius:10px;
+input[type=password]{width:100%;padding:13px 14px;font-size:20px;letter-spacing:.35em;text-align:center;border-radius:10px;
 border:1px solid #3a4d78;background:#0f1628;color:#fff;outline:none}
-input:focus{border-color:#6f8fe0;box-shadow:0 0 0 3px rgba(111,143,224,.25)}
-button{margin-top:12px;width:100%;padding:12px;border:0;border-radius:10px;background:#4a6fd1;color:#fff;
+input[type=password]:focus{border-color:#6f8fe0;box-shadow:0 0 0 3px rgba(111,143,224,.25)}
+.remember{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:#b8c3dc;cursor:pointer;user-select:none}
+.remember input{width:17px;height:17px;accent-color:#4a6fd1}
+button{margin-top:14px;width:100%;padding:12px;border:0;border-radius:10px;background:#4a6fd1;color:#fff;
 font-size:15px;font-weight:700;cursor:pointer}
 button:hover{background:#5a7fe0}
 .err{margin-top:12px;font-size:13px;color:#ff8a8a;min-height:18px}
@@ -36,6 +40,7 @@ button:hover{background:#5a7fe0}
 <h1>DISOLVEWORKS</h1>
 <p>비밀번호를 입력해야 볼 수 있는 사이트입니다.</p>
 <input name="password" type="password" inputmode="numeric" autofocus required aria-label="비밀번호">
+<label class="remember"><input type="checkbox" name="remember" value="1"> 비밀번호 기억하기</label>
 <input type="hidden" name="next" value="${esc(next)}">
 <button type="submit">입장</button>
 <div class="err">${esc(msg)}</div>
@@ -57,8 +62,7 @@ async function failState(ip) {
 }
 
 export default async (request, context) => {
-  const pw = sitePassword();
-  if (!pw) return; // 환경변수가 없으면 잠금 기능 꺼짐 (사이트 그대로)
+  if (!gateEnabled()) return; // 비밀번호 환경변수가 하나도 없으면 잠금 기능 꺼짐
 
   const url = new URL(request.url);
 
@@ -73,9 +77,11 @@ export default async (request, context) => {
     const st = await failState(context?.ip);
     if (st && st.v.n >= MAX_FAILS) return page(next, "시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.", 429);
 
-    if (form && safeEqual(String(form.get("password") || "").trim(), pw)) {
+    const kind = form ? matchPassword(form.get("password")) : "";
+    if (kind) {
       if (st && st.v.n) { try { await st.s.delete(st.key); } catch {} }
-      return new Response(null, { status: 303, headers: { Location: next, "Set-Cookie": await makeSiteCookie(pw), "Cache-Control": "no-store" } });
+      const remember = form.get("remember") === "1";
+      return new Response(null, { status: 303, headers: { Location: next, "Set-Cookie": await makeSiteCookie(kind, remember), "Cache-Control": "no-store" } });
     }
     if (st) { st.v.n += 1; try { await st.s.setJSON(st.key, st.v); } catch {} }
     await new Promise((r) => setTimeout(r, 600));
