@@ -37,6 +37,21 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
 .nav .cnt:empty{display:none}
 .view{display:none}.view.on{display:block}
 
+.vis{margin-bottom:16px}
+.vis .stats{margin-bottom:12px}
+.vchart{display:flex;align-items:flex-end;gap:4px;height:150px;padding:8px 0 0;border-bottom:1px solid #2a3348;position:relative}
+.vchart .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative;cursor:default}
+.vchart .c i{display:block;width:70%;max-width:26px;background:#7590ff;border-radius:4px 4px 0 0;min-height:2px}
+.vchart .c.today i{background:#9fb3ff}
+.vchart .c:hover i{background:#b7c5ff}
+.vchart .c b{font-size:10px;color:#dfe6f6;margin-bottom:3px;font-weight:700}
+.vdays{display:flex;gap:4px;margin-top:5px}.vdays span{flex:1;text-align:center;font-size:10px;color:#6f7b92}
+.vtip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#0b0f19;border:1px solid #3a4a6e;border-radius:8px;padding:7px 9px;font-size:11px;color:#dfe6f6;white-space:nowrap;display:none;z-index:3;line-height:1.5}
+.vchart .c:hover .vtip{display:block}
+.vtable{width:100%;border-collapse:collapse;font-size:12px}.vtable td{padding:8px 4px;border-bottom:1px solid #1d2435;color:#c9d2e6}.vtable td.n{text-align:right;color:#dfe6f6;font-weight:700;white-space:nowrap}
+.vtable td.t{max-width:0;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vnote{font-size:11px;color:#6f7b92;margin-top:8px;line-height:1.6}
+.vrange{display:flex;gap:6px}.vrange button{border:1px solid #2a3550;background:#111725;color:#a6b2c9;border-radius:999px;padding:6px 12px;font:700 12px/1 inherit;cursor:pointer}.vrange button.on{background:#223055;border-color:#4a63a4;color:#fff}
 /* 현황판 */
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
 .stat{background:rgba(16,20,30,.94);border:1px solid var(--line);border-radius:16px;padding:16px 18px;cursor:pointer;transition:.15s}
@@ -218,6 +233,23 @@ input:focus,select:focus,textarea:focus{border-color:#718cff}
 
   <!-- 현황 -->
   <section class="view" id="v-dash">
+    <div class="panel vis">
+      <div class="toolbar"><div><h1 style="font-size:22px">방문자</h1><div class="sub" style="margin:3px 0 0" id="visSub">사이트 자체 집계 · 주인 기기는 빼고 셉니다</div></div>
+        <div class="vrange" id="visRange"><button data-d="7">7일</button><button data-d="30" class="on">30일</button><button data-d="90">90일</button></div></div>
+      <div class="stats" style="margin-top:12px">
+        <div class="stat"><div class="k">오늘 방문자</div><div class="v" id="vToday">–</div><div class="s" id="vTodaySub"></div></div>
+        <div class="stat"><div class="k">오늘 새 방문자</div><div class="v" id="vNew">–</div><div class="s">처음 사이트를 연 기기</div></div>
+        <div class="stat"><div class="k" id="vRangeK">30일 방문자</div><div class="v" id="vRange">–</div><div class="s" id="vRangeSub"></div></div>
+        <div class="stat"><div class="k" id="vNewRangeK">30일 새 방문자</div><div class="v" id="vNewRange">–</div><div class="s" id="vDev"></div></div>
+      </div>
+      <div class="sub" style="margin-bottom:4px">날짜별 방문자 (막대에 마우스를 올리면 자세히)</div>
+      <div class="vchart" id="vChart"></div><div class="vdays" id="vDays"></div>
+      <div class="cols" style="margin-top:16px">
+        <div><h2 style="font-size:15px;margin:0 0 6px">많이 본 페이지</h2><table class="vtable" id="vPages"></table></div>
+        <div><h2 style="font-size:15px;margin:0 0 6px">오늘 최근 방문</h2><table class="vtable" id="vRecent"></table></div>
+      </div>
+      <div class="vnote" id="vNote"></div>
+    </div>
     <div class="stats">
       <div class="stat" data-go="items:active"><div class="k">웹 업로드 자료</div><div class="v" id="stUp">–</div><div class="s" id="stUpSub"></div></div>
       <div class="stat" data-go="items:static"><div class="k">깃허브 자료</div><div class="v" id="stGh">–</div><div class="s" id="stGhSub"></div></div>
@@ -450,6 +482,7 @@ function go(v){
   if(v==='memo')loadMemos();
   if(v==='log')loadActivity();
   if(v==='apps')loadApps();
+  if(v==='dash')loadVisitors();
   if(v==='docs')loadDocs();
 }
 $('#nav').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(b)go(b.dataset.v);});
@@ -1103,6 +1136,41 @@ $('#docThumbs').addEventListener('click',async()=>{
   docBusy=false;showDocProg(`완료 · 사진 ${ok}개 만듦`,100);setTimeout(hideDocProg,2000);await loadDocs();
   toast(ok===list.length?'미리보기 사진을 모두 만들었습니다':`${list.length-ok}개는 만들지 못했습니다`);
 });
+
+/* ── 방문자 통계 (자체 집계) ── */
+let visDays=30,visData=null;
+const DEV={phone:'폰',pc:'PC',tablet:'태블릿'},APP={kakao:'카카오톡',insta:'인스타그램',naver:'네이버 앱'};
+const shortDay=d=>`${+d.slice(5,7)}/${+d.slice(8,10)}`;
+async function loadVisitors(){
+  try{const r=await fetch(`/.netlify/functions/admin-stats?days=${visDays}`,{cache:'no-store'});if(!r.ok)throw 0;visData=await r.json();renderVisitors();}
+  catch{$('#visSub').textContent='방문 통계를 불러오지 못했습니다.';}
+}
+function renderVisitors(){
+  const days=visData.days||[],today=days[days.length-1]||{visitors:{},newV:[],views:0,pages:{}};
+  const all={},newAll=new Set(),pages={},dev={},app={};let views=0;
+  for(const d of days){views+=d.views;for(const v in d.visitors)all[v]=1;d.newV.forEach(v=>newAll.add(v));for(const v in d.dev)dev[v]=d.dev[v];for(const a in d.app||{})app[a]=(app[a]||0)+d.app[a];
+    for(const p in d.pages){const x=pages[p]||(pages[p]={views:0,t:'',v:new Set()});x.views+=d.pages[p].views;x.t=d.pages[p].t||x.t;d.pages[p].v.forEach(v=>x.v.add(v));}}
+  const tv=Object.keys(today.visitors).length;
+  $('#vToday').textContent=tv;$('#vTodaySub').textContent=`페이지 ${today.views}번 열림`;
+  $('#vNew').textContent=today.newV.length;
+  $('#vRangeK').textContent=`${visDays}일 방문자`;$('#vNewRangeK').textContent=`${visDays}일 새 방문자`;
+  $('#vRange').textContent=Object.keys(all).length;$('#vRangeSub').textContent=`페이지 ${views}번 열림`;
+  $('#vNewRange').textContent=newAll.size;
+  const dc={};Object.values(dev).forEach(d=>dc[d]=(dc[d]||0)+1);
+  $('#vDev').textContent=Object.entries(dc).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`${DEV[k]||k} ${n}`).join(' · ')||'아직 없음';
+  // 날짜별 막대 (최근 14일만 그려서 읽기 쉽게)
+  const show=days.slice(-14),max=Math.max(1,...show.map(d=>Object.keys(d.visitors).length));
+  $('#vChart').innerHTML=show.map((d,i)=>{const n=Object.keys(d.visitors).length;return`<div class="c${i===show.length-1?' today':''}"><div class="vtip"><b>${esc(d.day)}</b><br>방문자 ${n}명 · 새 방문자 ${d.newV.length}명<br>페이지 ${d.views}번</div>${n?`<b>${n}</b>`:''}<i style="height:${Math.max(2,Math.round(n/max*118))}px"></i></div>`;}).join('');
+  $('#vDays').innerHTML=show.map((d,i)=>`<span>${i===show.length-1?'오늘':shortDay(d.day)}</span>`).join('');
+  const top=Object.entries(pages).sort((a,b)=>b[1].v.size-a[1].v.size||b[1].views-a[1].views).slice(0,10);
+  $('#vPages').innerHTML=top.length?`<tr><td class="t" style="color:#6f7b92">페이지</td><td class="n" style="color:#6f7b92;font-weight:400">방문자</td><td class="n" style="color:#6f7b92;font-weight:400">열림</td></tr>`+top.map(([p,x])=>`<tr><td class="t" title="${esc(p)}"><a href="${esc(p)}" target="_blank" style="color:#c9d2e6">${esc(x.t||p)}</a></td><td class="n">${x.v.size}</td><td class="n" style="font-weight:400">${x.views}</td></tr>`).join(''):'<tr><td class="t" style="color:#6f7b92">아직 기록이 없습니다.</td></tr>';
+  const rec=today.recent||[];
+  $('#vRecent').innerHTML=rec.length?rec.slice(0,12).map(e=>{const t=new Date(e.at);return`<tr><td class="n" style="font-weight:400;color:#8a97ae">${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}</td><td class="t">${e.n?'<span style="color:#9fe7c8;font-weight:800">새</span> ':''}${esc(e.t||e.p)}</td><td class="n" style="font-weight:400;color:#8a97ae">${DEV[e.d]||''}${e.a?' · '+(APP[e.a]||e.a):''}</td></tr>`;}).join(''):'<tr><td class="t" style="color:#6f7b92">오늘은 아직 방문이 없습니다.</td></tr>';
+  const apps=Object.entries(app).map(([k,n])=>`${APP[k]||k} ${n}번`).join(' · ');
+  $('#vNote').innerHTML=`방문자 = 기기·브라우저 단위로 셉니다. 같은 사람이 폰 카카오톡 링크와 크롬으로 각각 열면 2명으로 잡혀요.<br>`+
+    `<b style="color:#9fe7c8">이 기기는 통계에서 빠져 있어요.</b> 관리자 페이지를 한 번이라도 연 기기·브라우저는 자동으로 제외됩니다 (구글 애널리틱스도 동일).${apps?`<br>앱 안에서 연 횟수: ${esc(apps)}`:''}`;
+}
+$('#visRange').addEventListener('click',e=>{const b=e.target.closest('button[data-d]');if(!b)return;visDays=+b.dataset.d;document.querySelectorAll('#visRange button').forEach(x=>x.classList.toggle('on',x===b));loadVisitors();});
 /* ── 앱 · 게임 카드 ── */
 let apps=[];
 const STATIC_GROUPS=['준우 게임','배동찬 게임'];
