@@ -40,7 +40,7 @@ button:hover{background:#5a7fe0}
 <h1>DISOLVEWORKS</h1>
 <p>비밀번호를 입력해야 볼 수 있는 사이트입니다.</p>
 <input name="password" type="password" inputmode="numeric" autofocus required aria-label="비밀번호">
-<label class="remember"><input type="checkbox" name="remember" value="1"> 비밀번호 기억하기</label>
+<label class="remember"><input type="checkbox" name="remember" value="1" checked> 비밀번호 기억하기</label>
 <input type="hidden" name="next" value="${esc(next)}">
 <button type="submit">입장</button>
 <div class="err">${esc(msg)}</div>
