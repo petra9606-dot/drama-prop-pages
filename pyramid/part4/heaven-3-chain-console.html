@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>haven-chain — Haven Chain Console</title>
+<title>heaven-chain — Heaven Chain Console</title>
 <style>
 :root{
   --bg:#171717;
@@ -284,7 +284,7 @@ html,body{
 <div class="workspace">
   <section class="ops">
     <div class="ops-top">
-      <div class="ops-brand"><div class="ops-logo">H</div><span>Haven Chain Console</span></div>
+      <div class="ops-brand"><div class="ops-logo">H</div><span>Heaven Chain Console</span></div>
       <div class="ops-path" id="opsPath"></div>
       <div class="ops-actions" id="opsStatus"></div>
     </div>
@@ -307,7 +307,7 @@ html,body{
       <main class="ops-canvas">
         <div class="console">
           <div class="console-head">
-            <div class="console-title"><b id="conTitle">Haven Network Overview</b><span id="conSub"></span></div>
+            <div class="console-title"><b id="conTitle">Heaven Network Overview</b><span id="conSub"></span></div>
             <div class="deploy-btn" id="deployBtn">Deploy revision</div>
           </div>
           <div class="summary" id="summary"></div>
@@ -331,7 +331,7 @@ html,body{
 
       <aside class="inspector">
         <div class="inspect-title">SELECTED CONTRACT</div>
-        <div class="inspect-block"><div class="inspect-label">CONTRACT</div><div class="inspect-box">HavenToken (HAVEN)</div></div>
+        <div class="inspect-block"><div class="inspect-label">CONTRACT</div><div class="inspect-box">HeavenToken (HEAVEN)</div></div>
         <div class="inspect-block"><div class="inspect-label">ADDRESS</div><div class="inspect-box" id="insAddr"></div></div>
         <div class="inspect-block"><div class="inspect-label">BUILD</div><div class="inspect-box" id="insRev"></div></div>
         <div class="inspect-block" id="insRows"></div>
@@ -377,7 +377,7 @@ html,body{
 
 <script>
 // stage: 1 = 초반 작업, 2 = 중반 작업, 3 = 마무리 (Enter 로 완료)
-const HAVEN_STAGE = (() => {
+const HEAVEN_STAGE = (() => {
   const q = new URLSearchParams(location.search).get("stage");
   const h = (location.hash || "").replace("#", "");
   const v = parseInt(q || h || "1", 10);
@@ -394,52 +394,52 @@ document.addEventListener("keydown", (e) => {
 }, true);
 
 // 완료 대화상자 (Enter "탁!" 이후) — Windows 스타일
-function havenCelebrate(opts) {
-  if (document.getElementById("havenDone")) return;
+function heavenCelebrate(opts) {
+  if (document.getElementById("heavenDone")) return;
   const o = Object.assign({ delay: 0 }, opts || {});
   const css = `
-#havenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
-#havenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
+#heavenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
+#heavenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
   box-shadow:0 32px 64px rgba(0,0,0,.37),0 2px 21px rgba(0,0,0,.27);overflow:hidden;animation:hdPop .18s cubic-bezier(.1,.9,.2,1)}
 @keyframes hdFade{from{opacity:0}}
 @keyframes hdPop{from{opacity:0;transform:scale(.96)}}
-#havenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
-#havenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
-#havenDone .hd-title .sp{flex:1}
-#havenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
-#havenDone .hd-x:hover{background:#c42b1c;color:#fff}
-#havenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
-#havenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
-#havenDone .hd-ok svg{width:18px;height:18px}
-#havenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
-#havenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
-#havenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
-#havenDone dd{margin:0;color:#1b1b1b}
-#havenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
-#havenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
-#havenDone .hd-btn:hover{background:#f6f6f6}
-#havenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
-#havenDone .hd-btn.pri:hover{background:#1b75c4}
+#heavenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
+#heavenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
+#heavenDone .hd-title .sp{flex:1}
+#heavenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
+#heavenDone .hd-x:hover{background:#c42b1c;color:#fff}
+#heavenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
+#heavenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
+#heavenDone .hd-ok svg{width:18px;height:18px}
+#heavenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
+#heavenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
+#heavenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
+#heavenDone dd{margin:0;color:#1b1b1b}
+#heavenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
+#heavenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
+#heavenDone .hd-btn:hover{background:#f6f6f6}
+#heavenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
+#heavenDone .hd-btn.pri:hover{background:#1b75c4}
 `;
   setTimeout(() => {
     const st = document.createElement("style");
     st.textContent = css;
     document.head.appendChild(st);
     const root = document.createElement("div");
-    root.id = "havenDone";
+    root.id = "heavenDone";
     const now = new Date();
     const p2 = (n) => String(n).padStart(2, "0");
     const ts = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
     root.innerHTML = `
       <div class="hd-win" role="dialog" aria-modal="true">
-        <div class="hd-title"><span class="ic">H</span><span>Haven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
+        <div class="hd-title"><span class="ic">H</span><span>Heaven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
         <div class="hd-body">
           <div class="hd-ok"><svg viewBox="0 0 16 16"><path d="M3.2 8.4l3 3 6.6-6.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h2>배포가 완료되었습니다.</h2>
-            <p>해븐코인(HAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
+            <p>헤븐코인(HEAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
             <dl>
-              <dt>네트워크</dt><dd>Haven Mainnet (chain 7310)</dd>
+              <dt>네트워크</dt><dd>Heaven Mainnet (chain 7310)</dd>
               <dt>검증 노드</dt><dd>7 / 7 온라인</dd>
               <dt>테스트</dt><dd>138 / 138 통과</dd>
               <dt>완료 시각</dt><dd>${ts}</dd>
@@ -461,14 +461,14 @@ function havenCelebrate(opts) {
   }, o.delay);
 }
 document.addEventListener("keydown", (e) => {
-  const d = document.getElementById("havenDone");
+  const d = document.getElementById("heavenDone");
   if (!d) return;
   if (e.key === "Escape" || e.key === "Enter" || e.key === " ") { d.remove(); }
   e.stopPropagation(); e.preventDefault();
 }, true);
 
 
-const S = HAVEN_STAGE;
+const S = HEAVEN_STAGE;
 const $ = (id) => document.getElementById(id);
 const rnd = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const hex = (n) => Array.from({ length: n }, () => "0123456789abcdef"[rnd(0, 15)]).join("");
@@ -477,35 +477,35 @@ let launched = false;
 /* ───────── 좌측 콘솔 ───────── */
 const C = {
   1: {
-    path: "devnet / haven-chain / overview", status: '<span class="env-dot" style="background:#f0b34b;box-shadow:none"></span>1 service degraded &nbsp; ⋮',
+    path: "devnet / heaven-chain / overview", status: '<span class="env-dot" style="background:#f0b34b;box-shadow:none"></span>1 service degraded &nbsp; ⋮',
     sub: "Single-node devnet · build v0.3.0-dev", btn: "Deploy revision",
     navVal: "1", navCon: "02", navStk: "—", navBrg: "—", navRel: "0.3",
     ms: [["Token core (ERC-20)", "done"], ["Genesis & devnet", "done"], ["PoS consensus", "wip"], ["Staking / vesting", ""], ["Bridge & wallet SDK", ""], ["Audit", ""], ["Mainnet", ""]],
     height: 41862, tps: [1, 6], cards: (h, t) => [["BLOCK HEIGHT", h.toLocaleString(), "+1 / 3s"], ["TPS (1m)", t, "devnet"], ["VALIDATORS", "1 / 1", "solo"], ["CONTRACTS", "2", "unverified"]],
-    nodes: [["Wallet SDK", "ts", "haven-js (planned)", "○ not started", "—", "orange", "#75879a"], ["RPC Gateway", "rust", "eth_* · haven_*", "● 200 OK", "9 ms", "", ""], ["Mempool", "rust", "pending=12", "● ready", "1 ms", "purple", ""], ["Consensus", "PoS", "single proposer", "● solo mode", "3.0 s", "green", "#f0b34b"], ["EVM Execution", "revm", "cancun", "● ok", "14 ms", "red", ""], ["Indexer", "postgres", "decode receipts", "● crashloop", "—", "green", "#ef6b75"]],
-    health: [["haven-node", "healthy", "1 pod"], ["haven-rpc", "healthy", "1 pod"], ["haven-indexer", "failing", "0 / 1"], ["haven-faucet", "healthy", "1 pod"]],
+    nodes: [["Wallet SDK", "ts", "heaven-js (planned)", "○ not started", "—", "orange", "#75879a"], ["RPC Gateway", "rust", "eth_* · heaven_*", "● 200 OK", "9 ms", "", ""], ["Mempool", "rust", "pending=12", "● ready", "1 ms", "purple", ""], ["Consensus", "PoS", "single proposer", "● solo mode", "3.0 s", "green", "#f0b34b"], ["EVM Execution", "revm", "cancun", "● ok", "14 ms", "red", ""], ["Indexer", "postgres", "decode receipts", "● crashloop", "—", "green", "#ef6b75"]],
+    health: [["heaven-node", "healthy", "1 pod"], ["heaven-rpc", "healthy", "1 pod"], ["heaven-indexer", "failing", "0 / 1"], ["heaven-faucet", "healthy", "1 pod"]],
     addr: "0x9fE4…a6e0 (devnet)", rev: "v0.3.0-dev · 4c1a9e2",
     rows: [["Status", "Draft"], ["Network", "devnet"], ["Holders", "3"], ["Tests", "41 passed"], ["Coverage", "38.2%"], ["Audit", "—"]]
   },
   2: {
-    path: "testnet / haven-chain / overview", status: '<span class="env-dot"></span>Testnet operational &nbsp; ⋮',
+    path: "testnet / heaven-chain / overview", status: '<span class="env-dot"></span>Testnet operational &nbsp; ⋮',
     sub: "Public testnet · build v0.7.2-rc", btn: "Deploy revision",
     navVal: "4", navCon: "05", navStk: "428M", navBrg: "—", navRel: "0.7",
     ms: [["Token core (ERC-20)", "done"], ["Genesis & devnet", "done"], ["PoS consensus", "done"], ["Staking / vesting", "done"], ["Bridge & wallet SDK", "wip"], ["Audit", ""], ["Mainnet", ""]],
-    height: 1184904, tps: [28, 66], cards: (h, t) => [["BLOCK HEIGHT", h.toLocaleString(), "+1 / 2s"], ["TPS (1m)", t, "testnet"], ["VALIDATORS", "4 / 4", "quorum 3"], ["STAKED", "428.2M", "HAVEN"]],
-    nodes: [["Wallet SDK", "ts", "haven-js 0.4.0-beta", "● beta", "—", "orange", ""], ["RPC Gateway", "rust", "eth_* · haven_*", "● 200 OK", "11 ms", "", ""], ["Mempool", "rust", "pending=48", "● ready", "1 ms", "purple", ""], ["Consensus", "PoS", "4 validators · VRF", "● finalized", "2.0 s", "green", ""], ["EVM Execution", "revm", "cancun", "● ok", "18 ms", "red", ""], ["Bridge Relayer", "rust", "lock / mint", "● pending", "—", "green", "#f0b34b"]],
-    health: [["haven-validator", "healthy", "4 pods"], ["haven-rpc", "healthy", "2 pods"], ["haven-indexer", "healthy", "1 pod"], ["bridge-relayer", "pending", "0 / 1"]],
+    height: 1184904, tps: [28, 66], cards: (h, t) => [["BLOCK HEIGHT", h.toLocaleString(), "+1 / 2s"], ["TPS (1m)", t, "testnet"], ["VALIDATORS", "4 / 4", "quorum 3"], ["STAKED", "428.2M", "HEAVEN"]],
+    nodes: [["Wallet SDK", "ts", "heaven-js 0.4.0-beta", "● beta", "—", "orange", ""], ["RPC Gateway", "rust", "eth_* · heaven_*", "● 200 OK", "11 ms", "", ""], ["Mempool", "rust", "pending=48", "● ready", "1 ms", "purple", ""], ["Consensus", "PoS", "4 validators · VRF", "● finalized", "2.0 s", "green", ""], ["EVM Execution", "revm", "cancun", "● ok", "18 ms", "red", ""], ["Bridge Relayer", "rust", "lock / mint", "● pending", "—", "green", "#f0b34b"]],
+    health: [["heaven-validator", "healthy", "4 pods"], ["heaven-rpc", "healthy", "2 pods"], ["heaven-indexer", "healthy", "1 pod"], ["bridge-relayer", "pending", "0 / 1"]],
     addr: "0x3Ab1…77c4 (testnet)", rev: "v0.7.2-rc · b81e07d",
     rows: [["Status", "Testnet"], ["Network", "chain 731002"], ["Holders", "2,184"], ["Tests", "83 passed"], ["Coverage", "64.7%"], ["Audit", "scheduled"]]
   },
   3: {
-    path: "mainnet / haven-chain / launch", status: '<span class="env-dot" style="background:#f0b34b;box-shadow:none"></span>Awaiting genesis &nbsp; ⋮',
+    path: "mainnet / heaven-chain / launch", status: '<span class="env-dot" style="background:#f0b34b;box-shadow:none"></span>Awaiting genesis &nbsp; ⋮',
     sub: "Mainnet · build v1.0.0", btn: "Launch mainnet",
     navVal: "7", navCon: "05", navStk: "—", navBrg: "ready", navRel: "1.0",
     ms: [["Token core (ERC-20)", "done"], ["Genesis & devnet", "done"], ["PoS consensus", "done"], ["Staking / vesting", "done"], ["Bridge & wallet SDK", "done"], ["Audit", "done"], ["Mainnet", "wip"]],
     height: 0, tps: [0, 0], cards: (h, t) => launched ? [["BLOCK HEIGHT", h.toLocaleString(), "+1 / 2s"], ["TPS (1m)", t, "mainnet"], ["VALIDATORS", "7 / 7", "quorum 5"], ["CHAIN ID", "7310", "mainnet"]] : [["BLOCK HEIGHT", "—", "genesis"], ["TPS (1m)", "—", "idle"], ["SIGNATURES", "6 / 7", "genesis"], ["CHAIN ID", "7310", "mainnet"]],
-    nodes: [["Wallet SDK", "ts", "haven-js 1.0.0", "● published", "—", "orange", ""], ["RPC Gateway", "rust", "eth_* · haven_*", "● standby", "—", "", "#75879a"], ["Mempool", "rust", "pending=0", "● standby", "—", "purple", "#75879a"], ["Consensus", "PoS", "7 validators · VRF", "● awaiting genesis", "—", "green", "#f0b34b"], ["EVM Execution", "revm", "cancun", "● standby", "—", "red", "#75879a"], ["Bridge Relayer", "rust", "lock / mint", "● standby", "—", "green", "#75879a"]],
-    health: [["haven-validator", "init", "0 / 7"], ["haven-rpc", "standby", "3 pods"], ["haven-indexer", "standby", "1 pod"], ["bridge-relayer", "standby", "1 pod"]],
+    nodes: [["Wallet SDK", "ts", "heaven-js 1.0.0", "● published", "—", "orange", ""], ["RPC Gateway", "rust", "eth_* · heaven_*", "● standby", "—", "", "#75879a"], ["Mempool", "rust", "pending=0", "● standby", "—", "purple", "#75879a"], ["Consensus", "PoS", "7 validators · VRF", "● awaiting genesis", "—", "green", "#f0b34b"], ["EVM Execution", "revm", "cancun", "● standby", "—", "red", "#75879a"], ["Bridge Relayer", "rust", "lock / mint", "● standby", "—", "green", "#75879a"]],
+    health: [["heaven-validator", "init", "0 / 7"], ["heaven-rpc", "standby", "3 pods"], ["heaven-indexer", "standby", "1 pod"], ["bridge-relayer", "standby", "1 pod"]],
     addr: "— (pending deployment)", rev: "v1.0.0 · 9e3f5a1 (signed)",
     rows: [["Status", "Release"], ["Network", "chain 7310"], ["Holders", "—"], ["Tests", "138 passed"], ["Coverage", "97.4%"], ["Audit", "passed"]]
   }
@@ -567,8 +567,8 @@ function pushTrace(html) {
 function blockTrace() {
   if (S === 3 && !launched) {
     const o = [
-      `<i>genesis</i> signature collected validator=haven-validator-${rnd(0, 5)} (6/7)`,
-      `<i>genesis</i> waiting for haven-validator-6 signature`,
+      `<i>genesis</i> signature collected validator=heaven-validator-${rnd(0, 5)} (6/7)`,
+      `<i>genesis</i> waiting for heaven-validator-6 signature`,
       `<i>p2p</i> seed peers connected 6/6 latency_avg=${rnd(8, 20)}ms`
     ];
     pushTrace(o[rnd(0, o.length - 1)]);
@@ -577,7 +577,7 @@ function blockTrace() {
   height += 1;
   const v = S === 1 ? 0 : rnd(0, S === 2 ? 3 : 6);
   lastTx = rnd(C.tps[0], C.tps[1] * 2);
-  pushTrace(`<i>#${height.toLocaleString()}</i> sealed by haven-validator-${v} txs=${lastTx} gas=${(rnd(5, 290) / 10).toFixed(1)}M`);
+  pushTrace(`<i>#${height.toLocaleString()}</i> sealed by heaven-validator-${v} txs=${lastTx} gas=${(rnd(5, 290) / 10).toFixed(1)}M`);
   renderCards();
   bars.push(lastTx); bars.shift(); renderChart();
 }
@@ -589,24 +589,24 @@ setInterval(blockTrace, S === 1 ? 3000 : 2000);
 
 /* ───────── VS Code ───────── */
 const FILES = {
-  1: { path: "crates/haven-node/src/genesis.rs", name: "genesis.rs", branch: "feature/genesis-devnet", prob: "⓪ 3  ⚠ 11" },
+  1: { path: "crates/heaven-node/src/genesis.rs", name: "genesis.rs", branch: "feature/genesis-devnet", prob: "⓪ 3  ⚠ 11" },
   2: { path: "crates/consensus/src/pos.rs", name: "pos.rs", branch: "feature/pos-validator-set", prob: "⓪ 1  ⚠ 4" },
-  3: { path: "crates/haven-node/src/main.rs", name: "main.rs", branch: "release/v1.0.0", prob: "⓪ 0  ⚠ 0" }
+  3: { path: "crates/heaven-node/src/main.rs", name: "main.rs", branch: "release/v1.0.0", prob: "⓪ 0  ⚠ 0" }
 }[S];
-$("vsTitle").textContent = `${FILES.name} — haven-chain`;
+$("vsTitle").textContent = `${FILES.name} — heaven-chain`;
 $("sbLeft").innerHTML = `⑂ ${FILES.branch}${S < 3 ? "*" : ""} &nbsp; ${FILES.prob.replace("⓪", "✕")}`;
 $("probTab").textContent = S === 1 ? "PROBLEMS 14" : S === 2 ? "PROBLEMS 5" : "PROBLEMS 0";
 $("tabs").innerHTML = [FILES.name, S === 1 ? "lib.rs" : S === 2 ? "slashing.rs" : "config.rs", "Cargo.toml"].map((n, i) =>
   `<div class="tab" style="${i ? "background:#181818;color:#8b8b8b" : ""}"><span style="color:${n.endsWith(".toml") ? "#9cdcfe" : "#dea584"}">${n.endsWith(".toml") ? "⚙" : "R"}</span>${n}</div>`).join("");
 
 const treeRows = [
-  ["▾ HAVEN-CHAIN", 0],
+  ["▾ HEAVEN-CHAIN", 0],
   ["▾ crates", 1],
   ["　▾ consensus", 1],
   ["　　R pos.rs", 2],
   ["　　R slashing.rs", 2],
   ["　　R lib.rs", 1],
-  ["　▾ haven-node", 1],
+  ["　▾ heaven-node", 1],
   ["　　R genesis.rs", 1],
   ["　　R main.rs", 1],
   ["　　R config.rs", 1],
@@ -621,7 +621,7 @@ const treeRows = [
 ];
 $("tree").innerHTML = treeRows.filter((r) => r[1] <= S).map(([t]) => {
   const active = t.trim().endsWith(FILES.name) ? " active" : "";
-  const ind = t.startsWith("▾ HAVEN") ? "" : " indent";
+  const ind = t.startsWith("▾ HEAVEN") ? "" : " indent";
   return `<div class="${ind.trim()}${active}">${t.replace("R ", '<span style="color:#dea584">R</span> ')}</div>`;
 }).join("");
 
@@ -631,12 +631,12 @@ const CODE = {
 "",
 "use anyhow::{bail, Context, Result};",
 "use serde::{Deserialize, Serialize};",
-"use haven_primitives::{Address, BlockHash, U256};",
-"use haven_crypto::keccak256;",
+"use heaven_primitives::{Address, BlockHash, U256};",
+"use heaven_crypto::keccak256;",
 "",
 "pub const CHAIN_ID_DEVNET: u64 = 731_001;",
 "pub const CHAIN_ID_MAINNET: u64 = 7_310;",
-"pub const HAVEN_DECIMALS: u8 = 18;",
+"pub const HEAVEN_DECIMALS: u8 = 18;",
 "",
 "#[derive(Debug, Clone, Serialize, Deserialize)]",
 "pub struct GenesisAccount {",
@@ -677,7 +677,7 @@ const CODE = {
 '            bail!("genesis must contain at least one validator");',
 "        }",
 "        let total: U256 = self.accounts.iter().map(|a| a.balance).sum();",
-"        let max_supply = U256::from(10_000_000_000u64) * U256::exp10(HAVEN_DECIMALS as usize);",
+"        let max_supply = U256::from(10_000_000_000u64) * U256::exp10(HEAVEN_DECIMALS as usize);",
 "        if total > max_supply {",
 '            bail!("genesis allocation {total} exceeds max supply {max_supply}");',
 "        }",
@@ -695,8 +695,8 @@ const CODE = {
 2: [
 "use std::collections::BTreeMap;",
 "",
-"use haven_primitives::{Address, U256};",
-"use haven_crypto::{vrf, Signature};",
+"use heaven_primitives::{Address, U256};",
+"use heaven_crypto::{vrf, Signature};",
 "use crate::{ConsensusError, Epoch, Height, Round};",
 "",
 "const MISSED_BLOCK_LIMIT: u32 = 500;",
@@ -769,15 +769,15 @@ const CODE = {
 ],
 3: [
 "use clap::Parser;",
-"use haven_node::{config::NodeConfig, genesis::Genesis, Node};",
-"use haven_telemetry::init_tracing;",
+"use heaven_node::{config::NodeConfig, genesis::Genesis, Node};",
+"use heaven_telemetry::init_tracing;",
 "",
 "#[derive(Parser)]",
-'#[command(name = "haven-node", version, about = "Haven Chain full node")]',
+'#[command(name = "heaven-node", version, about = "Heaven Chain full node")]',
 "struct Cli {",
 '    #[arg(long, default_value = "mainnet")]',
 "    network: String,",
-'    #[arg(long, default_value = "/data/haven")]',
+'    #[arg(long, default_value = "/data/heaven")]',
 "    datadir: std::path::PathBuf,",
 "    #[arg(long)]",
 "    validator_key: Option<std::path::PathBuf>,",
@@ -790,7 +790,7 @@ const CODE = {
 "#[tokio::main]",
 "async fn main() -> anyhow::Result<()> {",
 "    let cli = Cli::parse();",
-'    init_tracing("haven-node")?;',
+'    init_tracing("heaven-node")?;',
 "",
 '    let genesis = Genesis::load(cli.datadir.join("genesis.json"))?;',
 '    tracing::info!(chain_id = genesis.chain_id, hash = %genesis.hash(), "genesis loaded");',
@@ -805,7 +805,7 @@ const CODE = {
 "",
 "    let node = Node::new(config, genesis).await?;",
 "    let handle = node.start().await?;",
-'    tracing::info!(version = env!("CARGO_PKG_VERSION"), "haven-node started");',
+'    tracing::info!(version = env!("CARGO_PKG_VERSION"), "heaven-node started");',
 "",
 "    tokio::signal::ctrl_c().await?;",
 "    handle.shutdown().await?;",
@@ -866,9 +866,9 @@ function advance() {
 /* ───────── 터미널 ───────── */
 const term = $("terminalLog");
 const LOGS = {
-  1: [["CARGO", "check -p haven-node", "Checking haven-node v0.3.0"], ["WARN", "unused variable `epoch_seed`", "crates/consensus/src/pos.rs:211"], ["TEST", "cargo test -p haven-node genesis", "running 9 tests"], ["OK", "test result: ok", "9 passed; 0 failed; 3 ignored"], ["NODE", "devnet block sealed", `height=#H validators=1`], ["CARGO", "clippy --workspace", "17 warnings emitted"], ["ERR", "haven-indexer exited", "decode receipt: unexpected log topic length"], ["NODE", "rpc eth_blockNumber", "200 · 3 ms"]],
-  2: [["CARGO", "build --release -p haven-node", "Compiling haven-consensus v0.7.2"], ["TEST", "cargo test -p consensus", "running 46 tests"], ["OK", "test result: ok", "44 passed; 0 failed"], ["ERR", "pos::tests::double_sign_slash", "assertion failed: jailed_until.is_some()"], ["NODE", "testnet block finalized", `height=#H votes=4/4`], ["OK", "bench proposer_selection", "1.84 µs/iter (-6.1%)"], ["CARGO", "clippy -p consensus", "4 warnings emitted"], ["NODE", "p2p peers", "3 connected · 11 ms"]],
-  3: [["OK", "cargo test --workspace", "312 passed; 0 failed; 0 ignored"], ["OK", "cargo audit", "0 vulnerabilities found"], ["OK", "release build", "haven-node 1.0.0 (9e3f5a1) sha256 ok"], ["NODE", "genesis status", "signatures 6/7 · waiting validator-6"], ["NODE", "p2p seed peers", "6/6 connected"]]
+  1: [["CARGO", "check -p heaven-node", "Checking heaven-node v0.3.0"], ["WARN", "unused variable `epoch_seed`", "crates/consensus/src/pos.rs:211"], ["TEST", "cargo test -p heaven-node genesis", "running 9 tests"], ["OK", "test result: ok", "9 passed; 0 failed; 3 ignored"], ["NODE", "devnet block sealed", `height=#H validators=1`], ["CARGO", "clippy --workspace", "17 warnings emitted"], ["ERR", "heaven-indexer exited", "decode receipt: unexpected log topic length"], ["NODE", "rpc eth_blockNumber", "200 · 3 ms"]],
+  2: [["CARGO", "build --release -p heaven-node", "Compiling heaven-consensus v0.7.2"], ["TEST", "cargo test -p consensus", "running 46 tests"], ["OK", "test result: ok", "44 passed; 0 failed"], ["ERR", "pos::tests::double_sign_slash", "assertion failed: jailed_until.is_some()"], ["NODE", "testnet block finalized", `height=#H votes=4/4`], ["OK", "bench proposer_selection", "1.84 µs/iter (-6.1%)"], ["CARGO", "clippy -p consensus", "4 warnings emitted"], ["NODE", "p2p peers", "3 connected · 11 ms"]],
+  3: [["OK", "cargo test --workspace", "312 passed; 0 failed; 0 ignored"], ["OK", "cargo audit", "0 vulnerabilities found"], ["OK", "release build", "heaven-node 1.0.0 (9e3f5a1) sha256 ok"], ["NODE", "genesis status", "signatures 6/7 · waiting validator-6"], ["NODE", "p2p seed peers", "6/6 connected"]]
 }[S];
 const tagCls = { OK: "log-ok", CARGO: "log-mcp", TEST: "log-tool", NODE: "log-mcp", WARN: "log-tool", ERR: "" };
 let li = 0;
@@ -892,12 +892,12 @@ setInterval(nextTlog, 1300);
 
 /* ───────── 완료 ───────── */
 function launch() {
-  if (S !== 3) { havenCelebrate({ delay: 500 }); return; }
+  if (S !== 3) { heavenCelebrate({ delay: 500 }); return; }
   if (S !== 3 || launched) return;
   while (gi < code.length) advance();
   $("deployBtn").textContent = "Launching…";
-  havenCelebrate({ delay: 2600 });
-  tlog("NODE", "havenctl genesis sign --validator 6", "submitting signature");
+  heavenCelebrate({ delay: 2600 });
+  tlog("NODE", "heavenctl genesis sign --validator 6", "submitting signature");
   setTimeout(() => tlog("OK", "genesis sealed", "signatures 7/7 · hash 0x3d7e91c4…a9c1"), 700);
   setTimeout(() => {
     launched = true;
@@ -909,13 +909,13 @@ function launch() {
     C.nodes[3][3] = "● finalized"; C.nodes[3][4] = "2.0 s";
     C.nodes[4][3] = "● ok"; C.nodes[4][4] = "12 ms";
     C.nodes[5][3] = "● watching"; C.nodes[5][4] = "—";
-    C.health = [["haven-validator", "healthy", "7 pods"], ["haven-rpc", "healthy", "3 pods"], ["haven-indexer", "healthy", "1 pod"], ["bridge-relayer", "healthy", "1 pod"]];
+    C.health = [["heaven-validator", "healthy", "7 pods"], ["heaven-rpc", "healthy", "3 pods"], ["heaven-indexer", "healthy", "1 pod"], ["bridge-relayer", "healthy", "1 pod"]];
     C.tps = [4, 22];
     C.rows[0][1] = "Live"; C.rows[2][1] = "7";
     $("insAddr").textContent = "0x5E0d…4e01";
     renderRows(); renderFlow(); renderHealth(); renderCards();
     $("opsStatus").innerHTML = '<span class="env-dot"></span>Mainnet operational &nbsp; ⋮';
-    $("opsPath").textContent = "mainnet / haven-chain / overview";
+    $("opsPath").textContent = "mainnet / heaven-chain / overview";
     $("liveTag").textContent = "● LIVE · mainnet";
     $("liveTag").style.color = "";
     $("deployBtn").textContent = "Mainnet live";
@@ -923,7 +923,7 @@ function launch() {
     $("milestones").lastElementChild.querySelector(".status-dot").className = "status-dot";
     blockTrace();
   }, 1500);
-  setTimeout(() => tlog("OK", "haven-node 1.0.0", "mainnet started · 7/7 validators online"), 2200);
+  setTimeout(() => tlog("OK", "heaven-node 1.0.0", "mainnet started · 7/7 validators online"), 2200);
 }
 
 document.addEventListener("keydown", (e) => {

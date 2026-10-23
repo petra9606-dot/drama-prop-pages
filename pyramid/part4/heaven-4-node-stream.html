@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>haven-node — live-stream.log</title>
+<title>heaven-node — live-stream.log</title>
 <style>
     :root {
       --background: #070b10;
@@ -504,7 +504,7 @@
 
 <script>
 // stage: 1 = 초반 작업, 2 = 중반 작업, 3 = 마무리 (Enter 로 완료)
-const HAVEN_STAGE = (() => {
+const HEAVEN_STAGE = (() => {
   const q = new URLSearchParams(location.search).get("stage");
   const h = (location.hash || "").replace("#", "");
   const v = parseInt(q || h || "1", 10);
@@ -521,52 +521,52 @@ document.addEventListener("keydown", (e) => {
 }, true);
 
 // 완료 대화상자 (Enter "탁!" 이후) — Windows 스타일
-function havenCelebrate(opts) {
-  if (document.getElementById("havenDone")) return;
+function heavenCelebrate(opts) {
+  if (document.getElementById("heavenDone")) return;
   const o = Object.assign({ delay: 0 }, opts || {});
   const css = `
-#havenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
-#havenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
+#heavenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
+#heavenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
   box-shadow:0 32px 64px rgba(0,0,0,.37),0 2px 21px rgba(0,0,0,.27);overflow:hidden;animation:hdPop .18s cubic-bezier(.1,.9,.2,1)}
 @keyframes hdFade{from{opacity:0}}
 @keyframes hdPop{from{opacity:0;transform:scale(.96)}}
-#havenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
-#havenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
-#havenDone .hd-title .sp{flex:1}
-#havenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
-#havenDone .hd-x:hover{background:#c42b1c;color:#fff}
-#havenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
-#havenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
-#havenDone .hd-ok svg{width:18px;height:18px}
-#havenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
-#havenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
-#havenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
-#havenDone dd{margin:0;color:#1b1b1b}
-#havenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
-#havenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
-#havenDone .hd-btn:hover{background:#f6f6f6}
-#havenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
-#havenDone .hd-btn.pri:hover{background:#1b75c4}
+#heavenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
+#heavenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
+#heavenDone .hd-title .sp{flex:1}
+#heavenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
+#heavenDone .hd-x:hover{background:#c42b1c;color:#fff}
+#heavenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
+#heavenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
+#heavenDone .hd-ok svg{width:18px;height:18px}
+#heavenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
+#heavenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
+#heavenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
+#heavenDone dd{margin:0;color:#1b1b1b}
+#heavenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
+#heavenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
+#heavenDone .hd-btn:hover{background:#f6f6f6}
+#heavenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
+#heavenDone .hd-btn.pri:hover{background:#1b75c4}
 `;
   setTimeout(() => {
     const st = document.createElement("style");
     st.textContent = css;
     document.head.appendChild(st);
     const root = document.createElement("div");
-    root.id = "havenDone";
+    root.id = "heavenDone";
     const now = new Date();
     const p2 = (n) => String(n).padStart(2, "0");
     const ts = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
     root.innerHTML = `
       <div class="hd-win" role="dialog" aria-modal="true">
-        <div class="hd-title"><span class="ic">H</span><span>Haven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
+        <div class="hd-title"><span class="ic">H</span><span>Heaven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
         <div class="hd-body">
           <div class="hd-ok"><svg viewBox="0 0 16 16"><path d="M3.2 8.4l3 3 6.6-6.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h2>배포가 완료되었습니다.</h2>
-            <p>해븐코인(HAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
+            <p>헤븐코인(HEAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
             <dl>
-              <dt>네트워크</dt><dd>Haven Mainnet (chain 7310)</dd>
+              <dt>네트워크</dt><dd>Heaven Mainnet (chain 7310)</dd>
               <dt>검증 노드</dt><dd>7 / 7 온라인</dd>
               <dt>테스트</dt><dd>138 / 138 통과</dd>
               <dt>완료 시각</dt><dd>${ts}</dd>
@@ -588,14 +588,14 @@ function havenCelebrate(opts) {
   }, o.delay);
 }
 document.addEventListener("keydown", (e) => {
-  const d = document.getElementById("havenDone");
+  const d = document.getElementById("heavenDone");
   if (!d) return;
   if (e.key === "Escape" || e.key === "Enter" || e.key === " ") { d.remove(); }
   e.stopPropagation(); e.preventDefault();
 }, true);
 
 
-const S = HAVEN_STAGE;
+const S = HEAVEN_STAGE;
 const $ = (id) => document.getElementById(id);
 const rnd = (a, b) => Math.random() * (b - a) + a;
 const ri = (a, b) => Math.floor(rnd(a, b + 1));
@@ -606,9 +606,9 @@ const N = (v) => `<span class="number">${v}</span>`;
 const M = (v) => `<span class="muted">${v}</span>`;
 
 const CFG = {
-  1: { path: "devnet / haven-devnet-node-0 / live-stream.log", node: "haven-devnet-node-0", net: "devnet · chain 731001", ver: "haven-node 0.3.0-dev", height: 41862, vals: 1, peers: 0, tps: [0, 4], bt: "3.0s" },
-  2: { path: "testnet / haven-validator-0 / live-stream.log", node: "haven-validator-0", net: "testnet · chain 731002", ver: "haven-node 0.7.2-rc", height: 1184904, vals: 4, peers: 3, tps: [24, 68], bt: "2.0s" },
-  3: { path: "mainnet / haven-validator-0 / live-stream.log", node: "haven-validator-0", net: "mainnet · chain 7310", ver: "haven-node 1.0.0", height: 0, vals: 7, peers: 6, tps: [3, 26], bt: "2.0s" }
+  1: { path: "devnet / heaven-devnet-node-0 / live-stream.log", node: "heaven-devnet-node-0", net: "devnet · chain 731001", ver: "heaven-node 0.3.0-dev", height: 41862, vals: 1, peers: 0, tps: [0, 4], bt: "3.0s" },
+  2: { path: "testnet / heaven-validator-0 / live-stream.log", node: "heaven-validator-0", net: "testnet · chain 731002", ver: "heaven-node 0.7.2-rc", height: 1184904, vals: 4, peers: 3, tps: [24, 68], bt: "2.0s" },
+  3: { path: "mainnet / heaven-validator-0 / live-stream.log", node: "heaven-validator-0", net: "mainnet · chain 7310", ver: "heaven-node 1.0.0", height: 0, vals: 7, peers: 6, tps: [3, 26], bt: "2.0s" }
 }[S];
 let height = CFG.height;
 let launched = S !== 3;
@@ -627,15 +627,15 @@ function setStatus() {
 }
 
 /* ───────── 로그 템플릿 ───────── */
-const vName = () => `haven-validator-${ri(0, CFG.vals - 1)}`;
+const vName = () => `heaven-validator-${ri(0, CFG.vals - 1)}`;
 const normal = [
-  () => { height++; setStatus(); return ["build", "CONSENSUS", `Block proposed  ${K("height", height)}  ${K("round", 0, "number")}  ${K("proposer", S === 1 ? "haven-devnet-node-0" : vName())}  ${K("txs", ri(CFG.tps[0], CFG.tps[1] * 2), "number")}`]; },
+  () => { height++; setStatus(); return ["build", "CONSENSUS", `Block proposed  ${K("height", height)}  ${K("round", 0, "number")}  ${K("proposer", S === 1 ? "heaven-devnet-node-0" : vName())}  ${K("txs", ri(CFG.tps[0], CFG.tps[1] * 2), "number")}`]; },
   () => ["success", "COMMIT", `Block finalized  ${K("height", height)}  hash=${M("0x" + hex(10) + "…" + hex(4))}  votes=${N(S === 1 ? "1/1" : S === 2 ? ri(3, 4) + "/4" : "7/7")}  elapsed=${N(ri(140, 420) + "ms")}`],
   () => ["info", "EVM", `Block executed  ${K("height", height)}  gas_used=${N(ri(90000, 12800000).toLocaleString())}  gas_limit=${N("30,000,000")}  state_root=${M("0x" + hex(8) + "…")}`],
   () => ["network", "P2P", S === 1 ? `Peer discovery  ${K("peers", 0, "number")}  mode=${M("single-validator")}  bootnodes=${N(0)}` : `Gossip round complete  ${K("peers", CFG.peers, "number")}  inbound=${N(ri(1, 3))}  outbound=${N(ri(1, 3))}  latency_avg=${N(ri(6, 38) + "ms")}`],
-  () => ["api", "RPC", `<span class="method">${pick(["eth_call", "eth_getBalance", "eth_blockNumber", "eth_sendRawTransaction", "haven_getValidators", "eth_getLogs"])}</span>  status=${N(200)}  duration=${N(ri(1, 48) + "ms")}  client=${M("10.42." + ri(0, 3) + "." + ri(10, 240))}`],
+  () => ["api", "RPC", `<span class="method">${pick(["eth_call", "eth_getBalance", "eth_blockNumber", "eth_sendRawTransaction", "heaven_getValidators", "eth_getLogs"])}</span>  status=${N(200)}  duration=${N(ri(1, 48) + "ms")}  client=${M("10.42." + ri(0, 3) + "." + ri(10, 240))}`],
   () => ["cache", "MEMPOOL", `Txpool updated  pending=${N(ri(0, S === 1 ? 12 : 90))}  queued=${N(ri(0, 9))}  rejected=${N(0)}  base_fee=${N(ri(1, 9) + " gwei")}`],
-  () => ["auth", "STAKING", `Epoch checkpoint  ${K("epoch", Math.floor(height / 1600))}  active_set=${N(CFG.vals)}  bonded=${N(S === 1 ? "0" : S === 2 ? "428.2M" : "1.92B")} HAVEN  apr=${N(S === 1 ? "—" : "8.4%")}`],
+  () => ["auth", "STAKING", `Epoch checkpoint  ${K("epoch", Math.floor(height / 1600))}  active_set=${N(CFG.vals)}  bonded=${N(S === 1 ? "0" : S === 2 ? "428.2M" : "1.92B")} HEAVEN  apr=${N(S === 1 ? "—" : "8.4%")}`],
   () => ["trace", "PAYLOAD", `{ <span class="key">"hash"</span>: <span class="value">"0x${hex(12)}"</span>, <span class="key">"from"</span>: <span class="value">"0x${hex(4)}…${hex(4)}"</span>, <span class="key">"method"</span>: <span class="value">"${pick(["transfer", "stake", "approve", "claimReward", "delegate"])}"</span>, <span class="key">"value"</span>: <span class="number">${ri(1, 50000)}</span>, <span class="key">"status"</span>: <span class="number">1</span> }`]
 ];
 const warns = {
@@ -647,23 +647,23 @@ const warns = {
   2: [
     ["warn", "WARN", `Short reorg detected  depth=${N(1)}  at=${N(height - 1)}  re-indexing`],
     ["warn", "WARN", `Slashing evidence check skipped  reason=${M("evidence pool not wired")}`],
-    ["warn", "WARN", `Bridge relayer unreachable  target=${M("haven-bridge-relayer-0:9100")}  retry_in=${N("30s")}`]
+    ["warn", "WARN", `Bridge relayer unreachable  target=${M("heaven-bridge-relayer-0:9100")}  retry_in=${N("30s")}`]
   ],
   3: [["warn", "WARN", `Peer latency above baseline  peer=${M(vName())}  rtt=${N(ri(80, 140) + "ms")}`]]
 };
 const errors = {
   1: [
-    ["error", "ERROR", `haven-indexer panicked: decode receipt at block ${height - 3}: unexpected log topic length 5`],
-    ["error", "ERROR", `Container haven-indexer restarted (14)  backoff=${N("5m0s")}`]
+    ["error", "ERROR", `heaven-indexer panicked: decode receipt at block ${height - 3}: unexpected log topic length 5`],
+    ["error", "ERROR", `Container heaven-indexer restarted (14)  backoff=${N("5m0s")}`]
   ],
   2: [
     ["error", "ERROR", `test_SlashValidator_Double: assertion failed: 4.82e21 != 4.80e21`]
   ]
 };
 const genesisLogs = [
-  () => ["info", "INIT", `Genesis loaded  chain_id=${N(7310)}  sha256=${M("3d7e91c4…a9c1")}  alloc=${N("2.5B")} HAVEN`],
+  () => ["info", "INIT", `Genesis loaded  chain_id=${N(7310)}  sha256=${M("3d7e91c4…a9c1")}  alloc=${N("2.5B")} HEAVEN`],
   () => ["network", "P2P", `Seed peers connected  ${K("peers", "6/6", "number")}  latency_avg=${N(ri(8, 18) + "ms")}`],
-  () => ["auth", "GENESIS", `Waiting for validator signatures  signed=${N("6/7")}  missing=${M("haven-validator-6")}`],
+  () => ["auth", "GENESIS", `Waiting for validator signatures  signed=${N("6/7")}  missing=${M("heaven-validator-6")}`],
   () => ["info", "KEYSTORE", `Validator key loaded  pubkey=${M("0x" + hex(6) + "…" + hex(4))}`],
   () => ["cache", "MEMPOOL", `Txpool idle  pending=${N(0)}  (chain not started)`]
 ];
@@ -713,17 +713,17 @@ function metrics() {
 
 /* ───────── 완료 ───────── */
 function launch() {
-  if (S !== 3) { havenCelebrate({ delay: 500 }); return; }
+  if (S !== 3) { heavenCelebrate({ delay: 500 }); return; }
   if (S !== 3 || launched || holding) return;
   holding = true;
-  havenCelebrate({ delay: 3400 });
+  heavenCelebrate({ delay: 3400 });
   const seq = [
-    ["auth", "GENESIS", `Signature received  validator=${M("haven-validator-6")}  signed=${N("7/7")}`],
+    ["auth", "GENESIS", `Signature received  validator=${M("heaven-validator-6")}  signed=${N("7/7")}`],
     ["success", "GENESIS", `Genesis sealed  chain_id=${N(7310)}  hash=${M("0x3d7e91c4…a9c1")}  validators=${N(7)}`],
     ["success", "COMMIT", `Block finalized  ${K("height", 0)}  <span class="value">(genesis)</span>  votes=${N("7/7")}`],
-    ["build", "CONSENSUS", `Block proposed  ${K("height", 1)}  ${K("round", 0, "number")}  ${K("proposer", "haven-validator-3")}  ${K("txs", 6, "number")}`],
+    ["build", "CONSENSUS", `Block proposed  ${K("height", 1)}  ${K("round", 0, "number")}  ${K("proposer", "heaven-validator-3")}  ${K("txs", 6, "number")}`],
     ["success", "COMMIT", `Block finalized  ${K("height", 1)}  hash=${M("0xb04f72a1…17de")}  votes=${N("7/7")}  elapsed=${N("212ms")}`],
-    ["success", "NODE", `Haven mainnet is live  version=${N("1.0.0")}  validators=${N("7/7")}  rpc=${M("https://rpc.havenchain.io")}`]
+    ["success", "NODE", `Heaven mainnet is live  version=${N("1.0.0")}  validators=${N("7/7")}  rpc=${M("https://rpc.heavenchain.io")}`]
   ];
   seq.forEach((l, i) => setTimeout(() => {
     add(l);

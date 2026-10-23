@@ -226,8 +226,8 @@ body{
 
     <div class="header">
       <div class="brand">
-        <strong>HAVEN CI</strong>
-        <span>Namespace: <b>haven-ci</b></span>
+        <strong>HEAVEN CI</strong>
+        <span>Namespace: <b>heaven-ci</b></span>
         <span>Pipeline: <b id="pipe">-</b></span>
         <span>Ref: <b id="ref">-</b></span>
       </div>
@@ -272,7 +272,7 @@ body{
   <section class="terminal-overlay">
     <header class="terminal-title">
       <div class="lights"><i class="light r"></i><i class="light y"></i><i class="light g"></i></div>
-      <div class="terminal-name">haven-ci — zsh</div>
+      <div class="terminal-name">heaven-ci — zsh</div>
       <div></div>
     </header>
     <div class="terminal-output" id="termOutput"></div>
@@ -281,7 +281,7 @@ body{
 
 <script>
 // stage: 1 = 초반 작업, 2 = 중반 작업, 3 = 마무리 (Enter 로 완료)
-const HAVEN_STAGE = (() => {
+const HEAVEN_STAGE = (() => {
   const q = new URLSearchParams(location.search).get("stage");
   const h = (location.hash || "").replace("#", "");
   const v = parseInt(q || h || "1", 10);
@@ -298,52 +298,52 @@ document.addEventListener("keydown", (e) => {
 }, true);
 
 // 완료 대화상자 (Enter "탁!" 이후) — Windows 스타일
-function havenCelebrate(opts) {
-  if (document.getElementById("havenDone")) return;
+function heavenCelebrate(opts) {
+  if (document.getElementById("heavenDone")) return;
   const o = Object.assign({ delay: 0 }, opts || {});
   const css = `
-#havenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
-#havenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
+#heavenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
+#heavenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
   box-shadow:0 32px 64px rgba(0,0,0,.37),0 2px 21px rgba(0,0,0,.27);overflow:hidden;animation:hdPop .18s cubic-bezier(.1,.9,.2,1)}
 @keyframes hdFade{from{opacity:0}}
 @keyframes hdPop{from{opacity:0;transform:scale(.96)}}
-#havenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
-#havenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
-#havenDone .hd-title .sp{flex:1}
-#havenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
-#havenDone .hd-x:hover{background:#c42b1c;color:#fff}
-#havenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
-#havenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
-#havenDone .hd-ok svg{width:18px;height:18px}
-#havenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
-#havenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
-#havenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
-#havenDone dd{margin:0;color:#1b1b1b}
-#havenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
-#havenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
-#havenDone .hd-btn:hover{background:#f6f6f6}
-#havenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
-#havenDone .hd-btn.pri:hover{background:#1b75c4}
+#heavenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
+#heavenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
+#heavenDone .hd-title .sp{flex:1}
+#heavenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
+#heavenDone .hd-x:hover{background:#c42b1c;color:#fff}
+#heavenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
+#heavenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
+#heavenDone .hd-ok svg{width:18px;height:18px}
+#heavenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
+#heavenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
+#heavenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
+#heavenDone dd{margin:0;color:#1b1b1b}
+#heavenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
+#heavenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
+#heavenDone .hd-btn:hover{background:#f6f6f6}
+#heavenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
+#heavenDone .hd-btn.pri:hover{background:#1b75c4}
 `;
   setTimeout(() => {
     const st = document.createElement("style");
     st.textContent = css;
     document.head.appendChild(st);
     const root = document.createElement("div");
-    root.id = "havenDone";
+    root.id = "heavenDone";
     const now = new Date();
     const p2 = (n) => String(n).padStart(2, "0");
     const ts = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
     root.innerHTML = `
       <div class="hd-win" role="dialog" aria-modal="true">
-        <div class="hd-title"><span class="ic">H</span><span>Haven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
+        <div class="hd-title"><span class="ic">H</span><span>Heaven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
         <div class="hd-body">
           <div class="hd-ok"><svg viewBox="0 0 16 16"><path d="M3.2 8.4l3 3 6.6-6.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h2>배포가 완료되었습니다.</h2>
-            <p>해븐코인(HAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
+            <p>헤븐코인(HEAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
             <dl>
-              <dt>네트워크</dt><dd>Haven Mainnet (chain 7310)</dd>
+              <dt>네트워크</dt><dd>Heaven Mainnet (chain 7310)</dd>
               <dt>검증 노드</dt><dd>7 / 7 온라인</dd>
               <dt>테스트</dt><dd>138 / 138 통과</dd>
               <dt>완료 시각</dt><dd>${ts}</dd>
@@ -365,14 +365,14 @@ function havenCelebrate(opts) {
   }, o.delay);
 }
 document.addEventListener("keydown", (e) => {
-  const d = document.getElementById("havenDone");
+  const d = document.getElementById("heavenDone");
   if (!d) return;
   if (e.key === "Escape" || e.key === "Enter" || e.key === " ") { d.remove(); }
   e.stopPropagation(); e.preventDefault();
 }, true);
 
 
-const S = HAVEN_STAGE;
+const S = HEAVEN_STAGE;
 const $ = (id) => document.getElementById(id);
 const ri = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
@@ -380,9 +380,9 @@ const hex = (n) => Array.from({ length: n }, () => "0123456789abcdef"[ri(0, 15)]
 let launched = false;
 
 const CFG = {
-  1: { ctx: "haven-dev", pipe: "#214", ref: "feature/token-core@4c1a9e2" },
-  2: { ctx: "haven-stage", pipe: "#612", ref: "feature/staking-vesting@b81e07d" },
-  3: { ctx: "haven-prod", pipe: "#1048", ref: "release/v1.0.0@9e3f5a1" }
+  1: { ctx: "heaven-dev", pipe: "#214", ref: "feature/token-core@4c1a9e2" },
+  2: { ctx: "heaven-stage", pipe: "#612", ref: "feature/staking-vesting@b81e07d" },
+  3: { ctx: "heaven-prod", pipe: "#1048", ref: "release/v1.0.0@9e3f5a1" }
 }[S];
 $("ctx").textContent = CFG.ctx;
 $("pipe").textContent = CFG.pipe;
@@ -395,7 +395,7 @@ let pods = [];
 if (S === 1) pods = [
   [`forge-test-${suf()}`, "Running", "1/1", 310, "2m", "forge"],
   [`cargo-test-node-${suf()}`, "Running", "1/1", 880, "2m", "cargo"],
-  [`fuzz-haventoken-${suf()}`, "Running", "1/1", 940, "6m", "fuzz"],
+  [`fuzz-heaventoken-${suf()}`, "Running", "1/1", 940, "6m", "fuzz"],
   [`slither-scan-${suf()}`, "Completed", "0/1", 0, "9m", "slither"],
   [`indexer-it-${suf()}`, "Error", "0/1", 0, "4m", "indexer"],
   [`deploy-devnet-${suf()}`, "Pending", "0/1", 0, "1m", "deploy"]
@@ -403,7 +403,7 @@ if (S === 1) pods = [
 if (S === 2) pods = [
   [`forge-test-${suf()}`, "Running", "1/1", 420, "3m", "forge"],
   [`cargo-test-consensus-${suf()}`, "Running", "1/1", 1120, "3m", "cargo"],
-  [`fuzz-havenstaking-${suf()}`, "Running", "1/1", 980, "11m", "fuzz"],
+  [`fuzz-heavenstaking-${suf()}`, "Running", "1/1", 980, "11m", "fuzz"],
   [`invariant-vesting-${suf()}`, "Running", "1/1", 760, "8m", "invariant"],
   [`e2e-testnet-${suf()}`, "Error", "0/1", 0, "5m", "e2e"],
   [`slither-scan-${suf()}`, "Completed", "0/1", 0, "14m", "slither"],
@@ -446,30 +446,30 @@ function render() {
 
 /* ───────── 로그 내용 ───────── */
 const FORGE_TESTS = {
-  1: ["HavenTokenTest:test_Mint_ByMinter", "HavenTokenTest:test_Mint_RevertsAboveMaxSupply", "HavenTokenTest:test_Burn_ReducesSupply", "HavenTokenTest:test_Pause_BlocksTransfer", "HavenPermitTest:test_Permit_ValidSignature", "HavenPermitTest:test_Permit_ExpiredDeadline", "GenesisConfigTest:test_GenesisAllocation"],
-  2: ["HavenStakingTest:test_Stake_UpdatesPool", "HavenStakingTest:test_Unstake_StartsUnbonding", "HavenStakingTest:test_Reward_AccruesPerEpoch", "HavenStakingTest:test_Harvest_PaysPending", "HavenVestingTest:test_Cliff_NoRelease", "HavenVestingTest:test_Linear_Release", "HavenTokenTest:test_Mint_ByMinter"],
-  3: ["HavenBridgeTest:test_Lock_EmitsEvent", "HavenBridgeTest:test_Mint_RequiresQuorum", "HavenStakingTest:test_SlashValidator_Double", "HavenVestingTest:test_Revoke_ReturnsUnvested"]
+  1: ["HeavenTokenTest:test_Mint_ByMinter", "HeavenTokenTest:test_Mint_RevertsAboveMaxSupply", "HeavenTokenTest:test_Burn_ReducesSupply", "HeavenTokenTest:test_Pause_BlocksTransfer", "HeavenPermitTest:test_Permit_ValidSignature", "HeavenPermitTest:test_Permit_ExpiredDeadline", "GenesisConfigTest:test_GenesisAllocation"],
+  2: ["HeavenStakingTest:test_Stake_UpdatesPool", "HeavenStakingTest:test_Unstake_StartsUnbonding", "HeavenStakingTest:test_Reward_AccruesPerEpoch", "HeavenStakingTest:test_Harvest_PaysPending", "HeavenVestingTest:test_Cliff_NoRelease", "HeavenVestingTest:test_Linear_Release", "HeavenTokenTest:test_Mint_ByMinter"],
+  3: ["HeavenBridgeTest:test_Lock_EmitsEvent", "HeavenBridgeTest:test_Mint_RequiresQuorum", "HeavenStakingTest:test_SlashValidator_Double", "HeavenVestingTest:test_Revoke_ReturnsUnvested"]
 };
 function logFor(p) {
   const k = p[5];
   if (k === "forge") {
-    if (S === 2 && Math.random() < 0.12) return ["red", `[FAIL: assertion failed: 4.82e21 != 4.80e21] HavenStakingTest:test_SlashValidator_Double() (gas: ${ri(380000, 420000)})`];
+    if (S === 2 && Math.random() < 0.12) return ["red", `[FAIL: assertion failed: 4.82e21 != 4.80e21] HeavenStakingTest:test_SlashValidator_Double() (gas: ${ri(380000, 420000)})`];
     return ["green", `[PASS] ${pick(FORGE_TESTS[S])}() (gas: ${ri(18000, 310000).toLocaleString()})`];
   }
   if (k === "cargo") return Math.random() < 0.8
     ? ["white", `test ${pick(["genesis::tests::validate_rejects_empty_set", "genesis::tests::hash_is_stable", "pos::tests::proposer_weighted", "pos::tests::quorum_two_thirds", "p2p::tests::gossip_dedup", "evm::tests::base_fee_adjusts"])} ... ok`]
-    : ["white", `   Compiling ${pick(["haven-consensus", "haven-evm", "haven-p2p", "haven-staking"])} v${S === 1 ? "0.3.0" : "0.7.2"}`];
+    : ["white", `   Compiling ${pick(["heaven-consensus", "heaven-evm", "heaven-p2p", "heaven-staking"])} v${S === 1 ? "0.3.0" : "0.7.2"}`];
   if (k === "fuzz" || k === "invariant") return ["white", `[${k === "fuzz" ? "FUZZ" : "INVARIANT"}] ${pick(["totalSupply <= MAX_SUPPLY", "sum(stakes) == totalStaked", "vested <= allocation", "balanceOf(this) >= totalStaked"])} runs=${ri(1000, 65536).toLocaleString()} calls=${ri(10000, 900000).toLocaleString()} reverts=${ri(0, 900)} ✓`];
   if (k === "slither") return ["white", `INFO:Detectors: ${pick(["naming-convention", "solc-version", "too-many-digits", "immutable-states"])} — informational`];
   if (k === "indexer") return Math.random() < 0.5 ? ["red", `panicked at 'decode receipt: unexpected log topic length 5', src/decoder.rs:${ri(80, 140)}:17`] : ["white", `indexing block ${ri(41800, 41870)} txs=${ri(0, 6)}`];
-  if (k === "e2e") return Math.random() < 0.3 ? ["red", `✗ bridge round-trip (lock → mint → burn → release)  Error: relayer not reachable`] : ["green", `✓ ${pick(["transfer HAVEN between EOAs", "delegate to validator-2", "claim staking reward after epoch", "vesting cliff respected"])} (${ri(800, 4200)}ms)`];
+  if (k === "e2e") return Math.random() < 0.3 ? ["red", `✗ bridge round-trip (lock → mint → burn → release)  Error: relayer not reachable`] : ["green", `✓ ${pick(["transfer HEAVEN between EOAs", "delegate to validator-2", "claim staking reward after epoch", "vesting cliff respected"])} (${ri(800, 4200)}ms)`];
   if (k === "bridge") return ["white", `waiting for PersistentVolumeClaim "relayer-keys" to be bound`];
   if (k === "deploy") {
     if (S === 1) return ["white", `0/1 nodes are available: waiting for devnet node readiness`];
-    if (S === 2) return ["white", `deploy finished · HavenStaking 0x3Ab1…77c4 verified on testnet explorer`];
+    if (S === 2) return ["white", `deploy finished · HeavenStaking 0x3Ab1…77c4 verified on testnet explorer`];
     return launched ? ["green", `block #${ri(2, 40)} finalized votes=7/7`] : ["white", `awaiting approval: production deploy requires 2 approvals (1/2)`];
   }
-  if (k === "sign") return ["green", `artifact signed haven-node-1.0.0-linux-amd64.tar.gz sha256=${hex(12)}…`];
+  if (k === "sign") return ["green", `artifact signed heaven-node-1.0.0-linux-amd64.tar.gz sha256=${hex(12)}…`];
   return ["white", "heartbeat ok"];
 }
 function doneLog(p) {
@@ -533,9 +533,9 @@ function tl(cls, msg) {
   term.scrollTop = term.scrollHeight;
 }
 const TERM = {
-  1: [["white", "➜ haven-chain git push origin feature/token-core"], ["green", "To github.com:pharaoh-lab/haven-chain.git  9b2d4f0..4c1a9e2"], ["white", "➜ haven-chain havenci watch #214"], ["green", "pipeline #214 · 6 jobs · 3 running"], ["red", "job indexer-it failed (exit 101)"]],
-  2: [["white", "➜ haven-chain git push origin feature/staking-vesting"], ["green", "To github.com:pharaoh-lab/haven-chain.git  71fa0c3..b81e07d"], ["white", "➜ haven-chain havenci watch #612"], ["green", "pipeline #612 · 8 jobs · 4 running"], ["red", "job e2e-testnet failed: bridge round-trip"]],
-  3: [["white", "➜ haven-chain git tag -s v1.0.0 -m \"Haven mainnet\""], ["white", "➜ haven-chain git push origin v1.0.0"], ["green", "* [new tag]  v1.0.0 -> v1.0.0"], ["white", "➜ haven-chain havenci watch #1048"], ["green", "pipeline #1048 · 7/8 jobs succeeded"], ["white", "deploy-mainnet: awaiting approval (1/2)"], ["white", "➜ haven-chain havenci approve #1048 --job deploy-mainnet"]]
+  1: [["white", "➜ heaven-chain git push origin feature/token-core"], ["green", "To github.com:pharaoh-lab/heaven-chain.git  9b2d4f0..4c1a9e2"], ["white", "➜ heaven-chain heavenci watch #214"], ["green", "pipeline #214 · 6 jobs · 3 running"], ["red", "job indexer-it failed (exit 101)"]],
+  2: [["white", "➜ heaven-chain git push origin feature/staking-vesting"], ["green", "To github.com:pharaoh-lab/heaven-chain.git  71fa0c3..b81e07d"], ["white", "➜ heaven-chain heavenci watch #612"], ["green", "pipeline #612 · 8 jobs · 4 running"], ["red", "job e2e-testnet failed: bridge round-trip"]],
+  3: [["white", "➜ heaven-chain git tag -s v1.0.0 -m \"Heaven mainnet\""], ["white", "➜ heaven-chain git push origin v1.0.0"], ["green", "* [new tag]  v1.0.0 -> v1.0.0"], ["white", "➜ heaven-chain heavenci watch #1048"], ["green", "pipeline #1048 · 7/8 jobs succeeded"], ["white", "deploy-mainnet: awaiting approval (1/2)"], ["white", "➜ heaven-chain heavenci approve #1048 --job deploy-mainnet"]]
 }[S];
 let ti = 0;
 function termTick() {
@@ -544,32 +544,32 @@ function termTick() {
 
 /* ───────── 완료 ───────── */
 function launch() {
-  if (S !== 3) { havenCelebrate({ delay: 500 }); return; }
+  if (S !== 3) { heavenCelebrate({ delay: 500 }); return; }
   if (S !== 3 || launched) return;
   launched = true;
-  havenCelebrate({ delay: 5500 });
+  heavenCelebrate({ delay: 5500 });
   const p = pods[pods.length - 1];
   select(pods.length - 1);
   tl("green", "✔ approved by dongchan.bae (2/2)");
   const seq = [
     ["white", "approval 2/2 received — starting production deploy"],
-    ["white", "deploying HavenToken ... 0x5E0d1c94A7b3F2E8D61a90C4b7E2f3a8D9c04e01"],
-    ["white", "deploying HavenValidatorSet ... 0x91bC07e3A2d4F68c0B5e1D7a3F9c2E84b6A1d702"],
-    ["white", "deploying HavenStaking ... 0x2Fa84D16c9E0b3A7f5D2e8C14b9A6d0E3f7C5b31"],
-    ["white", "deploying HavenVesting ... 0xC3e7A90f1B4d26E8a5F0c9D3b7E1a64F2d8B0e95"],
-    ["white", "deploying HavenBridge ... 0x6aD2f8E14c7B90a3E5d1F6b2C8a0e47D9f3B1c58"],
+    ["white", "deploying HeavenToken ... 0x5E0d1c94A7b3F2E8D61a90C4b7E2f3a8D9c04e01"],
+    ["white", "deploying HeavenValidatorSet ... 0x91bC07e3A2d4F68c0B5e1D7a3F9c2E84b6A1d702"],
+    ["white", "deploying HeavenStaking ... 0x2Fa84D16c9E0b3A7f5D2e8C14b9A6d0E3f7C5b31"],
+    ["white", "deploying HeavenVesting ... 0xC3e7A90f1B4d26E8a5F0c9D3b7E1a64F2d8B0e95"],
+    ["white", "deploying HeavenBridge ... 0x6aD2f8E14c7B90a3E5d1F6b2C8a0e47D9f3B1c58"],
     ["green", "genesis sealed signatures=7/7 chain_id=7310"],
     ["green", "block #0 (genesis) finalized votes=7/7"],
     ["green", "block #1 finalized votes=7/7"],
     ["green", "explorer verification complete: 5/5 contracts verified"],
-    ["green", "deploy finished · HAVEN mainnet v1.0.0 is live"]
+    ["green", "deploy finished · HEAVEN mainnet v1.0.0 is live"]
   ];
   p[3] = 620; render();
   seq.forEach((l, i) => setTimeout(() => addLog(...l), 300 + i * 420));
   setTimeout(() => {
     p[1] = "Completed"; p[2] = "0/1"; p[3] = 0; render();
     tl("green", "pipeline #1048 · 8/8 jobs succeeded");
-    tl("white", "➜ haven-chain");
+    tl("white", "➜ heaven-chain");
   }, 300 + seq.length * 420 + 400);
 }
 

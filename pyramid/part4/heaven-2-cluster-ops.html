@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HAVEN OPS — k9s</title>
+<title>HEAVEN OPS — k9s</title>
 <style>
     :root {
       --background: #050505;
@@ -535,7 +535,7 @@
           <span class="traffic-light white"></span>
           <span class="traffic-light green"></span>
         </div>
-        <div class="terminal-title" id="termTitle">haven-ops — zsh — 90×18</div>
+        <div class="terminal-title" id="termTitle">heaven-ops — zsh — 90×18</div>
         <div></div>
       </header>
       <div id="connectionOutput" class="connection-output"></div>
@@ -548,7 +548,7 @@
           <span><span class="header-label">Cluster:</span> <span class="header-value" id="clusterName">-</span></span>
           <span><span class="header-label">Namespace:</span> <span class="header-value" id="nsName">-</span></span>
         </div>
-        <div class="cluster-console-logo">HAVEN&nbsp;OPS</div>
+        <div class="cluster-console-logo">HEAVEN&nbsp;OPS</div>
         <div class="header-stats">
           <span>HEIGHT <span id="heightStat" class="healthy">-</span></span>
           <span>PEERS <span id="peerStat" class="healthy">-</span></span>
@@ -591,7 +591,7 @@
         <div class="selected-pod-title">
           <span>Logs:</span>
           <strong id="selectedPodName"></strong>
-          <span class="muted" id="containerName">container/haven-node</span>
+          <span class="muted" id="containerName">container/heaven-node</span>
         </div>
         <div class="log-controls">
           <button class="log-control active">Auto-scroll</button>
@@ -622,7 +622,7 @@
 
   <script>
 // stage: 1 = 초반 작업, 2 = 중반 작업, 3 = 마무리 (Enter 로 완료)
-const HAVEN_STAGE = (() => {
+const HEAVEN_STAGE = (() => {
   const q = new URLSearchParams(location.search).get("stage");
   const h = (location.hash || "").replace("#", "");
   const v = parseInt(q || h || "1", 10);
@@ -639,52 +639,52 @@ document.addEventListener("keydown", (e) => {
 }, true);
 
 // 완료 대화상자 (Enter "탁!" 이후) — Windows 스타일
-function havenCelebrate(opts) {
-  if (document.getElementById("havenDone")) return;
+function heavenCelebrate(opts) {
+  if (document.getElementById("heavenDone")) return;
   const o = Object.assign({ delay: 0 }, opts || {});
   const css = `
-#havenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
-#havenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
+#heavenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
+#heavenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
   box-shadow:0 32px 64px rgba(0,0,0,.37),0 2px 21px rgba(0,0,0,.27);overflow:hidden;animation:hdPop .18s cubic-bezier(.1,.9,.2,1)}
 @keyframes hdFade{from{opacity:0}}
 @keyframes hdPop{from{opacity:0;transform:scale(.96)}}
-#havenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
-#havenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
-#havenDone .hd-title .sp{flex:1}
-#havenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
-#havenDone .hd-x:hover{background:#c42b1c;color:#fff}
-#havenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
-#havenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
-#havenDone .hd-ok svg{width:18px;height:18px}
-#havenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
-#havenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
-#havenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
-#havenDone dd{margin:0;color:#1b1b1b}
-#havenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
-#havenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
-#havenDone .hd-btn:hover{background:#f6f6f6}
-#havenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
-#havenDone .hd-btn.pri:hover{background:#1b75c4}
+#heavenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
+#heavenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
+#heavenDone .hd-title .sp{flex:1}
+#heavenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
+#heavenDone .hd-x:hover{background:#c42b1c;color:#fff}
+#heavenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
+#heavenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
+#heavenDone .hd-ok svg{width:18px;height:18px}
+#heavenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
+#heavenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
+#heavenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
+#heavenDone dd{margin:0;color:#1b1b1b}
+#heavenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
+#heavenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
+#heavenDone .hd-btn:hover{background:#f6f6f6}
+#heavenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
+#heavenDone .hd-btn.pri:hover{background:#1b75c4}
 `;
   setTimeout(() => {
     const st = document.createElement("style");
     st.textContent = css;
     document.head.appendChild(st);
     const root = document.createElement("div");
-    root.id = "havenDone";
+    root.id = "heavenDone";
     const now = new Date();
     const p2 = (n) => String(n).padStart(2, "0");
     const ts = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
     root.innerHTML = `
       <div class="hd-win" role="dialog" aria-modal="true">
-        <div class="hd-title"><span class="ic">H</span><span>Haven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
+        <div class="hd-title"><span class="ic">H</span><span>Heaven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
         <div class="hd-body">
           <div class="hd-ok"><svg viewBox="0 0 16 16"><path d="M3.2 8.4l3 3 6.6-6.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h2>배포가 완료되었습니다.</h2>
-            <p>해븐코인(HAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
+            <p>헤븐코인(HEAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
             <dl>
-              <dt>네트워크</dt><dd>Haven Mainnet (chain 7310)</dd>
+              <dt>네트워크</dt><dd>Heaven Mainnet (chain 7310)</dd>
               <dt>검증 노드</dt><dd>7 / 7 온라인</dd>
               <dt>테스트</dt><dd>138 / 138 통과</dd>
               <dt>완료 시각</dt><dd>${ts}</dd>
@@ -706,22 +706,22 @@ function havenCelebrate(opts) {
   }, o.delay);
 }
 document.addEventListener("keydown", (e) => {
-  const d = document.getElementById("havenDone");
+  const d = document.getElementById("heavenDone");
   if (!d) return;
   if (e.key === "Escape" || e.key === "Enter" || e.key === " ") { d.remove(); }
   e.stopPropagation(); e.preventDefault();
 }, true);
 
 
-const S = HAVEN_STAGE;
+const S = HEAVEN_STAGE;
 const $ = (id) => document.getElementById(id);
 const rnd = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
 const hex = (n) => Array.from({ length: n }, () => "0123456789abcdef"[rnd(0, 15)]).join("");
 
 const CFG = {
-  1: { ctx: "haven-dev", cluster: "haven-devnet-k8s", ns: "haven-devnet", height: 41862, peers: "0", node: "devpool" },
-  2: { ctx: "haven-stage", cluster: "haven-testnet-k8s", ns: "haven-testnet", height: 1184902, peers: "3", node: "valpool" },
-  3: { ctx: "haven-prod", cluster: "haven-mainnet-k8s", ns: "haven-mainnet", height: 0, peers: "0", node: "mainpool" }
+  1: { ctx: "heaven-dev", cluster: "heaven-devnet-k8s", ns: "heaven-devnet", height: 41862, peers: "0", node: "devpool" },
+  2: { ctx: "heaven-stage", cluster: "heaven-testnet-k8s", ns: "heaven-testnet", height: 1184902, peers: "3", node: "valpool" },
+  3: { ctx: "heaven-prod", cluster: "heaven-mainnet-k8s", ns: "heaven-mainnet", height: 0, peers: "0", node: "mainpool" }
 }[S];
 
 function pod(name, status, ready, restarts, age, nodeIdx) {
@@ -730,36 +730,36 @@ function pod(name, status, ready, restarts, age, nodeIdx) {
 const pods = [];
 if (S === 1) {
   pods.push(
-    pod("haven-validator-0", "Running", "1/1", 3, "3d4h", 1),
-    pod("haven-rpc-6b8f7d9c4-x2kqp", "Running", "1/1", 0, "3d4h", 1),
-    pod("haven-indexer-5d9c7b6f8-lm4tz", "CrashLoopBackOff", "0/1", 14, "2d19h", 2),
-    pod("haven-faucet-7c4d8b5f6-9wjrn", "Running", "1/1", 1, "1d6h", 2),
+    pod("heaven-validator-0", "Running", "1/1", 3, "3d4h", 1),
+    pod("heaven-rpc-6b8f7d9c4-x2kqp", "Running", "1/1", 0, "3d4h", 1),
+    pod("heaven-indexer-5d9c7b6f8-lm4tz", "CrashLoopBackOff", "0/1", 14, "2d19h", 2),
+    pod("heaven-faucet-7c4d8b5f6-9wjrn", "Running", "1/1", 1, "1d6h", 2),
     pod("postgres-0", "Running", "1/1", 0, "3d4h", 1),
     pod("redis-0", "Running", "1/1", 0, "3d4h", 2)
   );
 }
 if (S === 2) {
-  for (let i = 0; i < 4; i++) pods.push(pod(`haven-validator-${i}`, "Running", "1/1", i === 2 ? 2 : 0, "12d", i + 1));
+  for (let i = 0; i < 4; i++) pods.push(pod(`heaven-validator-${i}`, "Running", "1/1", i === 2 ? 2 : 0, "12d", i + 1));
   pods.push(
-    pod("haven-rpc-7f9b6c8d5-4hzpx", "Running", "1/1", 0, "11d", 1),
-    pod("haven-rpc-7f9b6c8d5-q8nvd", "Running", "1/1", 0, "11d", 3),
-    pod("haven-indexer-6c8d7f9b5-r2wkm", "Running", "1/1", 3, "9d", 2),
-    pod("haven-explorer-84bd6c7f9-t7xqj", "Running", "1/1", 0, "6d", 4),
-    pod("haven-faucet-5b7c9d6f8-k3mzn", "Running", "1/1", 0, "11d", 3),
-    pod("haven-bridge-relayer-0", "Pending", "0/1", 0, "38m", 4),
+    pod("heaven-rpc-7f9b6c8d5-4hzpx", "Running", "1/1", 0, "11d", 1),
+    pod("heaven-rpc-7f9b6c8d5-q8nvd", "Running", "1/1", 0, "11d", 3),
+    pod("heaven-indexer-6c8d7f9b5-r2wkm", "Running", "1/1", 3, "9d", 2),
+    pod("heaven-explorer-84bd6c7f9-t7xqj", "Running", "1/1", 0, "6d", 4),
+    pod("heaven-faucet-5b7c9d6f8-k3mzn", "Running", "1/1", 0, "11d", 3),
+    pod("heaven-bridge-relayer-0", "Pending", "0/1", 0, "38m", 4),
     pod("postgres-0", "Running", "1/1", 0, "12d", 2),
     pod("redis-0", "Running", "1/1", 0, "12d", 1)
   );
 }
 if (S === 3) {
-  for (let i = 0; i < 7; i++) pods.push(pod(`haven-validator-${i}`, "Init:0/1", "0/1", 0, `${rnd(3, 9)}m`, (i % 6) + 1));
+  for (let i = 0; i < 7; i++) pods.push(pod(`heaven-validator-${i}`, "Init:0/1", "0/1", 0, `${rnd(3, 9)}m`, (i % 6) + 1));
   pods.push(
-    pod("haven-rpc-9c7d8b6f5-a4kzp", "Running", "0/1", 0, "9m", 1),
-    pod("haven-rpc-9c7d8b6f5-m7xtq", "Running", "0/1", 0, "9m", 3),
-    pod("haven-rpc-9c7d8b6f5-w2hnc", "Running", "0/1", 0, "9m", 5),
-    pod("haven-indexer-7b8c9d5f6-p9vrm", "Running", "0/1", 0, "9m", 2),
-    pod("haven-explorer-6d9f8c7b4-j3kqs", "Running", "0/1", 0, "9m", 4),
-    pod("haven-bridge-relayer-0", "Running", "0/1", 0, "9m", 6),
+    pod("heaven-rpc-9c7d8b6f5-a4kzp", "Running", "0/1", 0, "9m", 1),
+    pod("heaven-rpc-9c7d8b6f5-m7xtq", "Running", "0/1", 0, "9m", 3),
+    pod("heaven-rpc-9c7d8b6f5-w2hnc", "Running", "0/1", 0, "9m", 5),
+    pod("heaven-indexer-7b8c9d5f6-p9vrm", "Running", "0/1", 0, "9m", 2),
+    pod("heaven-explorer-6d9f8c7b4-j3kqs", "Running", "0/1", 0, "9m", 4),
+    pod("heaven-bridge-relayer-0", "Running", "0/1", 0, "9m", 6),
     pod("postgres-0", "Running", "1/1", 0, "2h", 2),
     pod("redis-0", "Running", "1/1", 0, "2h", 1),
     pod("prometheus-0", "Running", "1/1", 0, "2h", 5)
@@ -819,8 +819,8 @@ const R = (t) => `<span class="red">${t}</span>`;
 
 function validatorLog() {
   const p = pods[selected].name;
-  const vals = pods.filter((x) => x.name.startsWith("haven-validator")).length;
-  const proposer = `haven-validator-${rnd(0, Math.max(0, vals - 1))}`;
+  const vals = pods.filter((x) => x.name.startsWith("heaven-validator")).length;
+  const proposer = `heaven-validator-${rnd(0, Math.max(0, vals - 1))}`;
   const opts = [
     () => { height++; return ["INFO", `[consensus] proposal received height=${height} round=0 proposer=${proposer}`]; },
     () => ["OK", `[consensus] committed block height=${height} hash=0x${hex(8)}…${hex(4)} votes=${S === 1 ? "1/1" : S === 2 ? rnd(3, 4) + "/4" : "7/7"} ${G("finalized")}`],
@@ -828,25 +828,25 @@ function validatorLog() {
     () => ["INFO", `[p2p] peers=${S === 1 ? 0 : S === 2 ? 3 : 6} inbound=${rnd(0, 3)} outbound=${rnd(1, 3)} latency_avg=${rnd(4, 38)}ms`],
     () => ["INFO", `[txpool] pending=${rnd(0, 60)} queued=${rnd(0, 8)} rejected=0`],
     () => ["OK", `[rpc] eth_getBlockByNumber latest status=${G("200")} duration=${rnd(2, 40)}ms`],
-    () => ["INFO", `[staking] epoch=${Math.floor(height / 1600)} active_set=${vals} total_bonded=${S === 1 ? "0" : (rnd(4100, 4400) / 10).toFixed(1) + "M"} HAVEN`]
+    () => ["INFO", `[staking] epoch=${Math.floor(height / 1600)} active_set=${vals} total_bonded=${S === 1 ? "0" : (rnd(4100, 4400) / 10).toFixed(1) + "M"} HEAVEN`]
   ];
   if (S === 1) opts.push(() => ["WARN", `[p2p] no peers available — running in single-validator mode`]);
   if (S === 2 && Math.random() < 0.15) opts.push(() => ["WARN", `[slashing] double-sign evidence check skipped: ${R("evidence pool not wired")}`]);
   return opts[rnd(0, opts.length - 1)]();
 }
 function otherLog(name) {
-  if (name.startsWith("haven-indexer")) {
+  if (name.startsWith("heaven-indexer")) {
     if (S === 1) return Math.random() < 0.5
       ? ["ERROR", `panic: decode receipt at block ${height - rnd(1, 9)}: ${R("unexpected log topic length 5")}`]
       : ["INFO", `indexer restarting from checkpoint block=${height - 2210}`];
     return ["INFO", `indexed block=${height - rnd(0, 2)} txs=${rnd(0, 120)} logs=${rnd(0, 300)} lag=${rnd(0, 2)}`];
   }
-  if (name.startsWith("haven-rpc")) return ["OK", `${["eth_call", "eth_getBalance", "eth_sendRawTransaction", "eth_blockNumber", "haven_getValidators"][rnd(0, 4)]} status=${G("200")} duration=${rnd(1, 60)}ms client=10.42.${rnd(0, 3)}.${rnd(10, 240)}`];
-  if (name.startsWith("haven-bridge")) return S === 2
+  if (name.startsWith("heaven-rpc")) return ["OK", `${["eth_call", "eth_getBalance", "eth_sendRawTransaction", "eth_blockNumber", "heaven_getValidators"][rnd(0, 4)]} status=${G("200")} duration=${rnd(1, 60)}ms client=10.42.${rnd(0, 3)}.${rnd(10, 240)}`];
+  if (name.startsWith("heaven-bridge")) return S === 2
     ? ["WARN", `waiting for volume binding: ${R("pvc relayer-keys unbound")}`]
     : ["INFO", `relayer watching chain=7310 confirmations=12 pending_transfers=0`];
-  if (name.startsWith("haven-faucet")) return ["INFO", `drip sent to 0x${hex(4)}…${hex(4)} amount=100 HAVEN tx=0x${hex(10)}`];
-  if (name.startsWith("haven-explorer")) return ["INFO", `GET /block/${height - rnd(0, 3)} 200 ${rnd(8, 90)}ms`];
+  if (name.startsWith("heaven-faucet")) return ["INFO", `drip sent to 0x${hex(4)}…${hex(4)} amount=100 HEAVEN tx=0x${hex(10)}`];
+  if (name.startsWith("heaven-explorer")) return ["INFO", `GET /block/${height - rnd(0, 3)} 200 ${rnd(8, 90)}ms`];
   if (name.startsWith("postgres")) return ["INFO", `checkpoint complete: wrote ${rnd(100, 4000)} buffers; distance=${rnd(1000, 90000)} kB`];
   return ["INFO", `heartbeat ok`];
 }
@@ -862,13 +862,13 @@ function waitingLog() {
 }
 function nextLog() {
   const name = pods[selected].name;
-  if (S === 3 && !launched) return name.startsWith("haven-validator") ? waitingLog() : ["INFO", `waiting for upstream validators... (${name})`];
-  return name.startsWith("haven-validator") ? validatorLog() : otherLog(name);
+  if (S === 3 && !launched) return name.startsWith("heaven-validator") ? waitingLog() : ["INFO", `waiting for upstream validators... (${name})`];
+  return name.startsWith("heaven-validator") ? validatorLog() : otherLog(name);
 }
 function selectPod(i) {
   selected = i;
   $("selectedPodName").textContent = pods[i].name;
-  $("containerName").textContent = "container/" + (pods[i].name.startsWith("haven-validator") ? "haven-node" : pods[i].name.replace(/-[a-z0-9]{8,10}-[a-z0-9]{5}$/, "").replace(/-\d$/, ""));
+  $("containerName").textContent = "container/" + (pods[i].name.startsWith("heaven-validator") ? "heaven-node" : pods[i].name.replace(/-[a-z0-9]{8,10}-[a-z0-9]{5}$/, "").replace(/-\d$/, ""));
   logWindow.innerHTML = "";
   renderPods();
   for (let k = 0; k < 24; k++) append(...nextLog());
@@ -887,8 +887,8 @@ const steps = [
   `${PR("~")}<span class="command">k9s</span>`
 ];
 if (S === 3) steps.splice(6, 0,
-  `${PR("~/haven-chain")}<span class="command">havenctl genesis status --network mainnet</span>`,
-  `<span class="muted">signatures: 6/7  missing: haven-validator-6</span>`
+  `${PR("~/heaven-chain")}<span class="command">heavenctl genesis status --network mainnet</span>`,
+  `<span class="muted">signatures: 6/7  missing: heaven-validator-6</span>`
 );
 let si = 0;
 function tick() {
@@ -897,7 +897,7 @@ function tick() {
     d.className = "connection-line";
     d.id = "connPrompt";
     d.innerHTML = S === 3
-      ? `${PR("~/haven-chain")}<span class="command">havenctl genesis sign --validator 6 --key ./keys/val6.json</span>${launched ? "" : '<span class="cursor"></span>'}`
+      ? `${PR("~/heaven-chain")}<span class="command">heavenctl genesis sign --validator 6 --key ./keys/val6.json</span>${launched ? "" : '<span class="cursor"></span>'}`
       : `${PR(CFG.ns)}<span class="cursor"></span>`;
     conn.appendChild(d);
     conn.scrollTop = conn.scrollHeight;
@@ -921,29 +921,29 @@ function connLine(html) {
 }
 
 function launch() {
-  if (S !== 3) { havenCelebrate({ delay: 500 }); return; }
+  if (S !== 3) { heavenCelebrate({ delay: 500 }); return; }
   if (S !== 3 || launched) return;
   launched = true;
-  havenCelebrate({ delay: 3000 });
+  heavenCelebrate({ delay: 3000 });
   const cp = $("connPrompt");
   if (cp) { const c = cp.querySelector(".cursor"); if (c) c.remove(); }
-  setTimeout(() => connLine(`<span class="muted">signing genesis 0x3d7e91c4…a9c1 with haven-validator-6</span>`), 300);
+  setTimeout(() => connLine(`<span class="muted">signing genesis 0x3d7e91c4…a9c1 with heaven-validator-6</span>`), 300);
   setTimeout(() => connLine(`<span class="success">✔ signatures: 7/7 — genesis sealed</span>`), 900);
   setTimeout(() => connLine(`<span class="success">✔ chain 7310 started  block #0 → #1</span>`), 1500);
-  setTimeout(() => connLine(`${PR("~/haven-chain")}<span class="cursor"></span>`), 1900);
+  setTimeout(() => connLine(`${PR("~/heaven-chain")}<span class="cursor"></span>`), 1900);
   pods.forEach((p, i) => {
-    if (!p.name.startsWith("haven-validator")) return;
+    if (!p.name.startsWith("heaven-validator")) return;
     setTimeout(() => { p.status = "PodInitializing"; renderPods(); }, 500 + i * 120);
     setTimeout(() => { p.status = "Running"; p.ready = "1/1"; p.age = "1s"; renderPods(); }, 1300 + i * 170);
   });
   pods.forEach((p, i) => {
-    if (p.ready === "0/1" && !p.name.startsWith("haven-validator")) setTimeout(() => { p.ready = "1/1"; renderPods(); }, 2600 + i * 120);
+    if (p.ready === "0/1" && !p.name.startsWith("heaven-validator")) setTimeout(() => { p.ready = "1/1"; renderPods(); }, 2600 + i * 120);
   });
   const seq = [
-    [400, ["OK", `[genesis] signature received from haven-validator-6 (7/7)`]],
+    [400, ["OK", `[genesis] signature received from heaven-validator-6 (7/7)`]],
     [800, ["OK", `[genesis] ${G("genesis sealed")} chain_id=7310 hash=0x3d7e91c4…a9c1`]],
     [1300, ["OK", `[consensus] committed block height=0 ${G("(genesis)")} votes=7/7`]],
-    [1900, ["INFO", `[consensus] proposal received height=1 round=0 proposer=haven-validator-3`]],
+    [1900, ["INFO", `[consensus] proposal received height=1 round=0 proposer=heaven-validator-3`]],
     [2400, ["OK", `[consensus] committed block height=1 hash=0xb04f72a1…17de votes=7/7 ${G("finalized")}`]],
     [2800, ["INFO", `[p2p] peers=6 inbound=3 outbound=3 latency_avg=11ms`]]
   ];

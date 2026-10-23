@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>haven-chain — Visual Studio Code</title>
+<title>heaven-chain — Visual Studio Code</title>
 <style>
     :root {
       --desktop-bg: #0a0f18;
@@ -908,7 +908,7 @@
           <span class="traffic-light yellow"></span>
           <span class="traffic-light green"></span>
         </div>
-        <div class="window-title" id="winTitle">HavenToken.sol — haven-chain — Visual Studio Code</div>
+        <div class="window-title" id="winTitle">HeavenToken.sol — heaven-chain — Visual Studio Code</div>
         <div class="topbar-actions"><span>◫</span><span>⌘</span></div>
       </header>
 
@@ -923,7 +923,7 @@
 
         <aside class="explorer">
           <div class="explorer-title">EXPLORER</div>
-          <div class="folder-title"><span>⌄</span><span>HAVEN-CHAIN</span></div>
+          <div class="folder-title"><span>⌄</span><span>HEAVEN-CHAIN</span></div>
           <div class="file-tree" id="fileTree"></div>
         </aside>
 
@@ -998,7 +998,7 @@
               <div class="build-name">
                 <span id="buildSpinner" class="build-spinner"></span>
                 <div>
-                  <div id="projectName">haven-devnet</div>
+                  <div id="projectName">heaven-devnet</div>
                   <div id="buildDescription" style="margin-top:3px;color:#667085;font-size:10px;font-weight:400;">Building Compose application</div>
                 </div>
               </div>
@@ -1012,7 +1012,7 @@
           </section>
 
           <div class="container-toolbar">
-            <strong id="projectName2">haven-devnet</strong>
+            <strong id="projectName2">heaven-devnet</strong>
             <span id="containerCount" class="container-count">0 containers</span>
           </div>
           <div id="containerList" class="container-list"></div>
@@ -1023,7 +1023,7 @@
 
   <script>
 // stage: 1 = 초반 작업, 2 = 중반 작업, 3 = 마무리 (Enter 로 완료)
-const HAVEN_STAGE = (() => {
+const HEAVEN_STAGE = (() => {
   const q = new URLSearchParams(location.search).get("stage");
   const h = (location.hash || "").replace("#", "");
   const v = parseInt(q || h || "1", 10);
@@ -1040,52 +1040,52 @@ document.addEventListener("keydown", (e) => {
 }, true);
 
 // 완료 대화상자 (Enter "탁!" 이후) — Windows 스타일
-function havenCelebrate(opts) {
-  if (document.getElementById("havenDone")) return;
+function heavenCelebrate(opts) {
+  if (document.getElementById("heavenDone")) return;
   const o = Object.assign({ delay: 0 }, opts || {});
   const css = `
-#havenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
-#havenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
+#heavenDone{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(0,0,0,.18);font-family:"Segoe UI Variable Text","Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;animation:hdFade .12s ease-out}
+#heavenDone .hd-win{position:relative;width:480px;max-width:92vw;background:#f9f9f9;color:#1b1b1b;border-radius:8px;border:1px solid rgba(0,0,0,.28);
   box-shadow:0 32px 64px rgba(0,0,0,.37),0 2px 21px rgba(0,0,0,.27);overflow:hidden;animation:hdPop .18s cubic-bezier(.1,.9,.2,1)}
 @keyframes hdFade{from{opacity:0}}
 @keyframes hdPop{from{opacity:0;transform:scale(.96)}}
-#havenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
-#havenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
-#havenDone .hd-title .sp{flex:1}
-#havenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
-#havenDone .hd-x:hover{background:#c42b1c;color:#fff}
-#havenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
-#havenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
-#havenDone .hd-ok svg{width:18px;height:18px}
-#havenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
-#havenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
-#havenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
-#havenDone dd{margin:0;color:#1b1b1b}
-#havenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
-#havenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
-#havenDone .hd-btn:hover{background:#f6f6f6}
-#havenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
-#havenDone .hd-btn.pri:hover{background:#1b75c4}
+#heavenDone .hd-title{display:flex;align-items:center;height:32px;padding-left:12px;font-size:12px;color:#1b1b1b;background:#f3f3f3;user-select:none;cursor:default}
+#heavenDone .hd-title .ic{width:16px;height:16px;margin-right:9px;border-radius:3px;background:#0f6cbd;color:#fff;font:700 10px/16px "Segoe UI",sans-serif;text-align:center}
+#heavenDone .hd-title .sp{flex:1}
+#heavenDone .hd-x{width:46px;height:32px;border:0;background:transparent;font:16px/1 "Segoe UI Symbol","Segoe UI",sans-serif;color:#1b1b1b;cursor:default}
+#heavenDone .hd-x:hover{background:#c42b1c;color:#fff}
+#heavenDone .hd-body{display:flex;gap:16px;padding:20px 24px 22px;background:#fff}
+#heavenDone .hd-ok{flex:none;width:32px;height:32px;border-radius:50%;background:#0f7b0f;display:grid;place-items:center;margin-top:1px}
+#heavenDone .hd-ok svg{width:18px;height:18px}
+#heavenDone h2{margin:0 0 8px;font-size:15px;font-weight:600;color:#1b1b1b}
+#heavenDone p{margin:0 0 12px;word-break:keep-all;font-size:13px;line-height:1.5;color:#1b1b1b}
+#heavenDone dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;color:#5d5d5d}
+#heavenDone dd{margin:0;color:#1b1b1b}
+#heavenDone .hd-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;background:#f3f3f3;border-top:1px solid #e5e5e5}
+#heavenDone .hd-btn{min-width:96px;height:32px;padding:0 14px;border-radius:4px;font:13px "Segoe UI","Malgun Gothic",sans-serif;cursor:default;border:1px solid #d1d1d1;border-bottom-color:#b9b9b9;background:#fdfdfd;color:#1b1b1b}
+#heavenDone .hd-btn:hover{background:#f6f6f6}
+#heavenDone .hd-btn.pri{background:#0f6cbd;border-color:#0f6cbd;border-bottom-color:#0b559a;color:#fff;outline:2px solid #000;outline-offset:1px}
+#heavenDone .hd-btn.pri:hover{background:#1b75c4}
 `;
   setTimeout(() => {
     const st = document.createElement("style");
     st.textContent = css;
     document.head.appendChild(st);
     const root = document.createElement("div");
-    root.id = "havenDone";
+    root.id = "heavenDone";
     const now = new Date();
     const p2 = (n) => String(n).padStart(2, "0");
     const ts = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
     root.innerHTML = `
       <div class="hd-win" role="dialog" aria-modal="true">
-        <div class="hd-title"><span class="ic">H</span><span>Haven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
+        <div class="hd-title"><span class="ic">H</span><span>Heaven Deploy</span><span class="sp"></span><button class="hd-x" data-close>✕</button></div>
         <div class="hd-body">
           <div class="hd-ok"><svg viewBox="0 0 16 16"><path d="M3.2 8.4l3 3 6.6-6.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h2>배포가 완료되었습니다.</h2>
-            <p>해븐코인(HAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
+            <p>헤븐코인(HEAVEN) v1.0.0 메인넷 배포가 정상적으로 완료되었습니다.</p>
             <dl>
-              <dt>네트워크</dt><dd>Haven Mainnet (chain 7310)</dd>
+              <dt>네트워크</dt><dd>Heaven Mainnet (chain 7310)</dd>
               <dt>검증 노드</dt><dd>7 / 7 온라인</dd>
               <dt>테스트</dt><dd>138 / 138 통과</dd>
               <dt>완료 시각</dt><dd>${ts}</dd>
@@ -1107,25 +1107,25 @@ function havenCelebrate(opts) {
   }, o.delay);
 }
 document.addEventListener("keydown", (e) => {
-  const d = document.getElementById("havenDone");
+  const d = document.getElementById("heavenDone");
   if (!d) return;
   if (e.key === "Escape" || e.key === "Enter" || e.key === " ") { d.remove(); }
   e.stopPropagation(); e.preventDefault();
 }, true);
 
 
-const S = HAVEN_STAGE;
+const S = HEAVEN_STAGE;
 const $ = (id) => document.getElementById(id);
 
 /* ───────────── 파일 트리 ───────────── */
 const tree = [
   [1, "⌄", "folder", "contracts"],
   [2, "⌄", "folder", "token"],
-  [3, "", "sol", "HavenToken.sol", 1],
-  [3, "", "sol", "IHavenToken.sol", 1],
+  [3, "", "sol", "HeavenToken.sol", 1],
+  [3, "", "sol", "IHeavenToken.sol", 1],
   [2, S >= 2 ? "⌄" : "›", "folder", "staking", 2],
-  [3, "", "sol", "HavenStaking.sol", 2],
-  [3, "", "sol", "HavenValidatorSet.sol", 2],
+  [3, "", "sol", "HeavenStaking.sol", 2],
+  [3, "", "sol", "HeavenValidatorSet.sol", 2],
   [2, "›", "folder", "vesting", 2],
   [2, "›", "folder", "bridge", 3],
   [2, "›", "folder", "interfaces", 1],
@@ -1139,7 +1139,7 @@ const tree = [
   [1, "", "json", "package.json", 1],
   [1, "", "md", "README.md", 1]
 ];
-const activeFile = S === 1 ? "HavenToken.sol" : S === 2 ? "HavenStaking.sol" : "deploy-mainnet.ts";
+const activeFile = S === 1 ? "HeavenToken.sol" : S === 2 ? "HeavenStaking.sol" : "deploy-mainnet.ts";
 const iconMap = {
   folder: '<span class="folder-icon">📁</span>',
   sol: '<span style="color:#a78bfa">◆</span>',
@@ -1152,7 +1152,7 @@ const iconMap = {
 $("fileTree").innerHTML = tree
   .filter((r) => (r[4] || 1) <= S)
   .filter((r) => {
-    if (r[3] === "HavenStaking.sol" || r[3] === "HavenValidatorSet.sol") return S >= 2;
+    if (r[3] === "HeavenStaking.sol" || r[3] === "HeavenValidatorSet.sol") return S >= 2;
     if (r[3] === "deploy-mainnet.ts") return S === 3;
     return true;
   })
@@ -1160,14 +1160,14 @@ $("fileTree").innerHTML = tree
   .join("");
 
 const tabsByStage = {
-  1: [["HavenToken.sol", "sol"], ["IHavenToken.sol", "sol"], ["foundry.toml", "toml"]],
-  2: [["HavenStaking.sol", "sol"], ["HavenValidatorSet.sol", "sol"], ["HavenStaking.t.sol", "sol"]],
+  1: [["HeavenToken.sol", "sol"], ["IHeavenToken.sol", "sol"], ["foundry.toml", "toml"]],
+  2: [["HeavenStaking.sol", "sol"], ["HeavenValidatorSet.sol", "sol"], ["HeavenStaking.t.sol", "sol"]],
   3: [["deploy-mainnet.ts", "ts"], ["mainnet.ts", "ts"], ["docker-compose.mainnet.yml", "docker"]]
 };
 $("editorTabs").innerHTML = tabsByStage[S]
   .map((t, i) => `<div class="editor-tab${i === 0 ? " active" : ""}">${iconMap[t[1]]}<span>${t[0]}</span>${i === 0 ? "<span>×</span>" : ""}</div>`)
   .join("");
-$("winTitle").textContent = `${activeFile} — haven-chain — Visual Studio Code`;
+$("winTitle").textContent = `${activeFile} — heaven-chain — Visual Studio Code`;
 $("branchName").textContent = S === 1 ? "⑂ feature/token-core*" : S === 2 ? "⑂ feature/staking-vesting*" : "⑂ release/v1.0.0";
 $("errCount").textContent = S === 1 ? "ⓧ 3" : S === 2 ? "ⓧ 1" : "ⓧ 0";
 $("warnCount").textContent = S === 1 ? "⚠ 14" : S === 2 ? "⚠ 6" : "⚠ 0";
@@ -1186,9 +1186,9 @@ const CODE = {
 'import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";',
 'import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";',
 "",
-"/// @title HAVEN — Haven Chain native utility token",
+"/// @title HEAVEN — Heaven Chain native utility token",
 "/// @notice Fixed max supply, role-gated minting, pausable transfers.",
-"contract HavenToken is ERC20, ERC20Permit, AccessControl, Pausable {",
+"contract HeavenToken is ERC20, ERC20Permit, AccessControl, Pausable {",
 '    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");',
 '    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");',
 "",
@@ -1203,8 +1203,8 @@ const CODE = {
 "    address public treasury;",
 "",
 "    constructor(address admin, address treasury_)",
-'        ERC20("Haven Coin", "HAVEN")',
-'        ERC20Permit("Haven Coin")',
+'        ERC20("Heaven Coin", "HEAVEN")',
+'        ERC20Permit("Heaven Coin")',
 "    {",
 "        if (admin == address(0) || treasury_ == address(0)) revert ZeroAddress();",
 "        _grantRole(DEFAULT_ADMIN_ROLE, admin);",
@@ -1250,10 +1250,10 @@ const CODE = {
 'import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";',
 'import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";',
 'import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";',
-'import {IHavenValidatorSet} from "../interfaces/IHavenValidatorSet.sol";',
+'import {IHeavenValidatorSet} from "../interfaces/IHeavenValidatorSet.sol";',
 "",
-"/// @title HavenStaking — delegated staking & epoch rewards",
-"contract HavenStaking is ReentrancyGuard {",
+"/// @title HeavenStaking — delegated staking & epoch rewards",
+"contract HeavenStaking is ReentrancyGuard {",
 "    using SafeERC20 for IERC20;",
 "",
 "    struct Stake {",
@@ -1263,8 +1263,8 @@ const CODE = {
 "        uint256 rewardDebt;",
 "    }",
 "",
-"    IERC20 public immutable haven;",
-"    IHavenValidatorSet public immutable validators;",
+"    IERC20 public immutable heaven;",
+"    IHeavenValidatorSet public immutable validators;",
 "",
 "    uint256 public constant EPOCH = 6 hours;",
 "    uint256 public constant UNBONDING_PERIOD = 14 days;",
@@ -1280,18 +1280,18 @@ const CODE = {
 "    event Unbonding(address indexed user, address indexed validator, uint256 amount, uint64 unlockAt);",
 "    event RewardPaid(address indexed user, uint256 reward);",
 "",
-"    constructor(IERC20 haven_, IHavenValidatorSet validators_) {",
-"        haven = haven_;",
+"    constructor(IERC20 heaven_, IHeavenValidatorSet validators_) {",
+"        heaven = heaven_;",
 "        validators = validators_;",
 "        lastRewardEpoch = block.timestamp / EPOCH;",
 "    }",
 "",
 "    function stake(address validator, uint256 amount) external nonReentrant {",
-'        require(validators.isActive(validator), "HAVEN: inactive validator");',
+'        require(validators.isActive(validator), "HEAVEN: inactive validator");',
 "        _updatePool();",
 "        Stake storage s = stakes[msg.sender][validator];",
 "        _harvest(s);",
-"        haven.safeTransferFrom(msg.sender, address(this), amount);",
+"        heaven.safeTransferFrom(msg.sender, address(this), amount);",
 "        s.amount += uint128(amount);",
 "        s.since = uint64(block.timestamp);",
 "        s.rewardDebt = (uint256(s.amount) * accRewardPerShare) / ACC_PRECISION;",
@@ -1301,7 +1301,7 @@ const CODE = {
 "",
 "    function unstake(address validator, uint256 amount) external nonReentrant {",
 "        Stake storage s = stakes[msg.sender][validator];",
-'        require(s.amount >= amount, "HAVEN: insufficient stake");',
+'        require(s.amount >= amount, "HEAVEN: insufficient stake");',
 "        _updatePool();",
 "        _harvest(s);",
 "        s.amount -= uint128(amount);",
@@ -1325,7 +1325,7 @@ const CODE = {
 "    function _harvest(Stake storage s) internal {",
 "        uint256 pending = (uint256(s.amount) * accRewardPerShare) / ACC_PRECISION - s.rewardDebt;",
 "        if (pending > 0) {",
-"            haven.safeTransfer(msg.sender, pending);",
+"            heaven.safeTransfer(msg.sender, pending);",
 "            emit RewardPaid(msg.sender, pending);",
 "        }",
 "    }",
@@ -1339,42 +1339,42 @@ const CODE = {
 'import { GENESIS, VALIDATORS, TREASURY_MULTISIG } from "../config/mainnet";',
 "",
 "async function main() {",
-'  if (network.name !== "haven-mainnet") throw new Error("wrong network");',
+'  if (network.name !== "heaven-mainnet") throw new Error("wrong network");',
 "  const [deployer] = await ethers.getSigners();",
 "  console.log(`deployer  ${deployer.address}`);",
 "  console.log(`chainId   ${network.config.chainId}`);",
 "",
-'  const Token = await ethers.getContractFactory("HavenToken");',
-"  const haven = await Token.deploy(TREASURY_MULTISIG, TREASURY_MULTISIG);",
-"  await haven.waitForDeployment();",
+'  const Token = await ethers.getContractFactory("HeavenToken");',
+"  const heaven = await Token.deploy(TREASURY_MULTISIG, TREASURY_MULTISIG);",
+"  await heaven.waitForDeployment();",
 "",
-'  const ValidatorSet = await ethers.getContractFactory("HavenValidatorSet");',
+'  const ValidatorSet = await ethers.getContractFactory("HeavenValidatorSet");',
 "  const vset = await ValidatorSet.deploy(VALIDATORS, GENESIS.epochEmission);",
 "  await vset.waitForDeployment();",
 "",
-'  const Staking = await ethers.getContractFactory("HavenStaking");',
-"  const staking = await Staking.deploy(await haven.getAddress(), await vset.getAddress());",
+'  const Staking = await ethers.getContractFactory("HeavenStaking");',
+"  const staking = await Staking.deploy(await heaven.getAddress(), await vset.getAddress());",
 "  await staking.waitForDeployment();",
 "",
-'  const Vesting = await ethers.getContractFactory("HavenVesting");',
-"  const vesting = await Vesting.deploy(await haven.getAddress(), GENESIS.vestingSchedule);",
+'  const Vesting = await ethers.getContractFactory("HeavenVesting");',
+"  const vesting = await Vesting.deploy(await heaven.getAddress(), GENESIS.vestingSchedule);",
 "  await vesting.waitForDeployment();",
 "",
-'  const Bridge = await ethers.getContractFactory("HavenBridge");',
-"  const bridge = await Bridge.deploy(await haven.getAddress(), GENESIS.relayers, 5);",
+'  const Bridge = await ethers.getContractFactory("HeavenBridge");',
+"  const bridge = await Bridge.deploy(await heaven.getAddress(), GENESIS.relayers, 5);",
 "  await bridge.waitForDeployment();",
 "",
-"  await (await haven.grantRole(await haven.MINTER_ROLE(), await staking.getAddress())).wait();",
-"  await (await haven.grantRole(await haven.MINTER_ROLE(), await bridge.getAddress())).wait();",
+"  await (await heaven.grantRole(await heaven.MINTER_ROLE(), await staking.getAddress())).wait();",
+"  await (await heaven.grantRole(await heaven.MINTER_ROLE(), await bridge.getAddress())).wait();",
 "",
 "  const addresses = {",
-"    HavenToken: await haven.getAddress(),",
-"    HavenValidatorSet: await vset.getAddress(),",
-"    HavenStaking: await staking.getAddress(),",
-"    HavenVesting: await vesting.getAddress(),",
-"    HavenBridge: await bridge.getAddress(),",
+"    HeavenToken: await heaven.getAddress(),",
+"    HeavenValidatorSet: await vset.getAddress(),",
+"    HeavenStaking: await staking.getAddress(),",
+"    HeavenVesting: await vesting.getAddress(),",
+"    HeavenBridge: await bridge.getAddress(),",
 "  };",
-'  writeFileSync("deployments/haven-mainnet.json", JSON.stringify(addresses, null, 2));',
+'  writeFileSync("deployments/heaven-mainnet.json", JSON.stringify(addresses, null, 2));',
 "  console.table(addresses);",
 "}",
 "",
@@ -1386,7 +1386,7 @@ const codeEditor = $("codeEditor");
 
 function esc(v) { return v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 const KW = new Set("pragma solidity import from contract is function returns return constructor event error emit revert require if else struct mapping using for modifier override internal external public private view pure immutable constant indexed storage memory calldata async await const let new throw catch".split(" "));
-const TY = new Set("uint256 uint128 uint64 bytes32 address bool string IERC20 ERC20 ERC20Permit AccessControl Pausable ReentrancyGuard SafeERC20 IHavenValidatorSet Stake Error JSON".split(" "));
+const TY = new Set("uint256 uint128 uint64 bytes32 address bool string IERC20 ERC20 ERC20Permit AccessControl Pausable ReentrancyGuard SafeERC20 IHeavenValidatorSet Stake Error JSON".split(" "));
 function hl(line) {
   const re = /(\/\/.*$)|("[^"]*"?|`[^`]*`?)|([A-Za-z_$][A-Za-z0-9_$]*)|(\d[\d_]*(?:e\d+)?)|([\s\S])/g;
   let m, h = "";
@@ -1446,7 +1446,7 @@ function line(html) {
   while (out.children.length > 160) out.removeChild(out.firstChild);
   out.scrollTop = out.scrollHeight;
 }
-const P = (branch) => `<span class="log-success">➜</span> <span class="log-muted">haven-chain</span> <span class="log-hash">git:(${branch})</span>`;
+const P = (branch) => `<span class="log-success">➜</span> <span class="log-muted">heaven-chain</span> <span class="log-hash">git:(${branch})</span>`;
 const branch = S === 1 ? "feature/token-core" : S === 2 ? "feature/staking-vesting" : "release/v1.0.0";
 
 const PRE = {
@@ -1457,19 +1457,19 @@ const PRE = {
   '<span class="log-success">[⠢] Solc 0.8.24 finished in 3.82s</span>',
   '<span class="log-warning">Compiler run successful with warnings:</span>',
   '<span class="log-warning">Warning (2072): Unused local variable.</span>',
-  '<span class="log-muted">  --&gt; contracts/token/HavenToken.sol:58:9</span>',
+  '<span class="log-muted">  --&gt; contracts/token/HeavenToken.sol:58:9</span>',
   "",
   `${P(branch)} <span class="log-command">forge test --summary</span>`,
   '<span class="log-muted">Ran 6 test suites in 1.94s (3.12s CPU time)</span>',
   '<span class="log-muted">╭──────────────────────┬────────┬────────┬─────────╮</span>',
   '<span class="log-muted">│ Test Suite           │ Passed │ Failed │ Skipped │</span>',
   '<span class="log-muted">├──────────────────────┼────────┼────────┼─────────┤</span>',
-  '<span class="log-muted">│</span> HavenTokenTest        <span class="log-muted">│</span> <span class="log-success">    24</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenPermitTest       <span class="log-muted">│</span> <span class="log-success">    11</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenTokenTest        <span class="log-muted">│</span> <span class="log-success">    24</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenPermitTest       <span class="log-muted">│</span> <span class="log-success">    11</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
   '<span class="log-muted">│</span> GenesisConfigTest    <span class="log-muted">│</span> <span class="log-success">     6</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       3 <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenStakingTest      <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     38</span> <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenVestingTest      <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     27</span> <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenBridgeTest       <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     29</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenStakingTest      <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     38</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenVestingTest      <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     27</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenBridgeTest       <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     29</span> <span class="log-muted">│</span>',
   '<span class="log-muted">╰──────────────────────┴────────┴────────┴─────────╯</span>',
   "",
   `${P(branch)} <span class="log-command">docker compose -f docker-compose.devnet.yml up --build</span>`
@@ -1480,16 +1480,16 @@ const PRE = {
   '<span class="log-muted">╭──────────────────────┬────────┬────────┬─────────╮</span>',
   '<span class="log-muted">│ Test Suite           │ Passed │ Failed │ Skipped │</span>',
   '<span class="log-muted">├──────────────────────┼────────┼────────┼─────────┤</span>',
-  '<span class="log-muted">│</span> HavenTokenTest        <span class="log-muted">│</span> <span class="log-success">    24</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenPermitTest       <span class="log-muted">│</span> <span class="log-success">    11</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenTokenTest        <span class="log-muted">│</span> <span class="log-success">    24</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenPermitTest       <span class="log-muted">│</span> <span class="log-success">    11</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
   '<span class="log-muted">│</span> GenesisConfigTest    <span class="log-muted">│</span> <span class="log-success">     9</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenStakingTest      <span class="log-muted">│</span> <span class="log-success">    31</span> <span class="log-muted">│</span> <span style="color:#f87171">     2</span> <span class="log-muted">│</span> <span class="log-warning">      5</span> <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenVestingTest      <span class="log-muted">│</span> <span class="log-success">     8</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     19</span> <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenBridgeTest       <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     29</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenStakingTest      <span class="log-muted">│</span> <span class="log-success">    31</span> <span class="log-muted">│</span> <span style="color:#f87171">     2</span> <span class="log-muted">│</span> <span class="log-warning">      5</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenVestingTest      <span class="log-muted">│</span> <span class="log-success">     8</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     19</span> <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenBridgeTest       <span class="log-muted">│</span>      0 <span class="log-muted">│</span>      0 <span class="log-muted">│</span> <span class="log-warning">     29</span> <span class="log-muted">│</span>',
   '<span class="log-muted">╰──────────────────────┴────────┴────────┴─────────╯</span>',
   '<span style="color:#f87171">Failing tests:</span>',
   '<span style="color:#f87171">[FAIL: assertion failed: 4.82e21 != 4.80e21] test_SlashValidator_Double() (gas: 412887)</span>',
-  '<span style="color:#f87171">[FAIL: HAVEN: insufficient stake] test_RewardAccrual_AfterUnbonding() (gas: 298114)</span>',
+  '<span style="color:#f87171">[FAIL: HEAVEN: insufficient stake] test_RewardAccrual_AfterUnbonding() (gas: 298114)</span>',
   "",
   `${P(branch)} <span class="log-command">docker compose -f docker-compose.testnet.yml up --build</span>`
 ],
@@ -1499,12 +1499,12 @@ const PRE = {
   '<span class="log-muted">╭──────────────────────┬────────┬────────┬─────────╮</span>',
   '<span class="log-muted">│ Test Suite           │ Passed │ Failed │ Skipped │</span>',
   '<span class="log-muted">├──────────────────────┼────────┼────────┼─────────┤</span>',
-  '<span class="log-muted">│</span> HavenTokenTest        <span class="log-muted">│</span> <span class="log-success">    24</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenPermitTest       <span class="log-muted">│</span> <span class="log-success">    11</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenTokenTest        <span class="log-muted">│</span> <span class="log-success">    24</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenPermitTest       <span class="log-muted">│</span> <span class="log-success">    11</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
   '<span class="log-muted">│</span> GenesisConfigTest    <span class="log-muted">│</span> <span class="log-success">     9</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenStakingTest      <span class="log-muted">│</span> <span class="log-success">    38</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenVestingTest      <span class="log-muted">│</span> <span class="log-success">    27</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
-  '<span class="log-muted">│</span> HavenBridgeTest       <span class="log-muted">│</span> <span class="log-success">    29</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenStakingTest      <span class="log-muted">│</span> <span class="log-success">    38</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenVestingTest      <span class="log-muted">│</span> <span class="log-success">    27</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
+  '<span class="log-muted">│</span> HeavenBridgeTest       <span class="log-muted">│</span> <span class="log-success">    29</span> <span class="log-muted">│</span>      0 <span class="log-muted">│</span>       0 <span class="log-muted">│</span>',
   '<span class="log-muted">╰──────────────────────┴────────┴────────┴─────────╯</span>',
   "",
   `${P(branch)} <span class="log-command">forge coverage --report summary | tail -2</span>`,
@@ -1520,35 +1520,35 @@ const PRE = {
 /* ───────────── 도커 ───────────── */
 const CONTAINERS = {
 1: [
-  ["haven-devnet-node-0", "validator · chainId 731001", "haven-node:0.3.0-dev"],
-  ["haven-devnet-rpc-1", "json-rpc :8545", "haven-rpc:0.3.0-dev"],
-  ["haven-devnet-postgres-1", "indexer db", "postgres:16-alpine"],
-  ["haven-devnet-redis-1", "cache", "redis:7.4-alpine"]
+  ["heaven-devnet-node-0", "validator · chainId 731001", "heaven-node:0.3.0-dev"],
+  ["heaven-devnet-rpc-1", "json-rpc :8545", "heaven-rpc:0.3.0-dev"],
+  ["heaven-devnet-postgres-1", "indexer db", "postgres:16-alpine"],
+  ["heaven-devnet-redis-1", "cache", "redis:7.4-alpine"]
 ],
 2: [
-  ["haven-testnet-validator-0", "validator · chainId 731002", "haven-node:0.7.2-rc"],
-  ["haven-testnet-validator-1", "validator", "haven-node:0.7.2-rc"],
-  ["haven-testnet-validator-2", "validator", "haven-node:0.7.2-rc"],
-  ["haven-testnet-validator-3", "validator", "haven-node:0.7.2-rc"],
-  ["haven-testnet-rpc-1", "json-rpc :8545", "haven-rpc:0.7.2-rc"],
-  ["haven-testnet-indexer-1", "block indexer", "haven-indexer:0.7.2-rc"],
-  ["haven-testnet-explorer-1", "explorer :4000", "haven-explorer:0.6.0"],
-  ["haven-testnet-postgres-1", "indexer db", "postgres:16-alpine"]
+  ["heaven-testnet-validator-0", "validator · chainId 731002", "heaven-node:0.7.2-rc"],
+  ["heaven-testnet-validator-1", "validator", "heaven-node:0.7.2-rc"],
+  ["heaven-testnet-validator-2", "validator", "heaven-node:0.7.2-rc"],
+  ["heaven-testnet-validator-3", "validator", "heaven-node:0.7.2-rc"],
+  ["heaven-testnet-rpc-1", "json-rpc :8545", "heaven-rpc:0.7.2-rc"],
+  ["heaven-testnet-indexer-1", "block indexer", "heaven-indexer:0.7.2-rc"],
+  ["heaven-testnet-explorer-1", "explorer :4000", "heaven-explorer:0.6.0"],
+  ["heaven-testnet-postgres-1", "indexer db", "postgres:16-alpine"]
 ],
 3: [
-  ["haven-mainnet-validator-0", "validator · chainId 7310", "haven-node:1.0.0"],
-  ["haven-mainnet-validator-1", "validator", "haven-node:1.0.0"],
-  ["haven-mainnet-validator-2", "validator", "haven-node:1.0.0"],
-  ["haven-mainnet-validator-3", "validator", "haven-node:1.0.0"],
-  ["haven-mainnet-validator-4", "validator", "haven-node:1.0.0"],
-  ["haven-mainnet-validator-5", "validator", "haven-node:1.0.0"],
-  ["haven-mainnet-validator-6", "validator", "haven-node:1.0.0"],
-  ["haven-mainnet-rpc-1", "json-rpc :8545", "haven-rpc:1.0.0"],
-  ["haven-mainnet-indexer-1", "block indexer", "haven-indexer:1.0.0"],
-  ["haven-mainnet-explorer-1", "explorer :443", "haven-explorer:1.0.0"],
-  ["haven-mainnet-bridge-relayer-1", "bridge relayer", "haven-relayer:1.0.0"]
+  ["heaven-mainnet-validator-0", "validator · chainId 7310", "heaven-node:1.0.0"],
+  ["heaven-mainnet-validator-1", "validator", "heaven-node:1.0.0"],
+  ["heaven-mainnet-validator-2", "validator", "heaven-node:1.0.0"],
+  ["heaven-mainnet-validator-3", "validator", "heaven-node:1.0.0"],
+  ["heaven-mainnet-validator-4", "validator", "heaven-node:1.0.0"],
+  ["heaven-mainnet-validator-5", "validator", "heaven-node:1.0.0"],
+  ["heaven-mainnet-validator-6", "validator", "heaven-node:1.0.0"],
+  ["heaven-mainnet-rpc-1", "json-rpc :8545", "heaven-rpc:1.0.0"],
+  ["heaven-mainnet-indexer-1", "block indexer", "heaven-indexer:1.0.0"],
+  ["heaven-mainnet-explorer-1", "explorer :443", "heaven-explorer:1.0.0"],
+  ["heaven-mainnet-bridge-relayer-1", "bridge relayer", "heaven-relayer:1.0.0"]
 ]};
-const project = S === 1 ? "haven-devnet" : S === 2 ? "haven-testnet" : "haven-mainnet";
+const project = S === 1 ? "heaven-devnet" : S === 2 ? "heaven-testnet" : "heaven-mainnet";
 $("projectName").textContent = project;
 $("projectName2").textContent = project;
 const list = $("containerList");
@@ -1587,22 +1587,22 @@ const EVENTS = {
 1: [
   [6, "Loading Compose definition", [L.mu("[+] Building 0.0s (0/1)"), L.step("[+]", "Building services with BuildKit")]],
   [18, "Resolving base images", [L.step("[node internal]", "load metadata for docker.io/library/rust:1.81-slim"), L.mu(" => sha256:<span class='log-hash'>4be1c0a92d7e</span>")]],
-  [34, "Compiling haven-node (release)", [L.step("[node 4/8]", "RUN cargo build --release -p haven-node"), L.mu("   Compiling haven-consensus v0.3.0 (/src/crates/consensus)"), L.mu("   Compiling haven-evm v0.3.0 (/src/crates/evm)"), L.wa("warning: unused variable: `epoch_seed` --> crates/consensus/src/pos.rs:211:13")]],
-  [52, "Starting infrastructure", [L.ok("✔ Network haven-devnet_default Created"), L.ok("✔ postgres Pulled"), L.ok("✔ redis Pulled")], [2, 3]],
-  [70, "Starting devnet validator", [L.mu("    Finished `release` profile [optimized] target(s) in 1m 48s"), L.step("[node]", "exporting to image haven-node:0.3.0-dev")], [0]],
-  [86, "Starting JSON-RPC", [L.step("[rpc]", "exporting to image haven-rpc:0.3.0-dev"), L.ok("✔ Container haven-devnet-node-0 Started")], [1]],
-  [100, "Devnet running · single validator", [L.ok("✔ Container haven-devnet-rpc-1 Started"), L.mu("haven-devnet-node-0  | INFO genesis loaded chain_id=731001 validators=1"), L.mu("haven-devnet-node-0  | INFO ⛏  sealed block #1  txs=0  hash=0x9a1c…e3f0")], null, true]
+  [34, "Compiling heaven-node (release)", [L.step("[node 4/8]", "RUN cargo build --release -p heaven-node"), L.mu("   Compiling heaven-consensus v0.3.0 (/src/crates/consensus)"), L.mu("   Compiling heaven-evm v0.3.0 (/src/crates/evm)"), L.wa("warning: unused variable: `epoch_seed` --> crates/consensus/src/pos.rs:211:13")]],
+  [52, "Starting infrastructure", [L.ok("✔ Network heaven-devnet_default Created"), L.ok("✔ postgres Pulled"), L.ok("✔ redis Pulled")], [2, 3]],
+  [70, "Starting devnet validator", [L.mu("    Finished `release` profile [optimized] target(s) in 1m 48s"), L.step("[node]", "exporting to image heaven-node:0.3.0-dev")], [0]],
+  [86, "Starting JSON-RPC", [L.step("[rpc]", "exporting to image heaven-rpc:0.3.0-dev"), L.ok("✔ Container heaven-devnet-node-0 Started")], [1]],
+  [100, "Devnet running · single validator", [L.ok("✔ Container heaven-devnet-rpc-1 Started"), L.mu("heaven-devnet-node-0  | INFO genesis loaded chain_id=731001 validators=1"), L.mu("heaven-devnet-node-0  | INFO ⛏  sealed block #1  txs=0  hash=0x9a1c…e3f0")], null, true]
 ],
 2: [
   [5, "Loading Compose definition", [L.mu("[+] Building 0.0s (0/4)"), L.step("[+]", "Building services with BuildKit")]],
   [15, "Resolving base images", [L.step("[validator internal]", "load metadata for docker.io/library/rust:1.81-slim"), L.mu(" => CACHED [validator 2/8] WORKDIR /src")]],
-  [28, "Compiling haven-node (release)", [L.step("[validator 4/8]", "RUN cargo build --release -p haven-node"), L.mu("   Compiling haven-consensus v0.7.2 (/src/crates/consensus)"), L.mu("   Compiling haven-staking v0.7.2 (/src/crates/staking)"), L.mu("   Compiling haven-p2p v0.7.2 (/src/crates/p2p)")]],
-  [44, "Starting infrastructure", [L.ok("✔ Network haven-testnet_default Created"), L.ok("✔ postgres Pulled")], [7]],
-  [60, "Starting validators", [L.mu("    Finished `release` profile [optimized] target(s) in 2m 31s"), L.ok("✔ Container haven-testnet-validator-0 Started"), L.ok("✔ Container haven-testnet-validator-1 Started")], [0, 1]],
-  [72, "Starting validators", [L.ok("✔ Container haven-testnet-validator-2 Started"), L.ok("✔ Container haven-testnet-validator-3 Started"), L.mu("haven-testnet-validator-0  | INFO p2p peers=3 quorum=3/4")], [2, 3]],
-  [84, "Starting RPC / indexer", [L.ok("✔ Container haven-testnet-rpc-1 Started"), L.ok("✔ Container haven-testnet-indexer-1 Started")], [4, 5]],
+  [28, "Compiling heaven-node (release)", [L.step("[validator 4/8]", "RUN cargo build --release -p heaven-node"), L.mu("   Compiling heaven-consensus v0.7.2 (/src/crates/consensus)"), L.mu("   Compiling heaven-staking v0.7.2 (/src/crates/staking)"), L.mu("   Compiling heaven-p2p v0.7.2 (/src/crates/p2p)")]],
+  [44, "Starting infrastructure", [L.ok("✔ Network heaven-testnet_default Created"), L.ok("✔ postgres Pulled")], [7]],
+  [60, "Starting validators", [L.mu("    Finished `release` profile [optimized] target(s) in 2m 31s"), L.ok("✔ Container heaven-testnet-validator-0 Started"), L.ok("✔ Container heaven-testnet-validator-1 Started")], [0, 1]],
+  [72, "Starting validators", [L.ok("✔ Container heaven-testnet-validator-2 Started"), L.ok("✔ Container heaven-testnet-validator-3 Started"), L.mu("heaven-testnet-validator-0  | INFO p2p peers=3 quorum=3/4")], [2, 3]],
+  [84, "Starting RPC / indexer", [L.ok("✔ Container heaven-testnet-rpc-1 Started"), L.ok("✔ Container heaven-testnet-indexer-1 Started")], [4, 5]],
   [93, "Starting explorer", [L.step("[explorer]", "next build"), L.mu(" ✓ Compiled successfully")], [6]],
-  [100, "Testnet running · 4 validators", [L.ok("✔ Container haven-testnet-explorer-1 Started"), L.mu("haven-testnet-validator-2  | INFO ⛏  sealed block #184,902  txs=37  epoch=740"), L.wa("haven-testnet-indexer-1    | WARN reorg depth=1 at #184,901, re-indexing")], null, true]
+  [100, "Testnet running · 4 validators", [L.ok("✔ Container heaven-testnet-explorer-1 Started"), L.mu("heaven-testnet-validator-2  | INFO ⛏  sealed block #184,902  txs=37  epoch=740"), L.wa("heaven-testnet-indexer-1    | WARN reorg depth=1 at #184,901, re-indexing")], null, true]
 ]};
 
 let t0 = performance.now();
@@ -1657,13 +1657,13 @@ renderCode();
 if (S === 1) {
   playEvents(EVENTS[1], () => {
     finishCard("RUNNING", "Compose application is running", "1 / 1 validators online");
-    liveNodeLogs(["haven-devnet-node-0"], 1, null);
+    liveNodeLogs(["heaven-devnet-node-0"], 1, null);
   });
 }
 if (S === 2) {
   playEvents(EVENTS[2], () => {
     finishCard("RUNNING", "Compose application is running", "4 / 4 validators online");
-    liveNodeLogs(["haven-testnet-validator-0", "haven-testnet-validator-1", "haven-testnet-validator-2", "haven-testnet-validator-3"], 184902, "3/4");
+    liveNodeLogs(["heaven-testnet-validator-0", "heaven-testnet-validator-1", "heaven-testnet-validator-2", "heaven-testnet-validator-3"], 184902, "3/4");
   });
 }
 
@@ -1676,17 +1676,17 @@ if (S === 3) {
   $("buildDescription").textContent = "Containers created · genesis not started";
   $("buildSpinner").style.animation = "spin 2.4s linear infinite";
   CONTAINERS[3].forEach((c) => addRow(c, "wait"));
-  line(L.ok("✔ Network haven-mainnet_default Created"));
+  line(L.ok("✔ Network heaven-mainnet_default Created"));
   CONTAINERS[3].forEach((c) => line(L.ok(`✔ Container ${c[0]} Created`)));
   line("");
-  line(`${P(branch)} <span class="log-command">npx hardhat run scripts/deploy-mainnet.ts --network haven-mainnet</span><span class="terminal-cursor"></span>`);
+  line(`${P(branch)} <span class="log-command">npx hardhat run scripts/deploy-mainnet.ts --network heaven-mainnet</span><span class="terminal-cursor"></span>`);
 }
 
 function launch() {
-  if (S !== 3) { havenCelebrate({ delay: 500 }); return; }
+  if (S !== 3) { heavenCelebrate({ delay: 500 }); return; }
   if (launched) return;
   launched = true;
-  havenCelebrate({ delay: 5900 });
+  heavenCelebrate({ delay: 5900 });
   const cur = out.querySelector(".terminal-cursor");
   if (cur) cur.remove();
   while (lineIdx < code.length) typeOne();
@@ -1697,20 +1697,20 @@ function launch() {
     [0, L.mu("Compiled 52 Solidity files successfully (evm target: cancun).")],
     [300, L.mu("deployer  0x7f3A…C21e")],
     [450, L.mu("chainId   7310")],
-    [900, L.ok("✔ HavenToken          deployed  0x5E0d1c94A7b3F2E8D61a90C4b7E2f3a8D9c04e01")],
-    [1300, L.ok("✔ HavenValidatorSet   deployed  0x91bC07e3A2d4F68c0B5e1D7a3F9c2E84b6A1d702")],
-    [1700, L.ok("✔ HavenStaking        deployed  0x2Fa84D16c9E0b3A7f5D2e8C14b9A6d0E3f7C5b31")],
-    [2100, L.ok("✔ HavenVesting        deployed  0xC3e7A90f1B4d26E8a5F0c9D3b7E1a64F2d8B0e95")],
-    [2500, L.ok("✔ HavenBridge         deployed  0x6aD2f8E14c7B90a3E5d1F6b2C8a0e47D9f3B1c58")],
-    [2900, L.mu("granted MINTER_ROLE → HavenStaking, HavenBridge")],
-    [3200, L.mu("written deployments/haven-mainnet.json")],
+    [900, L.ok("✔ HeavenToken          deployed  0x5E0d1c94A7b3F2E8D61a90C4b7E2f3a8D9c04e01")],
+    [1300, L.ok("✔ HeavenValidatorSet   deployed  0x91bC07e3A2d4F68c0B5e1D7a3F9c2E84b6A1d702")],
+    [1700, L.ok("✔ HeavenStaking        deployed  0x2Fa84D16c9E0b3A7f5D2e8C14b9A6d0E3f7C5b31")],
+    [2100, L.ok("✔ HeavenVesting        deployed  0xC3e7A90f1B4d26E8a5F0c9D3b7E1a64F2d8B0e95")],
+    [2500, L.ok("✔ HeavenBridge         deployed  0x6aD2f8E14c7B90a3E5d1F6b2C8a0e47D9f3B1c58")],
+    [2900, L.mu("granted MINTER_ROLE → HeavenStaking, HeavenBridge")],
+    [3200, L.mu("written deployments/heaven-mainnet.json")],
     [3600, ""],
-    [3700, L.mu("haven-mainnet-validator-0  | INFO genesis signed 7/7  chain_id=7310")],
-    [4100, L.mu("haven-mainnet-validator-0  | INFO ⛏  sealed block #0 (genesis)  hash=0x3d7e…a9c1")],
-    [4500, L.mu("haven-mainnet-validator-3  | INFO ⛏  sealed block #1  txs=6  hash=0xb04f…17de")],
-    [4900, L.ok("✔ haven-mainnet-explorer-1  ready  https://scan.havenchain.io")],
+    [3700, L.mu("heaven-mainnet-validator-0  | INFO genesis signed 7/7  chain_id=7310")],
+    [4100, L.mu("heaven-mainnet-validator-0  | INFO ⛏  sealed block #0 (genesis)  hash=0x3d7e…a9c1")],
+    [4500, L.mu("heaven-mainnet-validator-3  | INFO ⛏  sealed block #1  txs=6  hash=0xb04f…17de")],
+    [4900, L.ok("✔ heaven-mainnet-explorer-1  ready  https://scan.heavenchain.io")],
     [5300, ""],
-    [5400, L.ok("HAVEN v1.0.0 — mainnet deployment complete.")],
+    [5400, L.ok("HEAVEN v1.0.0 — mainnet deployment complete.")],
     [5600, `${P("release/v1.0.0")} <span class="terminal-cursor"></span>`]
   ];
   seq.forEach(([t, l]) => setTimeout(() => line(l), t));
@@ -1721,7 +1721,7 @@ function launch() {
   setTimeout(() => $("buildStepText").textContent = "Genesis signed · 7 / 7 validators", 3800);
   setTimeout(() => {
     finishCard("RUNNING", "Mainnet is live", "7 / 7 validators online · block #1");
-    liveNodeLogs(["haven-mainnet-validator-0", "haven-mainnet-validator-2", "haven-mainnet-validator-5", "haven-mainnet-rpc-1"], 1, "7/7");
+    liveNodeLogs(["heaven-mainnet-validator-0", "heaven-mainnet-validator-2", "heaven-mainnet-validator-5", "heaven-mainnet-rpc-1"], 1, "7/7");
   }, 6000);
 }
 

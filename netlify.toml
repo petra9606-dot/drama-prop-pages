@@ -16,3 +16,55 @@
   for = "/sw.js"
   [headers.values]
     Cache-Control = "no-cache"
+
+
+# 헤븐코인 화면: 예전 haven 주소로 들어와도 새 heaven 주소로 연결
+[[redirects]]
+  from = "/pyramid/part4/haven-1-vscode-docker.html"
+  to = "/pyramid/part4/heaven-1-vscode-docker.html"
+  status = 301
+
+[[redirects]]
+  from = "/pyramid/part4/haven-1-vscode-docker"
+  to = "/pyramid/part4/heaven-1-vscode-docker.html"
+  status = 301
+
+[[redirects]]
+  from = "/pyramid/part4/haven-2-cluster-ops.html"
+  to = "/pyramid/part4/heaven-2-cluster-ops.html"
+  status = 301
+
+[[redirects]]
+  from = "/pyramid/part4/haven-2-cluster-ops"
+  to = "/pyramid/part4/heaven-2-cluster-ops.html"
+  status = 301
+
+[[redirects]]
+  from = "/pyramid/part4/haven-3-chain-console.html"
+  to = "/pyramid/part4/heaven-3-chain-console.html"
+  status = 301
+
+[[redirects]]
+  from = "/pyramid/part4/haven-3-chain-console"
+  to = "/pyramid/part4/heaven-3-chain-console.html"
+  status = 301
+
+[[redirects]]
+  from = "/pyramid/part4/haven-4-node-stream.html"
+  to = "/pyramid/part4/heaven-4-node-stream.html"
+  status = 301
+
+[[redirects]]
+  from = "/pyramid/part4/haven-4-node-stream"
+  to = "/pyramid/part4/heaven-4-node-stream.html"
+  status = 301
+
+[[redirects]]
+  from = "/pyramid/part4/haven-5-ci-pods.html"
+  to = "/pyramid/part4/heaven-5-ci-pods.html"
+  status = 301
+
+[[redirects]]
+  from = "/pyramid/part4/haven-5-ci-pods"
+  to = "/pyramid/part4/heaven-5-ci-pods.html"
+  status = 301

@@ -229,11 +229,11 @@
 <script src="rider-v15-cues.js?v=15"></script>
 <script>
 const cfg = {
-  store: '예담손만두', address: '서연동 나래타워 1층',
-  standardStore: '온기분식 서연점', nextAddress: '서연동 달빛로 28',
-  specialStore: '달빛치킨 서연점', specialAddress: '서연동 은하수길 17',
+  store: '예담손만두', address: '관악구 태희로 200-12 제일빌라 302호',
+  standardStore: '온기분식 관악점', nextAddress: '관악구 달빛로 28',
+  specialStore: '달빛치킨 관악점', specialAddress: '관악구 은하수길 17',
   callFee: 3000, bonus: 2000, standardFee: 2800, specialFee: 4000,
-  vehicle: '오토바이', film: '서연동', km: '1.2 km', mins: '약 3분', firstDelay: 6, specialGap: 5
+  vehicle: '오토바이', film: '백서로', km: '1.2 km', mins: '약 3분', firstDelay: 6, specialGap: 5
 };
 const total = cfg.callFee + cfg.bonus;
 let st = { phase: 'accepted', seconds: 540, moving: false, waiting: false, blackStage: 0 };
@@ -332,7 +332,7 @@ const stageCard = () => `<div class="card">
   </div></div>`;
 
 const jobCard = () => `<div class="card">
-  <div class="rrow"><div class="rmk strong">P</div><div class="rcopy"><div class="rlabel">픽업</div><div class="rtitle">${cfg.store}</div><div class="rsub">달빛로 128 · 1층</div></div><div class="rarrow">›</div></div>
+  <div class="rrow"><div class="rmk strong">P</div><div class="rcopy"><div class="rlabel">픽업</div><div class="rtitle">${cfg.store}</div><div class="rsub">관악구 백서로 41</div></div><div class="rarrow">›</div></div>
   <div class="rstem"></div>
   <div class="rrow"><div class="rmk">D</div><div class="rcopy"><div class="rlabel">전달</div><div class="rtitle">${cfg.address}</div><div class="rsub">문 앞에 놓고 벨을 눌러주세요</div></div><div class="rarrow">›</div></div>
   <div class="metrics">
@@ -344,7 +344,7 @@ const jobCard = () => `<div class="card">
 const feeCard = () => `<div class="fee"><div><div class="t">이번 배달 수수료</div><div class="n">거리·예상시간 반영 · 확정 금액</div></div>
   <div class="v">${PV.money(cfg.callFee)}<i>원</i></div></div>`;
 
-const reqCard = () => `<div class="req"><i>i</i><div><b>고객 요청사항</b><p>문 앞에 놓고 벨을 눌러주세요. 공동현관 호출 1204.</p></div></div>`;
+const reqCard = () => `<div class="req"><i>i</i><div><b>고객 요청사항</b><p>문 앞에 놓고 벨을 눌러주세요. 공동현관 호출 302.</p></div></div>`;
 
 const slides = (special, acceptLabel) => `<div class="slides">
   <div class="sl ${special ? 'spc' : 'acc'}" data-slide="accept"><div class="sl-fill"></div>
