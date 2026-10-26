@@ -38,25 +38,63 @@ document.addEventListener('DOMContentLoaded', () => {
   // Tab switching effect
   const tabInternet = document.getElementById('tab-internet');
   const tabBank = document.getElementById('tab-bank');
+  const helpModal = document.getElementById('service-help');
+  let dialogOrigin = null;
+
+  function showDialog(modal, focusTarget) {
+    dialogOrigin = document.activeElement;
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    modal.tabIndex = -1;
+    (focusTarget || modal).focus();
+  }
+
+  function hideDialog(modal) {
+    modal.classList.add('hidden');
+    if (!document.querySelector('.modal-backdrop:not(.hidden)')) document.body.style.overflow = '';
+    if (dialogOrigin?.isConnected) dialogOrigin.focus();
+  }
+
+  document.querySelectorAll('[data-help]').forEach(button => {
+    button.addEventListener('click', () => showDialog(helpModal, document.getElementById('help-close')));
+  });
+  document.getElementById('help-close').addEventListener('click', () => hideDialog(helpModal));
+  [helpModal, inputModal].forEach(modal => modal.addEventListener('click', event => {
+    if (event.target === modal) hideDialog(modal);
+  }));
+  document.addEventListener('keydown', event => {
+    const modal = document.querySelector('.modal-backdrop:not(.hidden)');
+    if (!modal) return;
+    if (event.key === 'Escape' && modal !== loadingModal) { hideDialog(modal); return; }
+    if (event.key !== 'Tab') return;
+    const targets = [...modal.querySelectorAll('button:not([disabled]), input:not([disabled]), a[href]')].filter(el => el.getClientRects().length);
+    if (!targets.length) { event.preventDefault(); modal.focus(); return; }
+    const first = targets[0], last = targets[targets.length - 1];
+    if (event.shiftKey && (document.activeElement === first || document.activeElement === modal)) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && (document.activeElement === last || document.activeElement === modal)) { event.preventDefault(); first.focus(); }
+  });
 
   tabInternet?.addEventListener('click', () => {
     tabInternet.classList.add('active');
     tabBank.classList.remove('active');
+    tabInternet.setAttribute('aria-pressed', 'true');
+    tabBank.setAttribute('aria-pressed', 'false');
   });
 
   tabBank?.addEventListener('click', () => {
     tabBank.classList.add('active');
     tabInternet.classList.remove('active');
+    tabBank.setAttribute('aria-pressed', 'true');
+    tabInternet.setAttribute('aria-pressed', 'false');
   });
 
   // Modal Open / Close Handlers
   const openInputModal = () => {
-    inputModal.classList.remove('hidden');
-    inputWinFirst.focus();
+    showDialog(inputModal, inputWinFirst);
   };
 
   const closeInputModal = () => {
-    inputModal.classList.add('hidden');
+    hideDialog(inputModal);
   };
 
   openModalBtn1?.addEventListener('click', openInputModal);
@@ -108,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 5.5 Seconds Loading Sequence Handler
   function startLoadingSequence(winNumber) {
-    loadingModal.classList.remove('hidden');
+    showDialog(loadingModal);
 
     const totalDuration = 5500; // Exact 5.5 seconds
     const intervalTime = 50; // Update every 50ms
@@ -122,6 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
     step1.className = 'step-item active';
     step2.className = 'step-item';
     step3.className = 'step-item';
+    [step1, step2, step3].forEach((step, index) => { step.querySelector('.step-dot').textContent = String(index + 1); });
+    progressFill.parentElement.setAttribute('aria-valuenow', '0');
 
     const timer = setInterval(() => {
       elapsedTime += intervalTime;
@@ -131,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
       progressFill.style.width = `${progress}%`;
       progressPercent.textContent = `${progress}%`;
       timerSecText.textContent = remainingSec;
+      progressFill.parentElement.setAttribute('aria-valuenow', String(progress));
 
       // Update Step Indicators during the 5.5s timeline
       if (elapsedTime >= 1800 && elapsedTime < 3800) {
@@ -150,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         step3.querySelector('.step-dot').innerHTML = '<i class="fa-solid fa-check"></i>';
 
         setTimeout(() => {
-          loadingModal.classList.add('hidden');
+          hideDialog(loadingModal);
           displayWinningResult(winNumber);
         }, 300);
       }
@@ -168,11 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
     cardWinNumber.textContent = winNumber;
     winnerCard.classList.remove('hidden');
 
-    // 3. Trigger Confetti Effect
-    triggerConfetti();
-
-    // 4. Scroll smoothly to celebration card
-    winnerCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // 조회 결과로 이동하되 과장된 축하 효과는 사용하지 않는다.
+    winnerCard.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
   }
 
   // Reset & Relookup
@@ -190,58 +228,4 @@ document.addEventListener('DOMContentLoaded', () => {
     openInputModal();
   });
 
-  // Confetti Animation Engine
-  function triggerConfetti() {
-    const canvas = document.getElementById('confetti-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const particles = [];
-    const colors = ['#0072ce', '#f8ad1d', '#10b981', '#ef4444', '#8b5cf6', '#3b82f6'];
-
-    for (let i = 0; i < 90; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height - canvas.height,
-        size: Math.random() * 8 + 5,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        vx: (Math.random() - 0.5) * 3,
-        vy: Math.random() * 4 + 3,
-        rotation: Math.random() * 360,
-        vRot: (Math.random() - 0.5) * 10
-      });
-    }
-
-    let animationFrame;
-    const startTime = Date.now();
-
-    function render() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.rotation += p.vRot;
-
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate((p.rotation * Math.PI) / 180);
-        ctx.fillStyle = p.color;
-        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-        ctx.restore();
-      });
-
-      if (Date.now() - startTime < 4000) {
-        animationFrame = requestAnimationFrame(render);
-      } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        cancelAnimationFrame(animationFrame);
-      }
-    }
-
-    render();
-  }
 });
