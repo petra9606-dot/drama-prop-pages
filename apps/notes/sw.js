@@ -1,0 +1,5 @@
+const CACHE='dw-notes-app-v1';
+const FILES=['./','manifest.webmanifest','icon-192.png','icon-512.png','../preview/notes.css','../preview/notes-core.js','../preview/notes.js'];
+self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()))});
+self.addEventListener('activate',event=>{event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith('dw-notes-app-')&&key!==CACHE)await caches.delete(key);await self.clients.claim()})())});
+self.addEventListener('fetch',event=>{if(event.request.method!=='GET'||new URL(event.request.url).origin!==self.location.origin)return;event.respondWith((async()=>{const cache=await caches.open(CACHE);try{const response=await fetch(event.request);if(response.ok)await cache.put(event.request,response.clone());return response}catch(error){const saved=await cache.match(event.request,{ignoreSearch:true});if(saved)return saved;if(event.request.mode==='navigate')return cache.match('./');throw error}})())});
