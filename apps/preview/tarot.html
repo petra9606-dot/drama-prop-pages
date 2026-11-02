@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#190624">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>오늘의 타로</title>
+<link rel="preload" as="image" href="../tarot-assets/card-back.png">
+<link rel="preload" as="image" href="../tarot-assets/death-card.png">
+<link rel="preload" as="image" href="../tarot-assets/king-card.png">
+<link rel="stylesheet" href="tarot.css">
+<script src="tarot.js" defer></script>
+</head>
+<body class="loading">
+<main class="tarot-app">
+  <div class="backdrop" aria-hidden="true"><span class="moon"></span><span class="orbit"></span><span class="lower-orbit"></span><svg class="constellation" viewBox="0 0 112 88"><path d="M9 14 43 29 74 13 96 52 60 76"/><circle cx="9" cy="14" r="2"/><circle cx="43" cy="29" r="2"/><circle cx="74" cy="13" r="3"/><circle cx="96" cy="52" r="2"/><circle cx="60" cy="76" r="2"/></svg></div>
+  <header class="app-header"><h1><button id="title">오늘의 타로</button></h1><p id="sub">카드를 준비하고 있습니다</p></header>
+  <div id="deck" class="deck" role="group" aria-label="타로 카드 스무 장"></div>
+  <footer class="app-footer"><section class="result" id="result" aria-live="polite"><b id="rname"></b><div class="divider"></div><p id="rtext"></p><button id="reset" class="reset">↻ 다시 선택하기</button></section><p id="hint" class="hint">카드를 준비하고 있습니다</p></footer>
+</main>
+<dialog id="settings-dialog"><div class="controls" id="controls"><h2>TEST MODE</h2><p class="caption">카드 연출 설정</p><label>셔플 시간</label><div class="seg" data-key="delay"></div><label>셔플 강도</label><div class="seg" data-key="shuffle"></div><label>카드 공개 속도</label><div class="seg" data-key="pace"></div><label>공개 효과</label><div class="seg" data-key="reveal"></div><label>효과음</label><div class="seg" data-key="sound"></div><p class="guide">제목을 1.2초간 누르면 설정이 열립니다.<br>제목을 다섯 번 누르면 첫 번째 카드부터 시작합니다.</p><div class="actions"><button id="scene-reset">처음부터</button><button id="fullscreen">전체 화면</button><button id="settings-close">닫기</button></div></div></dialog>
+<script>if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));</script>
+</body>
+</html>

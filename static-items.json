@@ -22,7 +22,7 @@
     {"id":"p6-44-moment","project":"pyramid","projectName":"피라밋","part":"6부","partNum":6,"scene":"44씬","title":"시민용 릴스 대체 · 숏레빗","filename":"숏레빗 Reels","url":"/pyramid/part6/scene44/?screen=moment","changedAt":"2026-10-14T07:00:00Z","changeType":"new","changeNote":"그린스크린 · 릴스형 피드 · 팔로우 · 댓글"}
   ],
   "apps": [
-    {"id":"app-tarot","title":"오늘의 타로","filename":"today-tarot-v2.apk","url":"/apps/tarot-preview.html"},
+    {"id":"app-tarot","title":"오늘의 타로","filename":"today-tarot-v4.apk","url":"/apps/preview/tarot.html","changedAt":"2026-11-02T04:12:10Z","changeType":"updated","changeNote":"오늘의 타로 이름 통일 · 설치 없이 웹 체험"},
     {"id":"app-rider","title":"달림 라이더","filename":"dallim-rider-v10-schedule-route.apk","url":"/apps/preview/rider.html"},
     {"id":"app-nav","title":"길봄 내비","filename":"gilbom-nav-v3-real-map.apk","url":"/apps/preview/nav.html"},
     {"id":"app-mail","title":"촬영용 메일 앱","filename":"disolve-mail-remote-v1.apk","url":"/apps/preview/mail.html"},
