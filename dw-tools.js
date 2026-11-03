@@ -377,7 +377,7 @@
     navigator.wakeLock.request("screen").then((l) => { shootLock = l; }).catch(() => {});
   }
   // 폰용으로 만든 소품(세로 앱 화면 등)은 원래 크기로, 나머지 PC용 화면은 PC 크기로 그려서 줄여 보여 준다
-  const NATIVE = ["/pyramid/part6/scene44/?screen=loop", "/pyramid/part6/scene44/?screen=moment", "/apps/police-game.html"];
+  const NATIVE = ["/pyramid/part1/scene74/?screen=loop", "/pyramid/part6/scene44/?screen=loop", "/pyramid/part6/scene44/?screen=moment", "/apps/police-game.html"];
   const viewPref = (id) => { try { return localStorage.getItem("dw-view:" + id); } catch { return null; } };
   const setViewPref = (id, v) => { try { localStorage.setItem("dw-view:" + id, v); } catch {} };
   function viewMode(wrap, id) {
