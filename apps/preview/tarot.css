@@ -3,7 +3,8 @@
 /* Selected navy concept, 2026-11-09. UI text remains real text. */
 :root{--night:#091523;--gold:#d3ae73;--text:#f4e7d3;--muted:#b6afa2}
 html,body{background:#091523}.tarot-app{min-height:520px;padding-inline:18px;border:1px solid #ac8c5d99}
-.tarot-app:before,.tarot-app:after,.backdrop{display:none}
+.tarot-app:before,.tarot-app:after,.backdrop{display:block}
+.tarot-app:before{background:#142b43}.tarot-app:after{background:#10273a}
 .app-header{padding:19px 0 14px;border-bottom:1px solid #b69765aa;width:100%}
 .app-header h1{font-family:'Batang','Noto Serif KR',serif;font-weight:500;font-size:22px;letter-spacing:0;color:#f4e7d3}
 .app-header p{font-size:12px;min-height:17px;margin-top:8px}

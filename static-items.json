@@ -24,7 +24,7 @@
   ],
   "apps": [
     {"id":"app-notes","title":"메모장","filename":"notes.html","url":"/apps/notes/","changedAt":"2026-11-02T06:51:12Z","changeType":"new","changeNote":"메모별 준비 문장 설정 · 직접 입력과 연출 입력 · 자동 저장"},
-    {"id":"app-tarot","title":"오늘의 타로","filename":"today-tarot-v5.apk","url":"/apps/preview/tarot.html","changedAt":"2026-11-09T03:30:00Z","changeType":"updated","changeNote":"남색·금색 디자인 · 새 데스/킹 카드 · 당신의 오늘 하루 운세는? 오프닝 · v5 APK"},
+    {"id":"app-tarot","title":"오늘의 타로","filename":"today-tarot-v6.apk","url":"/apps/preview/tarot.html","changedAt":"2026-11-09T03:30:00Z","changeType":"updated","changeNote":"남색·금색 디자인 · 새 데스/킹 카드 · 당신의 오늘 하루 운세는? 오프닝 · v6 APK · 달·별 배경 복원"},
     {"id":"app-rider","title":"달림 라이더","filename":"dallim-rider-v10-schedule-route.apk","url":"/apps/preview/rider.html"},
     {"id":"app-nav","title":"길봄 내비","filename":"gilbom-nav-v3-real-map.apk","url":"/apps/preview/nav.html"},
     {"id":"app-mail","title":"촬영용 메일 앱","filename":"disolve-mail-remote-v1.apk","url":"/apps/preview/mail.html"},
