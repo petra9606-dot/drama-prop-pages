@@ -1,6 +1,7 @@
 // 관리자 페이지에서 교체한 깃허브 자료가 있으면 그 파일을, 없으면 원래 파일을 그대로 보여 준다.
 import { getStore } from "@netlify/blobs";
 import { gateOK } from "../lib/site-gate-edge.js";
+import { renameCheongyakHome } from "../lib/cheongyak-brand.js";
 
 let cache = { at: 0, map: null };
 
@@ -18,8 +19,14 @@ export default async (request) => {
     if (path.endsWith("/")) path += "index.html";
     const o = cache.map[path];
     if (!o || !o.key) return;
-    const body = await store.get(o.key, { type: "stream" });
+    let body = await store.get(o.key, { type: "stream" });
     if (!body) return;
+    // Scene 1-4 also has an administrator-uploaded copy. Rename its branding
+    // without discarding the custom form, winner animation or staff controls.
+    if (request.method === "GET" && path === "/pyramid/part1/cheongyak/index.html" &&
+        (!o.contentType || /text\/html/i.test(o.contentType))) {
+      body = renameCheongyakHome(await new Response(body).text());
+    }
     return new Response(request.method === "HEAD" ? null : body, {
       headers: {
         "Content-Type": o.contentType || "text/html; charset=utf-8",
