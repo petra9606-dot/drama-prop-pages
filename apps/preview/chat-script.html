@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>모아챗 · 준비된 메시지 기능 (제안 미리보기)</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:radial-gradient(circle at 16% 0,rgba(80,105,190,.13),transparent 28%),#0b0f19;color:#eef2ff;
+  font-family:'Segoe UI','Malgun Gothic','Apple SD Gothic Neo',sans-serif;min-height:100vh}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:18px 26px;border-bottom:1px solid #1b2334}
+.top h1{margin:0;font-size:17px;font-weight:800;letter-spacing:-.02em}
+.top h1 span{font-size:11px;font-weight:700;color:#7d8aa4;margin-left:7px;letter-spacing:.08em}
+.note b{color:#9fb0d4}
+.badge{margin-left:auto;font-size:11px;font-weight:800;color:#ffd79a;background:#3a2c17;border:1px solid #6b5125;border-radius:999px;padding:7px 13px}
+.main{max-width:1140px;margin:0 auto;padding:26px 22px 60px;display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:30px;align-items:start}
+.stage{display:flex;flex-direction:column;align-items:center}
+.phone{width:412px;max-width:100%;border-radius:44px;padding:11px;background:linear-gradient(160deg,#2b3446,#171d2a 45%,#0e131d);
+  box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.05) inset}
+.shell{border-radius:34px;overflow:hidden;background:#000}
+.screen{position:relative;width:390px;height:790px;max-width:100%;background:#f6f4f0;overflow:hidden;display:flex;flex-direction:column;
+  font-size:14px;line-height:1.35;color:#27242a}
+.cap{margin:16px auto 0;max-width:390px;text-align:center;font-size:12.5px;color:#8a97b2;line-height:1.75}
+.side h2{margin:2px 0 11px;font-size:13px;letter-spacing:.05em;color:#c3cde4}
+.scenes{display:flex;flex-direction:column;gap:7px}
+.scenes button{text-align:left;cursor:pointer;font:inherit;font-size:13px;background:#111827;border:1px solid #263244;border-radius:11px;
+  color:#cbd5ea;padding:11px 13px;transition:.15s;display:flex;gap:9px;align-items:center}
+.scenes button:hover{border-color:#5878de;background:#151e30}
+.scenes button.on{border-color:#7590ff;background:#1a2440;color:#fff}
+.scenes button i{font-style:normal;font-size:10px;font-weight:800;color:#8b9ac2;background:#1c2743;border:1px solid #30436e;border-radius:999px;padding:3px 7px;flex:0 0 auto}
+.note{color:#6a7691;font-size:11.5px;line-height:1.8;margin-top:18px}
+.note b{color:#9fb0d4}
+.toggles{margin-top:16px;border-top:1px solid #1b2334;padding-top:14px;display:flex;flex-direction:column;gap:9px}
+.toggles label{display:flex;align-items:center;gap:9px;font-size:12px;color:#9aa7c0;cursor:pointer}
+.toggles input{accent-color:#7590ff;width:15px;height:15px}
+@media(max-width:900px){.main{grid-template-columns:1fr}.phone{width:100%;border-radius:0;padding:0;background:none;box-shadow:none}
+  .shell{border-radius:0}.screen{width:100%;height:78vh;min-height:560px}}
+
+/* ─── 모아챗 ─── */
+.sbar{height:26px;flex:0 0 26px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;
+  font-size:11px;font-weight:700;background:#f6f4f0;color:#4a5560}
+.sbar.pale{background:#b8cad6;color:#3f4a52}
+.sbar.dark{background:#000;color:#8d9aa4}
+.app{flex:1;min-height:0;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.rhd{height:60px;flex:0 0 60px;background:#b8cad6;display:flex;align-items:center;padding:0 16px;gap:13px}
+.rhd .bk{font-size:31px;line-height:1;color:#27242a}
+.rhd .ttl{flex:1;font-size:19px;font-weight:700}
+.rhd .ic{font-size:21px;cursor:pointer}
+.msgs{flex:1;min-height:0;overflow-y:auto;background:#b8cad6;padding:16px 16px 24px}
+.msgs::-webkit-scrollbar{width:0}
+.pill{width:fit-content;margin:0 auto 20px;background:#a6b8c5;color:#fff;font-size:12px;border-radius:20px;padding:5px 16px}
+.pill.mid{margin:4px auto 18px}
+.m{display:flex;align-items:flex-start;margin-bottom:15px}
+.m.fresh{animation:pop .22s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.m .mav{width:36px;height:36px;border-radius:13px;background:#9fb0bd;color:#fff;font-weight:700;display:flex;align-items:center;
+  justify-content:center;font-size:14px;margin-right:8px;flex:0 0 auto}
+.m .bd{flex:1;min-width:0}
+.m .who{font-size:13px;margin-bottom:5px}
+.ln{display:flex;align-items:flex-end}
+.ln.mine{flex-direction:row-reverse}
+.bub{border-radius:14px;padding:10px 13px;max-width:76%;font-size:15px;line-height:1.45}
+.bub.me{background:#f7db51;border-top-right-radius:3px}
+.bub.you{background:#fff;border-top-left-radius:3px}
+.meta{margin:0 5px;text-align:right;flex:0 0 auto}
+.meta .un{color:#836a0d;font-size:12px;display:block;font-weight:700}
+.meta .tt{font-size:10px;color:#647686}
+.typing{background:#fff;border-radius:14px;border-top-left-radius:3px;padding:13px 15px;display:inline-flex;gap:5px;align-items:center}
+.typing i{width:7px;height:7px;border-radius:4px;background:#9aa8b4;display:block;animation:bl 1.15s infinite}
+.typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+@keyframes bl{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.comp{min-height:60px;flex:0 0 auto;background:#fff;display:flex;align-items:center;gap:9px;padding:8px 12px}
+.comp .plus{font-size:25px;color:#999;width:26px;text-align:center}
+.comp input{flex:1;min-width:0;height:42px;background:#f5f5f5;border:0;border-radius:15px;padding:0 14px;font-size:15px;
+  font-family:inherit;outline:none;color:#27242a}
+.comp button{background:#f7db51;border:0;border-radius:9px;padding:11px 14px;font-weight:700;color:#27242a;font-size:14px;cursor:pointer}
+.cuezone{position:absolute;left:0;bottom:0;width:96px;height:84px;z-index:20;cursor:pointer}
+.cuezone.show{border:2px dashed rgba(247,219,81,.95);background:rgba(39,36,42,.5);border-radius:0 14px 0 0;
+  display:flex;align-items:center;justify-content:center;text-align:center}
+.cuezone.show::after{content:"숨김 큐\A여기를 탭";white-space:pre;color:#f7db51;font-size:10px;font-weight:800;line-height:1.5}
+.staff{position:absolute;left:0;right:0;bottom:60px;z-index:15;background:rgba(39,36,42,.93);color:#f3efe2;
+  padding:8px 13px;display:flex;align-items:center;gap:10px;font-size:11px}
+.staff b{color:#f7db51;font-weight:800;flex:0 0 auto}
+.staff span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#d8d3c6}
+.staff em{font-style:normal;color:#9f9a8d;flex:0 0 auto}
+/* 대본 패널 */
+.sheet{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:40;display:flex;align-items:flex-end}
+.panel{width:100%;max-height:94%;background:#fff;border-radius:22px 22px 0 0;display:flex;flex-direction:column;
+  animation:up .24s ease-out;overflow:hidden}
+@keyframes up{from{transform:translateY(26px)}to{transform:none}}
+.ptop{display:flex;align-items:center;gap:12px;padding:16px 18px 0}
+.ptop h3{margin:0;font-size:18px;font-weight:800;flex:1}
+.ptop .x{font-size:26px;color:#8b8790;cursor:pointer;line-height:1}
+.ptabs{display:flex;gap:16px;padding:12px 18px 0}
+.ptabs span{font-size:13.5px;color:#a9a7aa;padding-bottom:9px;border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap}
+.ptabs span.on{color:#27242a;font-weight:800;border-bottom-color:#f7db51}
+.pbody{flex:1;min-height:0;overflow-y:auto;padding:14px 18px 10px}
+.pbody::-webkit-scrollbar{width:0}
+.help{font-size:11.5px;color:#8b8790;line-height:1.75;background:#f6f4f0;border-radius:11px;padding:11px 13px;margin-bottom:12px}
+.help b{color:#5c5861}
+textarea.paste{width:100%;min-height:200px;border:1px solid #e0ddd8;border-radius:12px;padding:12px;font-family:inherit;
+  font-size:13.5px;line-height:1.7;color:#27242a;resize:vertical;outline:none}
+textarea.paste:focus{border-color:#d8c04a}
+/* 대본 줄 */
+.prow{padding:9px 7px;border-bottom:1px solid #f1efec;border-radius:9px}
+.prow.next{background:#fffbe8;border-bottom-color:transparent}
+.prow.past{background:#f7f9fa}
+.r1{display:flex;align-items:flex-start;gap:8px}
+.r1 .num{width:17px;font-size:10px;color:#b4b0b7;flex:0 0 auto;text-align:right;font-variant-numeric:tabular-nums;padding-top:5px}
+.prow.next .num{color:#846c10;font-weight:800}
+.who-btn{flex:0 0 auto;min-width:42px;text-align:center;font-size:11px;font-weight:800;border-radius:8px;padding:5px 7px;cursor:pointer;border:1px solid transparent}
+.who-btn.you{background:#edf1f3;color:#5a6a76;border-color:#dfe5e9}
+.who-btn.me{background:#fdf3c8;color:#846c10;border-color:#f0e09a}
+.r1 .tx{flex:1;min-width:0;font-size:13.5px;line-height:1.5;word-break:break-all;padding-top:3px}
+.r1 .del{flex:0 0 auto;color:#c3bfc7;font-size:17px;cursor:pointer;padding:0 2px}
+.r2{display:flex;align-items:center;gap:6px;margin:7px 0 0 25px;flex-wrap:wrap}
+.chip{font-size:10.5px;border-radius:7px;padding:4px 8px;cursor:pointer;font-variant-numeric:tabular-nums;border:1px solid transparent}
+.chip.state{background:#e7f0e9;color:#4a7256;border-color:#d4e4d8}
+.chip.state.wait{background:#f4f2ef;color:#8a8690;border-color:#e8e5e1}
+.chip.time{background:#eef2f6;color:#56646f;border-color:#e0e7ed}
+.chip.time.set{background:#e4ecf6;color:#2f5480;border-color:#c9daee;font-weight:700}
+.chip.gap{background:#f4f2ef;color:#8a8690}
+.chip input{border:0;background:transparent;font:inherit;width:62px;outline:none;color:#2f5480;font-weight:700}
+.dateline{display:flex;align-items:center;gap:8px;padding:10px 7px;border-bottom:1px solid #f1efec}
+.dateline .dl{flex:1;text-align:center;font-size:11.5px;color:#7a8893;background:#eef1f3;border-radius:20px;padding:5px 10px}
+.split{display:flex;align-items:center;gap:8px;margin:4px 0 8px;color:#a4651f;font-size:10.5px;font-weight:800}
+.split::before,.split::after{content:"";flex:1;height:1px;background:#f0dcc0}
+/* 시간 탭 */
+.field{margin-bottom:13px}
+.field label{display:block;font-size:11.5px;color:#8b8790;margin-bottom:6px}
+.field input,.field select{width:100%;border:1px solid #e0ddd8;border-radius:10px;padding:11px 12px;font-family:inherit;
+  font-size:14px;color:#27242a;outline:none;background:#fff}
+.field input:focus,.field select:focus{border-color:#d8c04a}
+.row2{display:flex;gap:9px}
+.row2 .field{flex:1}
+.seg{display:flex;gap:6px}
+.seg span{flex:1;text-align:center;font-size:11.5px;font-weight:700;color:#7d7984;background:#f4f2ef;border-radius:9px;
+  padding:10px 4px;cursor:pointer;border:1px solid transparent}
+.seg span.on{background:#27242a;color:#f7db51;border-color:#27242a}
+.pfoot{flex:0 0 auto;border-top:1px solid #efedea;padding:11px 16px;display:flex;gap:8px;align-items:center;background:#fff}
+.btn{border:0;border-radius:11px;padding:13px 14px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer}
+.btn.main{background:#f7db51;color:#27242a;flex:1}
+.btn.ghost{background:#f1efec;color:#5c5861}
+.btn.warn{background:#fdeceb;color:#a4453f}
+.btn.on{background:#27242a;color:#f7db51}
+/* 잠금화면 */
+.lock{flex:1;background:linear-gradient(170deg,#0e1419,#1b242c 55%,#27333c);display:flex;flex-direction:column;align-items:center;
+  color:#fff;padding:0 14px;position:relative}
+.lock .d{margin-top:46px;font-size:14px;color:#c3cfd8}
+.lock .t{font-size:74px;font-weight:200;letter-spacing:-2px;line-height:1.04}
+.nstack{width:100%;margin-top:26px;display:flex;flex-direction:column;gap:9px}
+.noti{background:rgba(252,252,252,.95);border-radius:19px;padding:12px 14px;color:#27242a;cursor:pointer;
+  box-shadow:0 10px 26px rgba(0,0,0,.33);animation:slide .34s ease-out}
+@keyframes slide{from{transform:translateY(-12px);opacity:0}to{transform:none;opacity:1}}
+.noti .nh{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+.noti .nlogo{flex:0 0 auto;display:block}
+.noti .nt{font-size:10px;color:#9b979f;margin-left:auto}
+.noti .nf{font-size:14px;font-weight:800}
+.noti .nm{font-size:13.5px;color:#4a464f;line-height:1.5}
+.noti .more{font-size:11px;color:#8a8690;margin-top:7px;padding-top:7px;border-top:1px solid #eceaee}
+.lock .hint{margin-top:auto;margin-bottom:24px;font-size:11px;color:#93a8b4;text-align:center;line-height:1.75}
+.lockcue{position:absolute;left:0;bottom:0;width:96px;height:84px;cursor:pointer;z-index:5}
+.lockcue.show{border:2px dashed rgba(247,219,81,.8);border-radius:0 14px 0 0}
+.toast{position:absolute;left:18px;right:18px;bottom:104px;background:rgba(39,36,42,.95);color:#f7db51;font-size:12px;
+  font-weight:700;text-align:center;padding:11px 13px;border-radius:12px;animation:slide .2s ease-out;z-index:30}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>모아챗 · 준비된 메시지 <span>제안 미리보기 — APK 아직 아님</span></h1>
+  <div class="badge">시간 설정 · 이전 대화 추가됨</div>
+</header>
+<main class="main">
+  <div class="stage">
+    <div class="phone"><div class="shell"><div class="screen">
+      <div class="sbar pale" id="sbar"></div>
+      <div class="app" id="app"></div>
+    </div></div></div>
+    <p class="cap" id="cap"></p>
+  </div>
+  <aside class="side">
+    <h2>장면 고르기</h2>
+    <div class="scenes" id="scenes"></div>
+    <div class="toggles">
+      <label><input type="checkbox" id="showCue" checked> 숨김 큐 영역 표시 (실제로는 안 보임)</label>
+      <label><input type="checkbox" id="showStaff"> 리허설 표시 (스태프 확인용 · <b style="color:#ffd79a">실제 촬영 화면엔 안 나옴</b>)</label>
+      <label><input type="checkbox" id="showTyping" checked> 상대 '입력 중…' 연출</label>
+      <label><input type="checkbox" id="showRead" checked> 읽음(1) 사라지는 연출</label>
+    </div>
+    <p class="note">
+      왼쪽 폰을 <b>직접 조작해 보실 수 있습니다.</b> 대화방 왼쪽 아래 <b>숨김 큐</b>를 누르면 대본이 한 줄씩 나갑니다.
+      헤더 <b>☰</b> 로 대본·시간 설정이 열립니다.<br><br>
+      <b style="color:#ffd79a">촬영 화면에는 대본 개수·상태 같은 건 하나도 안 나옵니다.</b>
+      위의 '리허설 표시'를 켤 때만 보이고, 진행 상황은 ☰ 대본 패널을 열면 확인할 수 있습니다. 큐를 누르면 짧은 진동으로 알려줍니다.
+    </p>
+  </aside>
+</main>
+<script>
+/* ───────── 기본값 ───────── */
+const PEER = '서정우';
+const SAMPLE = `=== 어제 ===
+상대: 내일 그 서류 꼭 챙겨와
+나: 알겠어 걱정 마
+=== 오늘 ===
+상대: 어디야? 지금 출발함
+나: 거의 다 왔어. 5분만
+--- 촬영 시작 ---
+상대: 알겠어. 1층 로비에서 기다릴게
+상대: 아 그리고 그 서류 가져왔지? @4
+나: 응 챙겼어
+상대: 다행이다. 그거 없으면 오늘 못 넘어가`;
+
+let base = { dateLabel: '오늘', time: '23:04', pastGap: 4, flow: 'step' }; // flow: step(+1분) | fixed(고정) | live(실시간)
+let script = [];     // {kind:'msg'|'date', who, text, delay, time(직접지정), label}
+let pastCount = 0;   // 이 개수만큼은 처음부터 보여준다
+let shown = [];      // 화면에 올라간 것 {kind,who,text,time,unread,fresh,label}
+let cursor = 0;
+let view = 'room', panel = null, typing = false, auto = false, autoTimer = null;
+let pendingNotis = [], draftPaste = SAMPLE, editTime = -1, toastText = '', liveStep = 0;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const opt = id => $(id).checked;
+
+/* ───────── 시간 ───────── */
+function toMin(hhmm){ const m=String(hhmm||'').match(/^(\d{1,2})\s*:\s*(\d{1,2})$/); if(!m) return 23*60+4;
+  return (Math.min(23,+m[1]))*60 + Math.min(59,+m[2]); }
+function fmt(min){ min=((min%1440)+1440)%1440; const h=Math.floor(min/60), mm=String(min%60).padStart(2,'0');
+  return (h<12?'오전 ':'오후 ') + (h%12||12) + ':' + mm; }
+function fmt24(min){ min=((min%1440)+1440)%1440; return String(Math.floor(min/60)).padStart(2,'0')+':'+String(min%60).padStart(2,'0'); }
+// 각 줄의 표시 시각(분). 과거 줄은 기준 시각에서 역산, 큐 줄은 기준 시각부터 흐름대로.
+function lineMinutes(i){
+  const msgs = script.map((l,idx)=>({l,idx})).filter(x=>x.l.kind==='msg');
+  const pos = msgs.findIndex(x=>x.idx===i);
+  if(pos<0) return toMin(base.time);
+  const pastMsgs = msgs.filter(x=>x.idx < pastCount).length;
+  const b = toMin(base.time);
+  if(pos < pastMsgs) return b - (pastMsgs - pos) * base.pastGap;
+  const k = pos - pastMsgs;
+  if(base.flow==='fixed') return b;
+  if(base.flow==='live') return b + Math.floor(k/2);
+  return b + k;
+}
+function lineTime(i){ const l=script[i]; return l.time ? l.time : fmt(lineMinutes(i)); }
+
+/* ───────── 대본 파싱 ───────── */
+function parse(text){
+  const out = []; let split = -1;
+  String(text||'').split('\n').forEach(raw=>{
+    let line = raw.trim();
+    if(!line) return;
+    if(/^-{3,}/.test(line.replace(/\s/g,'').replace(/[^-]/g,'-')) && /^[-\s]*(촬영|시작|여기)?[-\s가-힣]*$/.test(line)){ split = out.length; return; }
+    const d = line.match(/^=+\s*(.+?)\s*=+$/);
+    if(d){ out.push({kind:'date', label:d[1]}); return; }
+    let delay = 3;
+    const g = line.match(/\s*(?:@(\d{1,2})초?|\[(\d{1,2})초\])\s*$/);
+    if(g){ delay = Number(g[1]||g[2]); line = line.slice(0, g.index).trim(); }
+    let who = 'you';
+    const m = line.match(/^([^\s:：]{1,8})\s*[:：]\s*(.*)$/);
+    if(m && m[2]){
+      const tag = m[1].trim();
+      who = (tag==='나'||tag==='내가'||tag.toLowerCase()==='me') ? 'me' : 'you';
+      line = m[2].trim();
+    }
+    out.push({kind:'msg', who, text:line, delay});
+  });
+  return { lines: out, split: split < 0 ? out.length : split };
+}
+function load(text){
+  const r = parse(text);
+  script = r.lines; pastCount = Math.min(r.split, script.length);
+  rebuild();
+}
+function rebuild(){
+  shown = []; cursor = 0; pendingNotis = []; typing = false; liveStep = 0;
+  for(let i=0;i<pastCount;i++) pushLine(i, false);
+  cursor = pastCount;
+}
+function pushLine(i, fresh){
+  const l = script[i];
+  if(!l) return;
+  if(l.kind==='date'){ shown.push({kind:'date', label:l.label}); return; }
+  // 이전 대화는 이미 읽은 상태로 둔다. 읽음(1)은 촬영 중 보낸 메시지에만 붙는다.
+  shown.push({kind:'msg', who:l.who, text:l.text, time:lineTime(i), unread:l.who==='me' && !!fresh, fresh:!!fresh});
+}
+
+/* ───────── 화면 조각 ───────── */
+function bubbles(){
+  let html = '';
+  shown.forEach(m=>{
+    if(m.kind==='date'){ html += `<div class="pill mid">${esc(m.label)}</div>`; return; }
+    if(m.who==='me'){
+      html += `<div class="m${m.fresh?' fresh':''}"><div class="bd"><div class="ln mine"><div class="bub me">${esc(m.text)}</div>
+        <div class="meta">${m.unread&&opt('showRead')?'<span class="un">1</span>':''}<span class="tt">${m.time}</span></div></div></div></div>`;
+    } else {
+      html += `<div class="m${m.fresh?' fresh':''}"><div class="mav">${PEER.slice(0,1)}</div><div class="bd"><div class="who">${PEER}</div>
+        <div class="ln"><div class="bub you">${esc(m.text)}</div><div class="meta"><span class="tt">${m.time}</span></div></div></div></div>`;
+    }
+  });
+  if(typing){
+    html += `<div class="m"><div class="mav">${PEER.slice(0,1)}</div><div class="bd"><div class="who">${PEER}</div>
+      <div class="ln"><div class="typing"><i></i><i></i><i></i></div></div></div></div>`;
+  }
+  if(!html) html = `<div class="pill">${esc(base.dateLabel)}</div>`;
+  return html;
+}
+function staffBar(){
+  if(!opt('showStaff')) return '';
+  const total = script.filter(l=>l.kind==='msg').length;
+  const doneN = script.slice(0,cursor).filter(l=>l.kind==='msg').length;
+  let nxt = null;
+  for(let i=cursor;i<script.length;i++) if(script[i].kind==='msg'){ nxt = script[i]; break; }
+  return `<div class="staff"><b>대본 ${Math.min(doneN+1,total)}/${total}</b>
+    <span>${nxt ? (nxt.who==='me'?'나 · ':'상대 · ') + esc(nxt.text) : '대본 끝 — 리셋하면 처음부터'}</span>
+    <em>${auto?'자동 ▶':'수동'}</em></div>`;
+}
+function roomScreen(){
+  return `<div class="rhd"><div class="bk">‹</div><div class="ttl">${PEER}</div>
+      <div class="ic">⌕</div><div class="ic" data-act="panel">☰</div></div>
+    <div class="msgs" id="msgs">${bubbles()}</div>
+    ${staffBar()}
+    <div class="comp"><div class="plus">＋</div><input id="draft" placeholder="메시지 입력"><button data-act="send">전송</button></div>
+    ${toastText?`<div class="toast">${esc(toastText)}</div>`:''}
+    <div class="cuezone${opt('showCue')?' show':''}" data-act="cue"></div>
+    ${panel?panelHtml():''}`;
+}
+
+function progressText(){
+  const total = script.filter(l=>l.kind==='msg').length;
+  const done = script.slice(0,cursor).filter(l=>l.kind==='msg').length;
+  return total ? `${done}/${total}` : '0/0';
+}
+function panelHtml(){
+  let body;
+  if(panel==='paste'){
+    body = `<div class="help">한 줄에 한 메시지씩 붙여넣으면 줄 단위로 잘립니다.<br>
+      · <b>나:</b> 로 시작 → 내 말풍선 / 그 외 → 상대 말풍선<br>
+      · <b>=== 어제 ===</b> → 날짜 구분선<br>
+      · <b>--- 촬영 시작 ---</b> → 윗부분은 처음부터 보이는 <b>이전 대화</b><br>
+      · 줄 끝 <b>@4</b> → 자동 재생 간격 4초</div>
+      <textarea class="paste" id="pasteBox">${esc(draftPaste)}</textarea>`;
+  } else if(panel==='time'){
+    body = `<div class="help">여기서 정한 시각이 <b>말풍선 시각 · 날짜 구분선 · 잠금화면 시계 · 상태바 시계</b>에 한꺼번에 적용됩니다.</div>
+      <div class="row2">
+        <div class="field"><label>기준 시각 (24시간)</label><input id="fTime" value="${esc(base.time)}" placeholder="23:04"></div>
+        <div class="field"><label>날짜 구분선 문구</label><input id="fDate" value="${esc(base.dateLabel)}" placeholder="오늘"></div>
+      </div>
+      <div class="field"><label>이전 대화 간격 — 한 줄당 ${base.pastGap}분씩 거슬러 올라갑니다</label>
+        <div class="seg">${[1,2,4,10,30].map(v=>`<span class="${base.pastGap===v?'on':''}" data-gap="${v}">${v}분</span>`).join('')}</div></div>
+      <div class="field"><label>새로 오는 메시지 시각</label>
+        <div class="seg">
+          <span class="${base.flow==='step'?'on':''}" data-flow="step">1분씩 증가</span>
+          <span class="${base.flow==='live'?'on':''}" data-flow="live">천천히</span>
+          <span class="${base.flow==='fixed'?'on':''}" data-flow="fixed">전부 같은 시각</span></div></div>
+      <div class="help">줄마다 다르게 쓰고 싶으면 <b>목록</b> 탭에서 그 줄의 시각을 눌러 직접 입력하세요. 직접 넣은 줄은 파란색으로 표시됩니다.</div>`;
+  } else {
+    body = `<div class="help">말풍선 색은 <b>상대/나</b>, 처음부터 보일지는 <b>보임/대기</b>, 시각은 <b>시각 칩</b>을 눌러 바꿉니다.</div>` +
+      (script.length ? script.map((l,i)=>{
+        if(l.kind==='date') return `<div class="dateline"><span class="num" style="width:17px;font-size:10px;color:#b4b0b7;text-align:right">${i+1}</span>
+          <span class="dl">${esc(l.label)}</span><span class="del" data-del="${i}" style="color:#c3bfc7;font-size:17px;cursor:pointer">×</span></div>`;
+        const past = i < pastCount;
+        const split = i === pastCount ? '<div class="split">여기부터 촬영 중 · 큐로 나감</div>' : '';
+        const t = l.time ? l.time : fmt(lineMinutes(i));
+        return split + `<div class="prow ${past?'past':''} ${i===cursor?'next':''}">
+          <div class="r1"><span class="num">${i+1}</span>
+            <span class="who-btn ${l.who==='me'?'me':'you'}" data-flip="${i}">${l.who==='me'?'나':'상대'}</span>
+            <span class="tx">${esc(l.text)}</span><span class="del" data-del="${i}">×</span></div>
+          <div class="r2">
+            <span class="chip state ${past?'':'wait'}" data-split="${i}">${past?'보임':'대기'}</span>
+            ${editTime===i
+              ? `<span class="chip time set"><input id="timeIn" value="${esc(t)}" autocomplete="off"></span>`
+              : `<span class="chip time ${l.time?'set':''}" data-time="${i}">${esc(t)}</span>`}
+            <span class="chip gap" data-delay="${i}">${l.delay}초</span>
+          </div></div>`;
+      }).join('') + (pastCount>=script.length?'<div class="split">여기부터 촬영 중 · 큐로 나감</div>':'')
+      : '<div class="help">대본이 비어 있습니다. 붙여넣기 탭에서 넣어주세요.</div>');
+  }
+  const foot = panel==='paste'
+    ? `<button class="btn main" data-act="apply">대본으로 만들기</button><button class="btn ghost" data-act="close">닫기</button>`
+    : panel==='time'
+    ? `<button class="btn main" data-act="savetime">시간 적용</button><button class="btn ghost" data-act="close">닫기</button>`
+    : `<button class="btn ${auto?'on':'main'}" data-act="auto">${auto?'자동 재생 멈춤 ■':'자동 재생 ▶'}</button>
+       <button class="btn warn" data-act="reset">재촬영 리셋 ↺</button>
+       <button class="btn ghost" data-act="close">닫기</button>`;
+  return `<div class="sheet"><div class="panel">
+      <div class="ptop"><h3>촬영 대본</h3><span style="font-size:11.5px;font-weight:800;color:#846c10;background:#fdf3c8;border-radius:8px;padding:5px 9px">${progressText()}</span><div class="x" data-act="close">×</div></div>
+      <div class="ptabs"><span class="${panel==='paste'?'on':''}" data-tab="paste">붙여넣기</span>
+        <span class="${panel==='list'?'on':''}" data-tab="list">목록${script.length?' ('+script.length+')':''}</span>
+        <span class="${panel==='time'?'on':''}" data-tab="time">시간·날짜</span></div>
+      <div class="pbody">${body}</div>
+      <div class="pfoot">${foot}</div></div></div>`;
+}
+
+function lockScreen(){
+  const list = pendingNotis.slice(-3);
+  const extra = pendingNotis.length - list.length;
+  const b = toMin(base.time);
+  return `<div class="lock">
+    <div class="d">${esc(base.dateLabel)}</div><div class="t">${fmt24(b).replace(/^0/,'')}</div>
+    <div class="nstack">${list.map((n,i)=>`<div class="noti" data-act="open">
+      <div class="nh"><svg class="nlogo" viewBox="0 0 1024 1024" width="22" height="22" aria-hidden="true"><defs><linearGradient id="mb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE979"/><stop offset=".55" stop-color="#F9D64F"/><stop offset="1" stop-color="#EFC32B"/></linearGradient><linearGradient id="mi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#322E38"/><stop offset="1" stop-color="#211E26"/></linearGradient></defs><rect width="1024" height="1024" rx="232" fill="url(#mb)"/><rect x="14" y="14" width="996" height="996" rx="220" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="20"/><path d="M512 290c-156 0-282 94-282 210 0 70 46 132 117 170l-34 128c-4 16 13 29 27 21l175-94c10 1 21 1 31 1 156 0 282-94 282-209S668 290 512 290z" fill="url(#mi)"/><circle cx="394" cy="499" r="41" fill="#FFE066"/><circle cx="512" cy="499" r="41" fill="#FFE066"/><circle cx="630" cy="499" r="41" fill="#FFE066"/></svg><div class="nf">${PEER}</div><div class="nt">지금</div></div>
+      <div class="nm">${esc(n.text)}</div>
+      ${extra>0&&i===0?`<div class="more">이전 메시지 ${extra}개 더</div>`:''}</div>`).join('')}</div>
+    ${pendingNotis.length?'':'<div style="margin-top:30px;font-size:12px;color:#8ba0ad">왼쪽 아래 숨김 큐를 누르면 알림이 옵니다</div>'}
+    <div class="hint">화면이 꺼져 있어도 알림이 뜨고,<br>알림에서 대화 내용이 바로 보입니다. 누르면 대화방으로 들어갑니다.</div>
+    ${toastText?`<div class="toast">${esc(toastText)}</div>`:''}
+    <div class="lockcue${opt('showCue')?' show':''}" data-act="cue"></div></div>`;
+}
+
+/* ───────── 렌더 ───────── */
+function paint(){
+  const clockTxt = fmt24(toMin(base.time)).replace(/^0/,'');
+  $('sbar').className = view==='lock' ? 'sbar dark' : 'sbar pale';
+  $('sbar').innerHTML = `<span>${clockTxt}</span><em style="font-style:normal;letter-spacing:1px">▮▮▮ ◗</em>`;
+  $('app').innerHTML = view==='lock' ? lockScreen() : roomScreen();
+  wire();
+  const box = $('msgs'); if(box) box.scrollTop = box.scrollHeight;
+  const ti = $('timeIn'); if(ti){ ti.focus(); ti.select(); }
+}
+// 안내 문구도 리허설 표시가 켜져 있을 때만 뜬다. 촬영 중에는 화면에 아무것도 나오지 않는다.
+function toast(msg){ if(!opt('showStaff')) return; toastText = msg; paint(); setTimeout(()=>{ toastText=''; paint(); }, 2300); }
+
+function wire(){
+  const app = $('app');
+  app.querySelectorAll('[data-act]').forEach(n=>n.addEventListener('click', e=>{
+    e.stopPropagation();
+    const a = n.dataset.act;
+    if(a==='cue') return next();
+    if(a==='panel'){ stopAuto(); panel='list'; return paint(); }
+    if(a==='close'){ keepPaste(); commitTime(); panel=null; editTime=-1; return paint(); }
+    if(a==='apply'){ draftPaste = app.querySelector('#pasteBox').value; load(draftPaste); panel='list'; return paint(); }
+    if(a==='savetime'){
+      const t = app.querySelector('#fTime').value.trim(), d = app.querySelector('#fDate').value.trim();
+      if(!/^\d{1,2}\s*:\s*\d{1,2}$/.test(t)) return toast('시각은 23:04 처럼 입력하세요');
+      base.time = t; base.dateLabel = d || '오늘';
+      rebuild(); panel='list'; return paint();
+    }
+    if(a==='auto'){ auto ? stopAuto() : startAuto(); return paint(); }
+    if(a==='reset'){ stopAuto(); rebuild(); return paint(); }
+    if(a==='send'){
+      const input = app.querySelector('#draft'); const t=(input.value||'').trim(); if(!t) return;
+      shown.push({kind:'msg', who:'me', text:t, time:fmt(toMin(base.time)+liveStep++), unread:true, fresh:true}); return paint();
+    }
+    if(a==='open'){ view='room'; pendingNotis=[]; shown.forEach(m=>{ if(m.who==='me') m.unread=false; }); return paint(); }
+  }));
+  app.querySelectorAll('[data-tab]').forEach(n=>n.addEventListener('click',()=>{ keepPaste(); commitTime(); panel=n.dataset.tab; paint(); }));
+  app.querySelectorAll('[data-flip]').forEach(n=>n.addEventListener('click',()=>{
+    const i=+n.dataset.flip; script[i].who = script[i].who==='me'?'you':'me'; rebuild(); paint(); }));
+  app.querySelectorAll('[data-split]').forEach(n=>n.addEventListener('click',()=>{
+    const i=+n.dataset.split; pastCount = (i < pastCount) ? i : i+1; rebuild(); paint(); }));
+  app.querySelectorAll('[data-time]').forEach(n=>n.addEventListener('click',()=>{ commitTime(); editTime=+n.dataset.time; paint(); }));
+  app.querySelectorAll('[data-delay]').forEach(n=>n.addEventListener('click',()=>{
+    const i=+n.dataset.delay, steps=[1,2,3,5,8,12];
+    script[i].delay = steps[(steps.indexOf(script[i].delay)+1)%steps.length]; paint(); }));
+  app.querySelectorAll('[data-del]').forEach(n=>n.addEventListener('click',()=>{
+    const i=+n.dataset.del; script.splice(i,1); if(pastCount>script.length) pastCount=script.length; rebuild(); paint(); }));
+  app.querySelectorAll('[data-gap]').forEach(n=>n.addEventListener('click',()=>{ base.pastGap=+n.dataset.gap; rebuild(); paint(); }));
+  app.querySelectorAll('[data-flow]').forEach(n=>n.addEventListener('click',()=>{ base.flow=n.dataset.flow; rebuild(); paint(); }));
+  const ti = app.querySelector('#timeIn');
+  if(ti) ti.addEventListener('keydown', e=>{ if(e.key==='Enter'){ commitTime(); paint(); } });
+  const input = app.querySelector('#draft');
+  if(input) input.addEventListener('keydown',e=>{ if(e.key==='Enter') app.querySelector('[data-act="send"]').click(); });
+}
+function keepPaste(){ const b=$('app').querySelector('#pasteBox'); if(b) draftPaste=b.value; }
+function commitTime(){
+  const ti = $('app') && $('app').querySelector('#timeIn');
+  if(ti && editTime>=0 && script[editTime]){
+    const v = ti.value.trim();
+    script[editTime].time = v || undefined;
+    const n = shownIndexOf(editTime);
+    if(n>=0 && shown[n]) shown[n].time = lineTime(editTime);
+  }
+  editTime = -1;
+}
+function shownIndexOf(i){ return i < pastCount ? i : -1; }
+
+/* ───────── 큐 ───────── */
+function next(){
+  while(cursor < script.length && script[cursor].kind==='date'){ pushLine(cursor++, true); }
+  if(cursor >= script.length){ if(view!=='lock') toast('대본이 끝났습니다 · 리셋하면 처음부터'); return; }
+  const i = cursor, line = script[i];
+  if(line.who==='me' && view==='lock'){ toast('다음 줄은 내 메시지입니다 · 대화방에서 보내세요'); return; }
+  cursor++;
+  if(line.who==='me'){
+    pushLine(i, true); paint();
+    if(opt('showRead')) setTimeout(()=>{ for(let k=shown.length-1;k>=0;k--) if(shown[k].who==='me'){ shown[k].unread=false; break; } paint(); }, 2200);
+    return;
+  }
+  if(view==='lock'){ pendingNotis.push(line); pushLine(i, true); paint(); return; }
+  if(opt('showTyping')){
+    typing = true; paint();
+    setTimeout(()=>{ typing=false; pushLine(i, true); shown.forEach(m=>{ if(m.who==='me') m.unread=false; }); paint(); },
+      900 + Math.min(1600, line.text.length*55));
+  } else { pushLine(i, true); paint(); }
+}
+function startAuto(){
+  auto = true; stopAuto(true);
+  const tick = ()=>{
+    if(!auto || cursor>=script.length){ auto=false; paint(); return; }
+    const d = (script[cursor] && script[cursor].delay) || 3;
+    next();
+    autoTimer = setTimeout(tick, d*1000);
+  };
+  autoTimer = setTimeout(tick, 400);
+}
+function stopAuto(keep){ if(autoTimer){ clearTimeout(autoTimer); autoTimer=null; } if(!keep) auto=false; }
+
+/* ───────── 장면 ───────── */
+const SCENES = [
+  { id:'room', label:'대화방 · 이전 대화가 보이는 상태', cap:'촬영 시작 상태. 어제·오늘 주고받은 이전 대화가 이미 쌓여 있고, 왼쪽 아래 숨김 큐만 다음 메시지를 기다립니다.',
+    run(){ load(SAMPLE); panel=null; view='room'; } },
+  { id:'paste', label:'대본 붙여넣기', cap:'대사를 한 번에 붙여넣습니다. === 어제 === 는 날짜 구분선, --- 촬영 시작 --- 윗부분은 처음부터 보이는 이전 대화가 됩니다.',
+    run(){ load(SAMPLE); view='room'; panel='paste'; } },
+  { id:'list', label:'목록 · 보임/대기 · 시각', cap:'줄마다 보임(이전 대화)과 대기(큐)를 바꾸고, 시각 칩을 눌러 그 줄만 다른 시각으로 적을 수 있습니다. 노란 줄이 다음 차례입니다.',
+    run(){ load(SAMPLE); view='room'; panel='list'; } },
+  { id:'time', label:'시간 · 날짜 설정', cap:'기준 시각을 정하면 말풍선 시각·날짜 구분선·잠금화면 시계·상태바 시계가 한꺼번에 바뀝니다. 밤 장면을 낮에 찍을 때 쓰는 화면입니다.',
+    run(){ load(SAMPLE); view='room'; panel='time'; } },
+  { id:'cue', label:'숨김 큐로 한 줄씩', cap:'숨김 큐를 누를 때마다 다음 줄이 나갑니다. 상대 메시지는 "입력 중…" 이 잠깐 보였다가 말풍선으로 바뀝니다. 직접 눌러보세요.',
+    run(){ load(SAMPLE); view='room'; panel=null; } },
+  { id:'auto', label:'자동 재생', cap:'정해둔 간격대로 알아서 흘러갑니다. 폰을 내려놔도 되고, 멈추고 싶으면 다시 누르면 됩니다.',
+    run(){ load(SAMPLE); view='room'; panel=null; startAuto(); } },
+  { id:'lock', label:'꺼진 화면 + 알림', cap:'화면이 꺼진 상태에서 큐를 누르면 알림이 쌓입니다. 시계는 설정한 기준 시각을 따릅니다. 알림을 누르면 이전 대화가 보이는 대화방으로 들어갑니다.',
+    run(){ load(SAMPLE); view='lock'; panel=null; } },
+  { id:'reset', label:'재촬영 리셋', cap:'리셋하면 이전 대화만 남고 큐는 처음으로 돌아갑니다. 대본과 시간 설정은 그대로입니다.',
+    run(){ load(SAMPLE); view='room'; panel='list'; next(); setTimeout(()=>{ if(location.hash==='#reset'){ next(); paint(); } }, 400); } },
+];
+function go(id){
+  const s = SCENES.find(x=>x.id===id) || SCENES[0];
+  stopAuto(); editTime=-1; toastText='';
+  document.querySelectorAll('.scenes button').forEach(b=>b.classList.toggle('on', b.dataset.id===s.id));
+  $('cap').textContent = s.cap;
+  try{ history.replaceState(null,'','#'+s.id); }catch(e){}
+  s.run(); paint();
+}
+$('scenes').innerHTML = SCENES.map((s,i)=>`<button data-id="${s.id}"><i>${String(i+1).padStart(2,'0')}</i><span>${s.label}</span></button>`).join('');
+$('scenes').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.id)));
+['showCue','showStaff','showTyping','showRead'].forEach(id=>$(id).addEventListener('change',paint));
+go((location.hash||'').replace('#','') || 'room');
+</script>
+</body>
+</html>
