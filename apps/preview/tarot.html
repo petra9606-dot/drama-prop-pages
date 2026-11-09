@@ -3,19 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#190624">
+<meta name="theme-color" content="#091523">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <title>오늘의 타로</title>
-<link rel="preload" as="image" href="../tarot-assets/card-back.png">
-<link rel="preload" as="image" href="../tarot-assets/death-card.png">
-<link rel="preload" as="image" href="../tarot-assets/king-card.png">
-<link rel="stylesheet" href="tarot.css">
-<script src="tarot.js" defer></script>
+<link rel="preload" as="image" href="../tarot-assets/card-back-v5.png">
+<link rel="preload" as="image" href="../tarot-assets/death-card-v5.png">
+<link rel="preload" as="image" href="../tarot-assets/king-card-v5.png">
+<link rel="stylesheet" href="tarot.css?v=5">
+<script src="tarot.js?v=5" defer></script>
 </head>
-<body class="loading">
+<body class="loading opening">
 <main class="tarot-app">
   <div class="backdrop" aria-hidden="true"><span class="moon"></span><span class="orbit"></span><span class="lower-orbit"></span><svg class="constellation" viewBox="0 0 112 88"><path d="M9 14 43 29 74 13 96 52 60 76"/><circle cx="9" cy="14" r="2"/><circle cx="43" cy="29" r="2"/><circle cx="74" cy="13" r="3"/><circle cx="96" cy="52" r="2"/><circle cx="60" cy="76" r="2"/></svg></div>
   <header class="app-header"><h1><button id="title">오늘의 타로</button></h1><p id="sub">카드를 준비하고 있습니다</p></header>
+  <section id="opening" class="opening-view" aria-labelledby="opening-title">
+    <h2 id="opening-title">당신의 오늘<br>하루 운세는?</h2>
+    <span class="opening-rule" aria-hidden="true">✦</span>
+    <p>마음을 가다듬고 카드를 골라보세요</p>
+    <img src="../tarot-assets/card-back-v5.png" alt="오늘의 타로 카드 뒷면" width="192" height="288">
+    <button id="start-reading" class="gold-button">카드 한 장 뽑기</button>
+  </section>
   <div id="deck" class="deck" role="group" aria-label="타로 카드 스무 장"></div>
   <footer class="app-footer"><section class="result" id="result" aria-live="polite"><b id="rname"></b><div class="divider"></div><p id="rtext"></p><button id="reset" class="reset">↻ 다시 선택하기</button></section><p id="hint" class="hint">카드를 준비하고 있습니다</p></footer>
 </main>

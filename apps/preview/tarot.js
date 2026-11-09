@@ -1,6 +1,6 @@
 const REDUCED_MOTION=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const N=20,CW=68,CENTER_Y=-10,BIG=2.8;let STEP=14;
-const CARDS=[{image:'../tarot-assets/death-card.png',name:'DEATH',sym:'☠',num:'XIII',text:'무엇을 바라든 이루어지지 않을 것이다'},{image:'../tarot-assets/king-card.png',name:'KING',sym:'♛',num:'IV',text:'화려한 조명을 받는 오늘, 당신이 세상의 주인공'}];
+const N=20,CW=68,CENTER_Y=-10;let BIG=2.8,STEP=14;
+const CARDS=[{image:'../tarot-assets/death-card-v5.png',name:'DEATH',sym:'☠',num:'XIII',text:'무엇을 바라든 이루어지지 않을 것이다'},{image:'../tarot-assets/king-card-v5.png',name:'KING',sym:'♛',num:'IV',text:'화려한 조명을 받는 오늘, 당신이 세상의 주인공'}];
 const OPTIONS={delay:[[3000,'3.0초'],[3500,'3.5초'],[4000,'4.0초']],shuffle:[['light','LIGHT'],['normal','NORMAL'],['wild','WILD']],pace:[[.75,'빠르게'],[1,'보통'],[1.35,'느리게'],[1.75,'아주 느리게']],reveal:[['flip','FLIP'],['fade','FADE'],['flipGlow','FLIP + GLOW']],sound:[[true,'ON'],[false,'OFF']]};
 const settings={delay:3500,shuffle:'normal',pace:1,reveal:'flipGlow',sound:true};
 try{const saved=JSON.parse(localStorage.getItem('today-tarot-web-settings-v1'));for(const key in OPTIONS)if(OPTIONS[key].some(([v])=>v===saved?.[key]))settings[key]=saved[key]}catch(e){}
@@ -21,13 +21,13 @@ const halo=document.createElement('div');halo.className='halo';deck.appendChild(
 const cards=[];
 for(let i=0;i<N;i++){
   const el=document.createElement('button');el.type='button';el.className='card';el.disabled=true;el.setAttribute('aria-label',(i+1)+'번 카드 선택');el.addEventListener('click',e=>{if(e.detail===0)choose(i)});
-  el.innerHTML='<div class="aura"></div><div class="flipper"><div class="face cback"><img class="art" src="../tarot-assets/card-back.png" alt=""><div class="shine"></div></div><div class="face front"><img class="art" alt=""><span class="num"></span><span class="sym"></span><span class="nm"></span><div class="veil"></div></div></div>';
+  el.innerHTML='<div class="aura"></div><div class="flipper"><div class="face cback"><img class="art" src="../tarot-assets/card-back-v5.png" alt=""><div class="shine"></div></div><div class="face front"><img class="art" alt=""><span class="num"></span><span class="sym"></span><span class="nm"></span><div class="veil"></div></div></div>';
   deck.appendChild(el);
   const d=Math.abs(i-9.5)/9.5;
   cards.push({el,flipper:el.querySelector('.flipper'),back:el.querySelector(".cback"),front:el.querySelector('.front'),veil:el.querySelector('.veil'),shine:el.querySelector('.shine'),aura:el.querySelector('.aura'),
     x:(i-9.5)*STEP,y:d*d*34,r:(i-9.5)*1.1,press:0,enter:0,ord:i,kx:stillKeys(0),ky:stillKeys(0),kr:stillKeys(0),ks:stillKeys(1)});
 }
-let phase='shuffling',hovered=null,selected=null,draw=0,start=0,plan=null,cues=[];
+let phase='opening',hovered=null,selected=null,draw=0,start=0,plan=null,cues=[];
 const V={lift:0,focus:0,shake:0,shuffle:0,hover:0,aura:0,halo:0,emph:0,move:0,exit:0,flip:0,fade:0,veil:1};
 const ease={lin:t=>t,sin:t=>-(Math.cos(Math.PI*t)-1)/2,out3:t=>1-Math.pow(1-t,3),io3:t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,outq:t=>1-(1-t)*(1-t)};
 // track: [[time,value,easing?],...] value held before first / after last
@@ -96,11 +96,13 @@ function buildScatter(){
   for(let i=ord.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ord[i],ord[j]]=[ord[j],ord[i]];}
   cards.forEach((c,i)=>c.ord=ord[i]);
 }
-function startShuffle(resetDraw=false){cues.forEach(clearTimeout);cues=[];if(resetDraw)draw=0;phase='shuffling';cards.forEach(c=>c.el.disabled=true);selected=null;result.classList.remove('show');Object.assign(V,{lift:0,focus:0,shake:0,shuffle:0,hover:0,aura:0,halo:0,emph:0,move:0,exit:0,flip:0,fade:0,veil:1});cards.forEach(c=>{c.press=0});buildScatter();plan=buildShufflePlan(settings);start=performance.now();sub.textContent='운명의 카드를 섞고 있습니다';hint.textContent='카드를 섞고 있습니다';play('shuffle');
+function startShuffle(resetDraw=false){document.body.classList.remove('opening');$('opening').hidden=true;cues.forEach(clearTimeout);cues=[];if(resetDraw)draw=0;phase='shuffling';cards.forEach(c=>c.el.disabled=true);selected=null;result.classList.remove('show');Object.assign(V,{lift:0,focus:0,shake:0,shuffle:0,hover:0,aura:0,halo:0,emph:0,move:0,exit:0,flip:0,fade:0,veil:1});cards.forEach(c=>{c.press=0});buildScatter();plan=buildShufflePlan(settings);start=performance.now();sub.textContent='운명의 카드를 섞고 있습니다';hint.textContent='카드를 섞고 있습니다';play('shuffle');
   cues.push(setTimeout(()=>play('shuffle'),Math.round(plan.T*.45)));
   cues.push(setTimeout(()=>cards.forEach((c,i)=>c.ord=i),Math.round(plan.T*.8)));
   cues.push(setTimeout(()=>{phase='choose';cards.forEach(c=>c.el.disabled=false);plan=null;V.shuffle=0;sub.textContent='마음이 끌리는 카드를 터치하세요';hint.textContent='스무 장의 카드 중 한 장을 선택하세요'},plan.T))}
-function reset(){cards.forEach(c=>{c.enter=0;c.press=0});enterStart=performance.now();startShuffle(true)}
+function reset(){document.body.classList.add('opening');$('opening').hidden=false;cues.forEach(clearTimeout);cues=[];phase='opening';draw=0;selected=null;plan=null;cards.forEach(c=>c.el.disabled=true);result.classList.remove('show');return;}
+function restartDeck(){cards.forEach(c=>{c.enter=0;c.press=0});enterStart=performance.now();startShuffle(true)}
+$('start-reading').onclick=()=>startShuffle(true);
 $('reset').onclick=()=>startShuffle(false);
 let taps=0,tapTimer=null,lp=null;const title=$('title');
 function openSettings(){clearTimeout(lp);lp=null;taps=0;$('settings-dialog').showModal()}
@@ -112,7 +114,7 @@ title.addEventListener('click',e=>{if(e.detail===0)openSettings()});
 $('settings-close').onclick=()=>$('settings-dialog').close();
 $('scene-reset').onclick=()=>{$('settings-dialog').close();reset()};
 $('fullscreen').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen?.().catch(()=>{})};
-function layoutDeck(){const W=deck.clientWidth;DECK_H=deck.clientHeight;STEP=Math.max(8,Math.min(18,(W-CW-12)/(N-1)));ROW_W=STEP*(N-1)+CW;cards.forEach((c,i)=>{c.x=(i-9.5)*STEP});if(phase==='shuffling')buildScatter()}
+function layoutDeck(){const W=deck.clientWidth;DECK_H=deck.clientHeight;BIG=Math.min(4.2,Math.max(1.6,(DECK_H-34)/102),Math.max(1.6,(W-34)/68));STEP=Math.max(8,Math.min(18,(W-CW-12)/(N-1)));ROW_W=STEP*(N-1)+CW;cards.forEach((c,i)=>{c.x=(i-9.5)*STEP});if(phase==='shuffling')buildScatter()}
 window.addEventListener('resize',layoutDeck);layoutDeck();
 
 let enterStart=performance.now(),last=performance.now();
@@ -149,7 +151,7 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-Promise.all(['card-back.png','death-card.png','king-card.png'].map(name=>new Promise(resolve=>{const img=new Image();img.onload=resolve;img.onerror=resolve;img.src='../tarot-assets/'+name}))).then(()=>{document.body.classList.remove('loading');startShuffle(true)});
+Promise.all(['card-back-v5.png','death-card-v5.png','king-card-v5.png'].map(name=>new Promise(resolve=>{const img=new Image();img.onload=resolve;img.onerror=resolve;img.src='../tarot-assets/'+name}))).then(()=>{document.body.classList.remove('loading');sub.textContent='';hint.textContent='';reset()});
 
 // controls
 document.querySelectorAll('.seg').forEach(seg=>{const key=seg.dataset.key;OPTIONS[key].forEach(([v,l])=>{const b=document.createElement('button');b.textContent=l;b.onclick=()=>{settings[key]=v;render();try{localStorage.setItem('today-tarot-web-settings-v1',JSON.stringify(settings))}catch(e){}};b.dataset.v=String(v);seg.appendChild(b)})});
