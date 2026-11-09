@@ -101,7 +101,6 @@ function startShuffle(resetDraw=false){document.body.classList.remove('opening')
   cues.push(setTimeout(()=>cards.forEach((c,i)=>c.ord=i),Math.round(plan.T*.8)));
   cues.push(setTimeout(()=>{phase='choose';cards.forEach(c=>c.el.disabled=false);plan=null;V.shuffle=0;sub.textContent='마음이 끌리는 카드를 터치하세요';hint.textContent='스무 장의 카드 중 한 장을 선택하세요'},plan.T))}
 function reset(){document.body.classList.add('opening');$('opening').hidden=false;cues.forEach(clearTimeout);cues=[];phase='opening';draw=0;selected=null;plan=null;cards.forEach(c=>c.el.disabled=true);result.classList.remove('show');return;}
-function restartDeck(){cards.forEach(c=>{c.enter=0;c.press=0});enterStart=performance.now();startShuffle(true)}
 $('start-reading').onclick=()=>startShuffle(true);
 $('reset').onclick=()=>startShuffle(false);
 let taps=0,tapTimer=null,lp=null;const title=$('title');
