@@ -6,12 +6,22 @@
       "part": 1,
       "scene": "63·64",
       "title": "마이바흐 배달 오토바이 추격씬",
-      "description": "청주 오송·원주 혁신 로케이션 비교 · 전체 연결본과 추격 구간 · 컷별 앵글 수정 메모",
-      "updated": "2026.11.11",
-      "cover": "./pyramid/part1/scene63-64-maybach-chase/v8/thumbs/cheongju/64C-09.jpg",
-      "latest": {"version": "v8", "url": "./pyramid/part1/scene63-64-maybach-chase/v8/player.html"},
+      "description": "청주 오송·원주 혁신 로케이션 비교 · 안정화·속도감·추격 연속성 개선 · 컷별 앵글 수정 메모",
+      "updated": "2026.11.12",
+      "cover": "./pyramid/part1/scene63-64-maybach-chase/v9/thumbs/cheongju/64C-09.jpg",
+      "latest": {
+        "version": "v9",
+        "url": "./pyramid/part1/scene63-64-maybach-chase/v9/player.html"
+      },
       "versions": [
-        {"version": "v8", "url": "./pyramid/part1/scene63-64-maybach-chase/v8/player.html"}
+        {
+          "version": "v9",
+          "url": "./pyramid/part1/scene63-64-maybach-chase/v9/player.html"
+        },
+        {
+          "version": "v8",
+          "url": "./pyramid/part1/scene63-64-maybach-chase/v8/player.html"
+        }
       ]
     }
   ]
