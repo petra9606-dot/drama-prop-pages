@@ -2,7 +2,7 @@
   "_설명": "깃허브로 직접 올린 자료 목록. 관리자 페이지의 '깃허브 자료' 탭에서 숨김/표시를 바꿀 수 있습니다. 새 자료는 여기에 한 줄 추가하면 모든 페이지에 반영됩니다.",
   "_업데이트표시": "새로 넣거나 고친 자료에 changedAt(ISO 시각) · changeType(new|updated) · changeNote(설명)을 넣으면 사이트에 NEW/수정됨 표시와 업데이트 소식이 뜹니다.",
   "scenes": [
-    {"id":"p1-63-64-previz-v8","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"63·64씬","title":"마이바흐 배달 오토바이 추격씬","filename":"player.html","url":"/previz/pyramid-63-64-v8/player.html","changedAt":"2026-11-11T11:00:00Z","changeType":"new","changeNote":"PREVIZ에 청주 오송·원주 혁신 전체/추격 영상과 컷별 검토 플레이어 추가"},
+    {"id":"p1-63-64-previz-v8","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"63·64씬","title":"마이바흐 배달 오토바이 추격씬","filename":"player.html","url":"/previz/pyramid/part1/scene63-64-maybach-chase/v8/player.html","changedAt":"2026-11-11T11:00:00Z","changeType":"new","changeNote":"PREVIZ에 청주 오송·원주 혁신 전체/추격 영상과 컷별 검토 플레이어 추가"},
     {"id":"p1-4-cheongyak","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"4씬","title":"청약 당첨조회","filename":"cheongyak/index.html","url":"/pyramid/part1/cheongyak/index.html"},
     {"id":"p1-46-statement","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"46씬","title":"진술서","filename":"진술서.html","url":"/pyramid/part1/statement.html"},
     {"id":"p1-46-statement-hwp","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"46씬","title":"진술서 (한글 인쇄 시뮬레이션)","filename":"statement-hwp.html","url":"/pyramid/part1/statement-hwp.html"},
