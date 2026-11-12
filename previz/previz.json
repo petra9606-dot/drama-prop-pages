@@ -6,12 +6,12 @@
       "part": 1,
       "scene": "63·64",
       "title": "마이바흐 배달 오토바이 추격씬",
-      "description": "청주 오송·원주 혁신 로케이션 비교 · 안정화·속도감·추격 연속성 개선 · 컷별 앵글 수정 메모",
+      "description": "원주 혁신 · 정체 차로 사이드미러 접촉 → 시가지 추격(좌회전·직부감) → 회전교차로 · 실제 3D 건물·실제 차량 모델",
       "updated": "2026.11.12",
-      "cover": "./pyramid/part1/scene63-64-maybach-chase/v9/thumbs/cheongju/64C-09.jpg",
+      "cover": "./pyramid/part1/scene63-64-maybach-chase/v10/thumbs/wonju/64C-26.jpg",
       "latest": {
-        "version": "v9",
-        "url": "./pyramid/part1/scene63-64-maybach-chase/v9/player.html"
+        "version": "v10",
+        "url": "./pyramid/part1/scene63-64-maybach-chase/v10/player.html"
       }
     }
   ]
