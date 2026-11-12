@@ -2,7 +2,7 @@
   "_설명": "깃허브로 직접 올린 자료 목록. 관리자 페이지의 '깃허브 자료' 탭에서 숨김/표시를 바꿀 수 있습니다. 새 자료는 여기에 한 줄 추가하면 모든 페이지에 반영됩니다.",
   "_업데이트표시": "새로 넣거나 고친 자료에 changedAt(ISO 시각) · changeType(new|updated) · changeNote(설명)을 넣으면 사이트에 NEW/수정됨 표시와 업데이트 소식이 뜹니다.",
   "scenes": [
-    {"id":"p1-4-cheongyak","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"4씬","title":"청약 당첨조회","filename":"cheongyak/index.html","url":"/pyramid/part1/cheongyak/index.html","changedAt":"2026-11-12T04:40:00Z","changeType":"updated","changeNote":"청약홈 명칭을 청약누리로 변경"},
+    {"id":"p1-4-cheongyak","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"4씬","title":"청약 당첨조회","filename":"cheongyak/index.html","url":"/pyramid/part1/cheongyak/index.html","changedAt":"2026-11-12T04:57:00Z","changeType":"updated"},
     {"id":"p1-46-statement","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"46씬","title":"진술서","filename":"진술서.html","url":"/pyramid/part1/statement.html"},
     {"id":"p1-46-statement-hwp","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"46씬","title":"진술서 (한글 인쇄 시뮬레이션)","filename":"statement-hwp.html","url":"/pyramid/part1/statement-hwp.html"},
     {"id":"p1-74-loop","project":"pyramid","projectName":"피라밋","part":"1부","partNum":1,"scene":"74씬","title":"송경필 쇼츠 · 아재개그","filename":"클립로그 숏폼","url":"/pyramid/part1/scene74/?screen=loop","changedAt":"2026-11-10T02:00:00Z","changeType":"updated","changeNote":"6부 44씬에서 가져온 비트원 뉴스 내용을 1부 74씬에 맞는 아재개그 쇼츠로 교체 (제목·채널·자막·댓글)"},
