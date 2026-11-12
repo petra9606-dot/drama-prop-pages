@@ -1,6 +1,6 @@
 // DisolveWorks 오프라인 지원 — 한 번 열어 본 페이지는 인터넷이 끊겨도 다시 열린다.
 // 온라인이면 항상 최신 내용을 먼저 가져오고(network-first), 느리거나 끊기면 저장본을 보여 준다.
-const CACHE = "dw-offline-v1";
+const CACHE = "dw-offline-v2";
 const NET_TIMEOUT = 4000;
 const CDN_HOSTS = [
   "cdnjs.cloudflare.com", "cdn.jsdelivr.net", "unpkg.com", "code.jquery.com", "cdn.tailwindcss.com",
