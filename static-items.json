@@ -28,7 +28,7 @@
     {"id":"app-notes","title":"메모장","filename":"notes.html","url":"/apps/notes/","changedAt":"2026-11-02T06:51:12Z","changeType":"new","changeNote":"메모별 준비 문장 설정 · 직접 입력과 연출 입력 · 자동 저장"},
     {"id":"app-tarot","title":"오늘의 타로","filename":"today-tarot-v7.apk","url":"/apps/preview/tarot.html","changedAt":"2026-11-09T03:30:00Z","changeType":"updated","changeNote":"보라색 배경 복원 · 고딕체 개선 · 새 데스/킹 카드 · 오프닝 · v7 APK"},
     {"id":"app-rider","title":"달림 라이더","filename":"dallim-rider-v10-schedule-route.apk","url":"/apps/preview/rider.html"},
-    {"id":"app-nav","title":"길봄 내비","filename":"gilbom-nav-v8-offline.apk","url":"/apps/preview/gilbom-v8.html"},
+    {"id":"app-nav","title":"길봄 내비","filename":"gilbom-nav-v9-offline.apk","url":"/apps/preview/gilbom-v9.html"},
     {"id":"app-mail","title":"촬영용 메일 앱","filename":"disolve-mail-remote-v1.apk","url":"/apps/preview/mail.html"},
     {"id":"app-chat","title":"모아챗","filename":"moa-chat-final.apk","url":"/apps/preview/chat.html"}
   ]
