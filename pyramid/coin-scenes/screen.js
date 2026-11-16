@@ -145,10 +145,10 @@
   function priceAt(p){
     if(scene === "crash"){
       return keyedPrice([
-        [0,1284],[.10,1281],[.13,1287],[.15,1214],[.175,1058],[.20,1112],
-        [.235,1005],[.275,994],[.305,812],[.335,876],[.38,826],[.425,602],
-        [.465,654],[.525,405],[.57,472],[.635,267],[.685,324],[.755,158],
-        [.805,196],[.88,131],[.94,142],[1,124]
+        [0,1284],[.087,1281],[.13,1280],[.174,640],[.217,768],[.261,384],
+        [.304,470],[.348,235],[.391,300],[.435,150],[.478,210],[.522,142],
+        [.565,185],[.609,118],[.652,154],[.696,110],[.74,138],[.783,105],
+        [.826,132],[.87,115],[.913,140],[1,124]
       ],p);
     }
     if(scene === "otc"){
@@ -159,10 +159,10 @@
       return cfg.start+(cfg.end-cfg.start)*v;
     }
     return keyedPrice([
-      [0,1000],[.20,1000],[.225,1012],[.245,1175],[.275,1408],[.305,1318],
-      [.335,1586],[.38,1508],[.42,1775],[.455,1996],[.49,1888],[.535,2254],
-      [.575,2136],[.625,2492],[.675,2364],[.735,2698],[.785,2555],
-      [.855,2824],[.91,2738],[1,2860]
+      [0,1000],[.20,1000],[.217,1000],[.261,1500],[.304,1320],[.348,1980],
+      [.391,1740],[.435,2610],[.478,2300],[.522,2860],[.565,2500],
+      [.609,2780],[.652,2440],[.696,2900],[.74,2570],[.783,2840],
+      [.826,2700],[.87,2950],[.913,2780],[1,2860]
     ],p);
   }
 
@@ -192,7 +192,7 @@
     $("#headline").textContent = scene==="crash" ? "나루코인 가격 급변 · 투자 유의" : (isPre?"헤븐코인 거래 개시 예정 09:00":"헤븐코인 원화마켓 거래 개시");
     $("#marketState").textContent = scene==="crash" ? (p<.12?"정상 거래":"가격 급변") : (isPre?"거래 개시 전":"거래 중");
     $("#marketState").className=`market-state ${(scene==="crash"&&p>=.12)||!isPre?'live':''}`;
-    $("#chartTitle").textContent=scene==="crash"?"나루코인 · 5분봉":"헤븐코인 · 1분봉";
+    $("#chartTitle").textContent=scene==="crash"?"나루코인 · 5분봉":"헤븐코인 · 5분봉";
     $("#watermark").hidden=!isPre;
     $("#tradeStatus").textContent=isPre?"체결 대기":"실시간";
     renderBook(isPre);
@@ -271,7 +271,7 @@
     ctx.strokeStyle=dark?"#27323c":"#edf0f4";ctx.lineWidth=1;
     for(let i=0;i<=5;i++){const y=pad.t+ch*i/5;ctx.beginPath();ctx.moveTo(pad.l,y+.5);ctx.lineTo(w-pad.r,y+.5);ctx.stroke();}
     for(let i=0;i<=8;i++){const x=pad.l+cw*i/8;ctx.beginPath();ctx.moveTo(x+.5,pad.t);ctx.lineTo(x+.5,h-pad.b);ctx.stroke();}
-    const points=[];const count=64;
+    const points=[];const count=scene==="otc"?64:24;
     for(let i=0;i<count;i++){
       const t=i/(count-1);let v;
       if(t<=progress){
@@ -285,7 +285,7 @@
     const x=i=>pad.l+cw*i/(count-1), y=v=>pad.t+ch-(v-min)/(max-min)*ch;
     ctx.font="10px Arial";ctx.fillStyle=dark?"#687987":"#96a2b2";ctx.textAlign="left";
     for(let i=0;i<=5;i++){const val=max-(max-min)*i/5;ctx.fillText(nfmt(Math.round(val)),w-pad.r+9,pad.t+ch*i/5+4);}
-    ctx.textAlign="center";const times=scene==="otc"?["13:58","13:59","14:00","14:01"]:scene==="listing"?["08:59:40","08:59:50","09:00:00","09:00:10"]:["13:55","14:05","14:15","14:25"];
+    ctx.textAlign="center";const times=scene==="otc"?["13:58","13:59","14:00","14:01"]:scene==="listing"?["07:05","07:45","08:25","09:00"]:["12:30","13:10","13:50","14:30"];
     times.forEach((t,i)=>ctx.fillText(t,pad.l+cw*i/(times.length-1),h-9));
     if(scene==="listing"&&progress<.20){
       ctx.setLineDash([4,4]);ctx.strokeStyle="#aab5c2";ctx.beginPath();ctx.moveTo(pad.l,y(cfg.start));ctx.lineTo(w-pad.r,y(cfg.start));ctx.stroke();ctx.setLineDash([]);return;
