@@ -130,12 +130,26 @@
     if(progress<1) raf=requestAnimationFrame(frame); else running=false;
   }
 
+  function keyedPrice(keys,p){
+    if(p<=keys[0][0]) return keys[0][1];
+    for(let i=1;i<keys.length;i++){
+      if(p<=keys[i][0]){
+        const [t0,v0]=keys[i-1],[t1,v1]=keys[i];
+        const q=clamp((p-t0)/(t1-t0),0,1);
+        const shaped=q*q*(3-2*q);
+        return v0+(v1-v0)*shaped;
+      }
+    }
+    return keys[keys.length-1][1];
+  }
   function priceAt(p){
     if(scene === "crash"){
-      if(p<.12) return cfg.start + Math.sin(p*60)*2;
-      const q=(p-.12)/.88;
-      const staged = q<.18 ? q*.35 : q<.52 ? .063+(q-.18)*1.8 : .675+(q-.52)*.68;
-      return cfg.start-(cfg.start-cfg.end)*clamp(staged,0,1);
+      return keyedPrice([
+        [0,1284],[.10,1281],[.13,1287],[.15,1214],[.175,1058],[.20,1112],
+        [.235,1005],[.275,994],[.305,812],[.335,876],[.38,826],[.425,602],
+        [.465,654],[.525,405],[.57,472],[.635,267],[.685,324],[.755,158],
+        [.805,196],[.88,131],[.94,142],[1,124]
+      ],p);
     }
     if(scene === "otc"){
       const stops=[0,0,.25,.5,.75,1,1];
@@ -144,9 +158,12 @@
       const v=stops[idx]+(stops[idx+1]-stops[idx])*ease(local);
       return cfg.start+(cfg.end-cfg.start)*v;
     }
-    if(p<.20) return cfg.start;
-    const q=(p-.20)/.80;
-    return cfg.start+(cfg.end-cfg.start)*(Math.pow(q,.72)+Math.sin(q*31)*.04*q*(1-q));
+    return keyedPrice([
+      [0,1000],[.20,1000],[.225,1012],[.245,1175],[.275,1408],[.305,1318],
+      [.335,1586],[.38,1508],[.42,1775],[.455,1996],[.49,1888],[.535,2254],
+      [.575,2136],[.625,2492],[.675,2364],[.735,2698],[.785,2555],
+      [.855,2824],[.91,2738],[1,2860]
+    ],p);
   }
 
   function update(p,force){
@@ -257,7 +274,10 @@
     const points=[];const count=64;
     for(let i=0;i<count;i++){
       const t=i/(count-1);let v;
-      if(t<=progress){v=priceAt(t)+(Math.sin(i*1.91)+Math.sin(i*.43))*cfg.start*(scene==="crash"?.002:scene==="otc"?.006:.004)*Math.min(1,t*3);}else{v=priceAt(progress);}
+      if(t<=progress){
+        const micro=(Math.sin(i*2.417)+Math.sin(i*.731+1.8))*cfg.start*(scene==="crash"?.0025:scene==="otc"?.006:.0035)*Math.min(1,t*3);
+        v=priceAt(t)+micro;
+      }else{v=priceAt(progress);}
       points.push(v);
     }
     let min,max;
@@ -275,16 +295,20 @@
       ctx.lineTo(x(count-1),h-pad.b);ctx.lineTo(x(0),h-pad.b);ctx.closePath();ctx.fillStyle="#ef6a5814";ctx.fill();
     }else{
       const visible=Math.max(8,Math.floor(progress*(count-1)));
-      const bar=Math.max(3,cw/count*.58);
+      const bar=Math.max(4,cw/count*.62);
       for(let i=0;i<count;i++){
         const base=points[Math.max(0,i-1)],close=points[i];
-        const open=i?base:cfg.start;const hi=Math.max(open,close)*(1+.003+(i%4)*.0015),lo=Math.min(open,close)*(1-.003-(i%3)*.0013);
+        const open=i?base:cfg.start;
+        const move=Math.abs(close-open)/Math.max(1,open),shock=move>.045;
+        const upper=shock?.012+(i%3)*.006:.003+(i%4)*.0016+(i%13===0?.012:0);
+        const lower=shock?.014+((i+1)%3)*.006:.003+(i%3)*.0018+(i%11===0?.016:0);
+        const hi=Math.max(open,close)*(1+upper),lo=Math.min(open,close)*(1-lower);
         const color=close>=open?"#d44747":"#3973c9";ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=1;
         ctx.beginPath();ctx.moveTo(x(i),y(hi));ctx.lineTo(x(i),y(lo));ctx.stroke();
         ctx.fillRect(x(i)-bar/2,Math.min(y(open),y(close)),bar,Math.max(1.4,Math.abs(y(open)-y(close))));
-        if(i>visible&&scene==="listing")break;
+        if(i>=visible)break;
       }
-      ctx.beginPath();points.forEach((v,i)=>{if(scene==="listing"&&i>visible)return;const avg=points.slice(Math.max(0,i-4),i+1).reduce((a,b)=>a+b,0)/Math.min(5,i+1);i?ctx.lineTo(x(i),y(avg)):ctx.moveTo(x(i),y(avg));});ctx.strokeStyle="#c79c48";ctx.lineWidth=1.2;ctx.stroke();
+      ctx.beginPath();points.forEach((v,i)=>{if(i>visible)return;const avg=points.slice(Math.max(0,i-4),i+1).reduce((a,b)=>a+b,0)/Math.min(5,i+1);i?ctx.lineTo(x(i),y(avg)):ctx.moveTo(x(i),y(avg));});ctx.strokeStyle="#c79c48";ctx.lineWidth=1.2;ctx.stroke();
     }
     ctx.setLineDash([4,3]);ctx.strokeStyle=dark?"#bd675d":"#be6a66";ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(pad.l,y(current));ctx.lineTo(w-pad.r,y(current));ctx.stroke();ctx.setLineDash([]);
   }
