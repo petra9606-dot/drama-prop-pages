@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="color-scheme" content="light">
+  <title>BitOne WORKPLACE · 사내 업무 포털</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="svg-defs" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 20v-7h6v7"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5Z"/><path d="M14 3v5h5M8 12h8M8 16h6"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 3v17h17M8 15l4-5 4 2 4-6"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M5 17h14l-2-3V9A5 5 0 0 0 7 9v5ZM10 21h4"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M18 15a5 5 0 0 1 3 4v2"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6h7l2 3h9v11H3Z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
+    <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m8 13 7-7a3 3 0 0 1 4 4L9 20a5 5 0 0 1-7-7L13 2M6 15l10-10"/></symbol>
+    <symbol id="i-time" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H3V9h18v8h-4M7 14h10v7H7Z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 11h18"/></symbol>
+  </defs></svg>
+
+  <aside class="sidebar" aria-label="주 메뉴">
+    <a class="brand" href="#home" aria-label="비트원 업무 홈"><span class="brand-mark">B<span>1</span></span><span>BitOne<small>WORKPLACE</small></span></a>
+    <div class="workspace-label">사내 업무 포털 <span>INTERNAL</span></div>
+    <nav>
+      <a href="#home" data-nav="home"><svg><use href="#i-home"/></svg>업무 홈</a>
+      <a href="#inbox" data-nav="approval"><svg><use href="#i-doc"/></svg>전자결재 <span class="nav-count" data-pending-count>3</span></a>
+      <div class="subnav" id="approvalSubnav">
+        <a href="#inbox" data-sub="inbox">결재대기함 <b data-pending-count>3</b></a>
+        <a href="#completed" data-sub="completed">결재완료함</a>
+        <a href="#returned" data-sub="returned">반려문서함</a>
+        <a href="#reference" data-sub="reference">참조문서함</a>
+      </div>
+      <a href="#listing" data-nav="listing"><svg><use href="#i-chart"/></svg>거래지원 관리</a>
+      <a href="#notices" data-nav="notices"><svg><use href="#i-bell"/></svg>공지사항</a>
+      <a href="#organization" data-nav="organization"><svg><use href="#i-users"/></svg>조직도</a>
+      <a href="#resources" data-nav="resources"><svg><use href="#i-folder"/></svg>업무 자료실</a>
+    </nav>
+    <div class="sidebar-bottom"><span class="secure-dot"></span>사내 업무망 연결<div>BitOne Corporation</div></div>
+  </aside>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="top-path"><span>WORKPLACE</span><i>/</i><strong id="topTitle">업무 홈</strong></div>
+      <div class="top-actions">
+        <button class="icon-button notification-button" id="notificationButton" aria-label="업무 알림" aria-expanded="false"><svg><use href="#i-bell"/></svg><span class="unread-dot" id="notificationDot"></span></button>
+        <span class="top-divider"></span>
+        <span class="avatar">조</span><span class="profile"><strong>조지환</strong><span>대표이사</span></span>
+      </div>
+    </header>
+    <main id="main" tabindex="-1"></main>
+    <footer class="app-footer"><span>© BitOne Corporation. All rights reserved.</span><span><svg><use href="#i-lock"/></svg>내부 업무용 · 대외비</span></footer>
+  </div>
+  <div id="notifications" class="notification-panel" hidden></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="actionDialog" class="action-dialog" aria-labelledby="actionTitle">
+    <form id="actionForm">
+      <div class="dialog-heading"><span id="actionEyebrow" class="eyebrow">FINAL APPROVAL</span><button class="icon-button" type="button" data-close-dialog aria-label="닫기"><svg><use href="#i-close"/></svg></button></div>
+      <h2 id="actionTitle">헤븐코인 상장 승인</h2>
+      <p class="dialog-description" id="actionDescription"></p>
+      <div class="confirmation-summary"><span>대상 자산</span><strong>헤븐코인 <em>HEAVEN / KRW</em></strong><span>최종 결재자</span><strong>조지환 대표이사</strong></div>
+      <label class="field-label" for="approvalComment">결재 의견 <span id="commentOptional">선택</span></label>
+      <textarea id="approvalComment" maxlength="240" rows="3" placeholder="결재 의견을 입력하세요."></textarea>
+      <p class="dialog-error" id="dialogError" role="alert"></p>
+      <div class="dialog-buttons"><button type="button" class="button" data-close-dialog>취소</button><button type="submit" class="button primary" id="confirmAction">승인</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="previewDialog" class="preview-dialog" aria-labelledby="previewTitle"><div class="preview-heading"><div><span class="eyebrow" id="previewType">DOCUMENT PREVIEW</span><h2 id="previewTitle"></h2></div><button type="button" class="icon-button" id="closePreview" aria-label="닫기"><svg><use href="#i-close"/></svg></button></div><div id="previewBody"></div></dialog>
+
+  <dialog id="setupDialog" class="setup-dialog" aria-labelledby="setupTitle">
+    <form id="setupForm">
+      <div class="dialog-heading"><span class="eyebrow">촬영 설정 · F2</span><button type="button" class="icon-button" id="closeSetup" aria-label="설정 닫기"><svg><use href="#i-close"/></svg></button></div>
+      <h2 id="setupTitle">비트원 사내 포털</h2><p class="dialog-description">화면 소품용 설정입니다. 실제 결재·거래·외부 전송은 발생하지 않습니다.</p>
+      <div class="setup-grid">
+        <label>결재 방식<select name="confirmMode"><option value="confirm">승인 버튼 → 확인창 → 최종 승인</option><option value="direct">승인 버튼 한 번으로 승인</option></select></label>
+        <label>승인 처리 시간<select name="delay"><option value="600">0.6초</option><option value="1200">1.2초</option><option value="0">즉시</option></select></label>
+        <label>화면 날짜 <input name="date" type="date"><small>비워두면 날짜 대신 문서번호를 표시합니다.</small></label>
+        <label>화면 시각 <input name="time" type="time" step="60" value="08:40"></label>
+        <label>거래 개시 시각<input name="openTime" type="time" step="60" value="09:00"></label>
+        <label>글자 크기<select name="fontScale"><option value="1">기본</option><option value="1.08">108%</option><option value="1.16">116%</option></select></label>
+        <label class="full-width">표시 문서번호<input name="documentNo" maxlength="32" value="BT-LST-000127"></label>
+      </div>
+      <div class="setup-links"><button type="button" class="button" data-setup-state="pending">승인 전으로 초기화</button><button type="button" class="button" data-setup-state="approved">승인 완료 화면</button><button type="button" class="button" id="fullscreenButton">전체화면</button></div>
+      <p class="shortcut-help">F2 설정 · A 상장 승인 · R 반복 촬영 초기화 · F 전체화면<br>주소의 ?view=document 로 결재문서에 바로 진입할 수 있습니다.<br>설정은 이 브라우저에만 저장되며 결재 상태는 탭별로 유지됩니다.</p>
+      <div class="dialog-buttons"><button type="button" class="button" id="setupDefaults">설정 기본값</button><button type="submit" class="button primary">적용</button></div>
+    </form>
+  </dialog>
+  <script src="app.js"></script>
+</body>
+</html>
