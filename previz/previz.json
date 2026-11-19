@@ -1,6 +1,20 @@
 {
   "items": [
     {
+      "id": "pyramid-part5-scene66-67-villa-raid",
+      "project": "pyramid",
+      "part": 5,
+      "scene": "66·67",
+      "title": "별장 습격 · 최병갑 최후",
+      "description": "가평 삼회리 별장 · 밤 — 국도 차 안 → 열린 정문 통과 → 보초 건물 앞 삼단봉 격투 → 거실 대면 · 지하실 인서트 · 유리창 피 튀김 (컷 설명·대사 자막)",
+      "updated": "2026.11.19",
+      "cover": "./pyramid/part5/scene66-67-villa-raid/v1/thumbs/villa/66-17.jpg",
+      "latest": {
+        "version": "v1",
+        "url": "./pyramid/part5/scene66-67-villa-raid/v1/player.html"
+      }
+    },
+    {
       "id": "pyramid-part1-scene63-64-maybach-chase",
       "project": "pyramid",
       "part": 1,
