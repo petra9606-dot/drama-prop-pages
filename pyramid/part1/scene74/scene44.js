@@ -94,5 +94,8 @@
  document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select')||settings.open||comments.open||publish.open||exportDialog.open)return;if(e.key.toLowerCase()==='e'){e.preventDefault();openSettings();}else if(e.key.toLowerCase()==='f'){e.preventDefault();fullscreen();}else if(e.code==='Space'&&screen!=='hub'){e.preventDefault();play();}else if(['ArrowDown','ArrowUp'].includes(e.key)&&screen!=='hub'){e.preventDefault();selectPost(index+(e.key==='ArrowDown'?1:-1));}});
  document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)app.querySelector('main')?.classList.remove('film');});
  window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});window.addEventListener('pagehide',()=>{cancelAnimationFrame(frame);stopPublish();if(localMedia)URL.revokeObjectURL(localMedia);});
- render();frame=requestAnimationFrame(loop);if(query.get('setup')==='1')openSettings();if(storageError)toast('저장된 설정을 읽지 못해 기본값으로 시작합니다');
+ const markerMarkup='<div class="tracking-markers" aria-hidden="true"><i style="--x:8%;--y:10%"></i><i style="--x:92%;--y:10%"></i><i style="--x:50%;--y:50%"></i><i style="--x:8%;--y:90%"></i><i style="--x:92%;--y:90%"></i></div>';
+ function syncTrackingMarkers(){app.querySelectorAll('.green-preview,.feed-stage').forEach(node=>{const video=node.querySelector('.studio-video,.feed-video'),markers=node.querySelector(':scope > .tracking-markers');if(video){markers?.remove();}else if(!markers){node.insertAdjacentHTML('afterbegin',markerMarkup);}});}
+ const markerObserver=new MutationObserver(syncTrackingMarkers);markerObserver.observe(app,{childList:true,subtree:true});
+ render();syncTrackingMarkers();frame=requestAnimationFrame(loop);if(query.get('setup')==='1')openSettings();if(storageError)toast('저장된 설정을 읽지 못해 기본값으로 시작합니다');
 })();
