@@ -87,8 +87,12 @@ function applyFilter(){
 }
 document.getElementById('chips').addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;curScene=c.dataset.s;applyFilter();});
 let uploadedItems=[];
+const shadowedUpload=x=>{
+  const s=`${x.scene||''} ${x.title||''} ${x.filename||''}`.replace(/\s+/g,'').toLowerCase();
+  return /44씬/.test(s)&&(/뉴스기사여론조작/.test(s)||/숏폼제작,?쇼츠,?릴스/.test(s));
+};
 render([]);
 DW_STATIC.then(({scenes})=>{staticItems=scenes.filter(x=>x.part==='6부').map(x=>({...x,source:'기존'}));render(uploadedItems);});
-fetch('/.netlify/functions/catalog?project=pyramid&part=6부').then(r=>r.json()).then(({items=[]})=>{uploadedItems=items;render(items);}).catch(()=>render(uploadedItems));
+fetch('/.netlify/functions/catalog?project=pyramid&part=6부').then(r=>r.json()).then(({items=[]})=>{uploadedItems=items.filter(x=>!shadowedUpload(x));render(uploadedItems);}).catch(()=>render(uploadedItems));
 document.getElementById('localSearch').addEventListener('input',applyFilter);
 </script></body></html>

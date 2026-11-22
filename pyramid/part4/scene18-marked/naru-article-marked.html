@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goole</title>
+  <!-- 고품질 한국어 웹폰트 (Pretendard & Noto Sans KR 시스템 폰트 연동) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #03c75a;
+      --text-main: #111111;
+      --text-body: #242424;
+      --text-sub: #767676;
+      --text-muted: #959595;
+      --border-light: #ebebeb;
+      --chroma-green: #00FF00;
+      --google-red: #ea4335;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: #ffffff;
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Screen Management */
+    .screen {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+    }
+    .screen.active {
+      display: block;
+    }
+
+    /* ------------------------------------------- */
+    /* 1. GOOLE HOME SCREEN (알파벳 2개 빨간색)     */
+    /* ------------------------------------------- */
+    #home-screen {
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    #home-screen.active {
+      display: flex;
+    }
+
+    .home-top-nav {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 24px;
+      font-size: 13px;
+    }
+    .home-top-nav a {
+      color: #333333;
+      text-decoration: none;
+    }
+    .home-top-nav a:hover {
+      text-decoration: underline;
+    }
+    .home-top-nav .apps-icon {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      padding: 3px;
+      cursor: pointer;
+    }
+    .apps-icon span {
+      background-color: #555555;
+      border-radius: 50%;
+    }
+    .sign-in-btn {
+      background-color: #111111;
+      color: #ffffff !important;
+      padding: 8px 20px;
+      border-radius: 4px;
+      font-weight: 500;
+      text-decoration: none !important;
+      font-size: 13px;
+    }
+
+    .home-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: -60px;
+      flex-grow: 1;
+      padding: 0 20px;
+    }
+
+    /* 요청사항: 메인화면 Goole 로고 중 알파벳 2개만 빨간색 적용 */
+    .goole-logo {
+      font-size: 92px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      margin-bottom: 28px;
+      user-select: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Pretendard", sans-serif;
+    }
+    .logo-black { color: #111111; }
+    .logo-red { color: var(--google-red); }
+
+    .search-box-container {
+      width: 100%;
+      max-width: 584px;
+      position: relative;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 48px;
+      border: 1px solid #dfe1e5;
+      border-radius: 24px;
+      padding: 0 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      transition: all 0.2s ease-in-out;
+    }
+    .search-bar:hover, .search-bar:focus-within {
+      box-shadow: 0 1px 10px rgba(0,0,0,0.16);
+      border-color: #b5b5b5;
+    }
+
+    .search-icon-svg {
+      width: 20px;
+      height: 20px;
+      fill: #555555;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      background: transparent;
+      color: #111111;
+      letter-spacing: -0.3px;
+    }
+
+    .search-tools-icons {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 8px;
+    }
+    .search-tools-icons svg {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      fill: #444444;
+    }
+
+    .home-buttons {
+      margin-top: 30px;
+      display: flex;
+      gap: 12px;
+    }
+    .goole-btn {
+      background-color: #f8f9fa;
+      border: 1px solid #f1f3f4;
+      border-radius: 4px;
+      color: #222222;
+      font-size: 14px;
+      padding: 0 18px;
+      line-height: 38px;
+      height: 38px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .goole-btn:hover {
+      background-color: #f1f3f4;
+      border-color: #dadce0;
+      color: #000000;
+    }
+
+    .home-footer {
+      background: #f8f9fa;
+      color: #70757a;
+      font-size: 13px;
+    }
+    .footer-loc {
+      padding: 13px 24px;
+      border-bottom: 1px solid #eaeaea;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 12px 24px;
+    }
+    .footer-group {
+      display: flex;
+      gap: 20px;
+    }
+    .footer-group a {
+      color: #666666;
+      text-decoration: none;
+    }
+    .footer-group a:hover {
+      text-decoration: underline;
+    }
+
+    /* ------------------------------------------- */
+    /* 2. SEARCH RESULTS SCREEN                   */
+    /* ------------------------------------------- */
+    #results-screen {
+      background: #ffffff;
+    }
+
+    .results-header {
+      position: sticky;
+      top: 0;
+      background: #ffffff;
+      border-bottom: 1px solid #ececec;
+      padding: 20px 24px 0 24px;
+      z-index: 100;
+    }
+    .results-header-top {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .results-logo {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .results-search-bar {
+      flex: 1;
+      max-width: 692px;
+      height: 44px;
+      border-radius: 24px;
+      border: 1px solid #d3d3d3;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+    }
+    .results-search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 15px;
+      font-weight: 500;
+      color: #111111;
+      letter-spacing: -0.3px;
+    }
+    .results-nav-tabs {
+      display: flex;
+      gap: 22px;
+      margin-top: 18px;
+      padding-left: 136px;
+      font-size: 14px;
+      color: #555555;
+    }
+    .tab-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-bottom: 12px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      font-weight: 500;
+    }
+    .tab-item.active {
+      color: #111111;
+      font-weight: 700;
+      border-bottom-color: #111111;
+    }
+
+    .results-body {
+      padding: 18px 24px 70px 160px;
+      max-width: 1040px;
+    }
+    .results-meta {
+      font-size: 13px;
+      color: #888888;
+      margin-bottom: 22px;
+      letter-spacing: -0.2px;
+    }
+
+    .news-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 포털 뉴스 검색 결과 카드 */
+    .news-card {
+      max-width: 720px;
+      cursor: pointer;
+      padding: 10px 12px;
+      border-radius: 6px;
+      transition: background 0.12s ease-in-out;
+      border-bottom: 1px solid #f2f2f2;
+    }
+    .news-card:hover {
+      background: #f9f9fb;
+    }
+
+    .news-card-publisher {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #555555;
+      margin-bottom: 6px;
+    }
+    .publisher-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #444444;
+      background: #f1f2f4;
+      padding: 1px 6px;
+      border-radius: 3px;
+      letter-spacing: -0.2px;
+    }
+    .publisher-name {
+      font-weight: 600;
+      color: #333333;
+      letter-spacing: -0.3px;
+    }
+
+    .news-card-title {
+      font-size: 17px;
+      line-height: 1.42;
+      color: #0b0b0b;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      letter-spacing: -0.4px;
+      word-break: keep-all;
+    }
+    .news-card:hover .news-card-title {
+      text-decoration: underline;
+      color: #000000;
+    }
+
+    .news-card-desc {
+      font-size: 13.5px;
+      line-height: 1.62;
+      color: #585858;
+      letter-spacing: -0.3px;
+      word-break: break-all;
+    }
+
+    /* 6번째 기사는 자연스럽게 목록에 녹아들도록 특별한 뱃지/강조선 일체 제거 */
+    .news-card.target-article {
+      border-radius: 6px;
+    }
+
+    /* ------------------------------------------- */
+    /* 동영상 섹션 (사용자 요청 스크린샷 1, 2 반영) */
+    /* ------------------------------------------- */
+    .videos-section {
+      max-width: 720px;
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid #ebebeb;
+    }
+
+    .videos-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .videos-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #111111;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .videos-more-btn {
+      color: #767676;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+    }
+
+    .video-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px 8px;
+      border-bottom: 1px solid #f2f2f2;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .video-item:hover {
+      background: #f9f9fb;
+    }
+
+    .video-thumbnail-container {
+      width: 172px;
+      height: 98px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      background: #111;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    .video-thumbnail-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .video-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+    .video-item-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #0b0b0b;
+      line-height: 1.38;
+      letter-spacing: -0.4px;
+      word-break: keep-all;
+    }
+    .video-item:hover .video-item-title {
+      text-decoration: underline;
+    }
+
+    .video-source {
+      font-size: 12.5px;
+      color: #666666;
+      margin-top: 2px;
+    }
+
+    /* 스크린샷 2 스타일의 동영상 자막/핵심내용 스니펫 */
+    .video-snippet {
+      font-size: 13px;
+      line-height: 1.55;
+      color: #4a4a4a;
+      letter-spacing: -0.3px;
+      margin-top: 4px;
+      word-break: keep-all;
+    }
+
+    /* 관련 기사 더보기 섹션 */
+    .related-articles-section {
+      max-width: 720px;
+      margin-top: 36px;
+      padding-top: 22px;
+      border-top: 1px solid #ebebeb;
+    }
+    .related-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111111;
+      margin-bottom: 14px;
+      letter-spacing: -0.4px;
+    }
+
+    /* ------------------------------------------- */
+    /* 3. NEWS ARTICLE SCREEN (한서일보 상세 기사)  */
+    /* ------------------------------------------- */
+    #article-screen {
+      background: #f6f7f9;
+    }
+
+    .newspaper-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e4e7;
+    }
+    .newspaper-nav-bar {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 11px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #767676;
+      border-bottom: 1px solid #f1f2f4;
+    }
+    .newspaper-logo-area {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 22px 20px 18px 20px;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+    .newspaper-logo {
+      font-size: 32px;
+      font-weight: 900;
+      color: #111111;
+      letter-spacing: -1.2px;
+      cursor: pointer;
+    }
+    .newspaper-tagline {
+      font-size: 13px;
+      color: #888888;
+      letter-spacing: -0.3px;
+    }
+
+    .newspaper-categories {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      gap: 26px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #333333;
+      height: 46px;
+      align-items: center;
+    }
+    .category-item {
+      cursor: pointer;
+      position: relative;
+    }
+    .category-item.active {
+      color: #03c75a;
+      font-weight: 700;
+    }
+
+    /* 기사 메인 본문 컨테이너 */
+    .article-container {
+      max-width: 860px;
+      margin: 28px auto 90px auto;
+      background: #ffffff;
+      padding: 48px 56px;
+      border: 1px solid #e5e8eb;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .article-breadcrumb {
+      font-size: 13px;
+      color: #0077d9;
+      font-weight: 700;
+      margin-bottom: 14px;
+      letter-spacing: -0.3px;
+    }
+
+    .article-main-title {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.38;
+      color: #111111;
+      letter-spacing: -0.8px;
+      margin-bottom: 18px;
+      word-break: keep-all;
+    }
+
+    .article-byline-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #eeeeee;
+      margin-bottom: 30px;
+      font-size: 13px;
+      color: #767676;
+    }
+    .article-author-date {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .author-name {
+      font-weight: 700;
+      color: #222222;
+      letter-spacing: -0.3px;
+    }
+    .publish-time {
+      color: #888888;
+      font-size: 12.5px;
+    }
+
+    /* 크로마키 사진 영역 */
+    .photo-wrapper {
+      margin: 28px 0 24px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .chroma-green-box {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 440px;
+      background-color: var(--chroma-green); /* 순수 크로마키 초록 #00FF00 */
+      border-radius: 2px;
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chroma-tracker {
+      position: absolute;
+      width: 5%;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .chroma-tracker::before,
+    .chroma-tracker::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 100%;
+      height: 12%;
+      border-radius: 1px;
+      background: #00d900;
+      transform: translate(-50%, -50%);
+    }
+    .chroma-tracker::after {
+      transform: translate(-50%, -50%) rotate(90deg);
+    }
+    .tracker-tl { top: 10%; left: 8%; }
+    .tracker-tr { top: 10%; left: 92%; }
+    .tracker-bl { top: 90%; left: 8%; }
+    .tracker-br { top: 90%; left: 92%; }
+    .tracker-c { top: 50%; left: 50%; }
+
+    /* 사진 아래 캡션 (작은 글씨) */
+    .photo-caption {
+      margin-top: 10px;
+      font-size: 12.5px;
+      color: #666666;
+      text-align: center;
+      line-height: 1.5;
+      letter-spacing: -0.3px;
+    }
+
+    /* 핵심 요약 섹션 (큰글씨) */
+    .article-key-summary {
+      background: #f9fafb;
+      border-left: 3px solid #111111;
+      padding: 18px 22px;
+      margin: 30px 0 34px 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .summary-item {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1.68;
+      letter-spacing: -0.4px;
+      display: flex;
+      align-items: baseline;
+      gap: 9px;
+    }
+    .summary-item + .summary-item {
+      margin-top: 8px;
+    }
+    .summary-item::before {
+      content: "•";
+      color: #111111;
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    /* 기사 본문 (작은 글씨) */
+    .article-body-content {
+      font-size: 17px;
+      line-height: 1.84;
+      color: #242424;
+      letter-spacing: -0.4px;
+      word-break: keep-all;
+    }
+    .article-body-content p {
+      margin-bottom: 22px;
+      text-align: justify;
+    }
+    .reporter-signoff {
+      margin-top: 36px;
+      padding-top: 22px;
+      border-top: 1px solid #eeeeee;
+      font-weight: 600;
+      color: #3b3b3b;
+      font-size: 15px;
+      letter-spacing: -0.3px;
+    }
+
+    .article-footer-copyright {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #999999;
+      text-align: center;
+      border-top: 1px solid #f1f2f4;
+      padding-top: 20px;
+      letter-spacing: -0.2px;
+    }
+
+    /* 플로팅 촬영 보조 바 */
+    .film-controls {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(17, 17, 17, 0.82);
+      backdrop-filter: blur(8px);
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+    }
+    .film-btn {
+      background: #2a2a2a;
+      color: #ffffff;
+      border: 1px solid #484848;
+      padding: 4px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: background 0.2s;
+    }
+    .film-btn:hover {
+      background: #444444;
+    }
+  </style>
+<!-- DW-STAT --><script >
+// DisolveWorks 자체 방문 통계 — 개인정보 없이 "기기별 임의 번호"로만 방문자를 센다.
+// 관리자 페이지를 한 번이라도 연 기기(주인 기기)는 세지 않는다.
+(function () {
+  try {
+    if (window.top !== window.self) return;            // 미리보기·촬영 화면 안의 소품은 따로 세지 않음
+    if (localStorage.getItem("dw-noga")) return;        // 주인 기기
+    if (/bot|crawl|spider|headless|lighthouse/i.test(navigator.userAgent)) return;
+    var vid = localStorage.getItem("dw-vid"), isNew = false;
+    if (!vid) { vid = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("dw-vid", vid); isNew = true; }
+    var path = location.pathname + (location.pathname.indexOf("shoot.html") >= 0 ? location.search : "");
+    // 같은 탭에서 같은 페이지를 30분 안에 다시 열면 한 번만
+    var k = "dw-st:" + path, last = +sessionStorage.getItem(k) || 0;
+    if (Date.now() - last < 30 * 60 * 1000) return;
+    sessionStorage.setItem(k, String(Date.now()));
+    var ua = navigator.userAgent, dev = /iPad|Tablet/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? "tablet" : /Mobi|Android|iPhone/i.test(ua) ? "phone" : "pc";
+    var ref = ""; try { if (document.referrer) { var r = new URL(document.referrer); if (r.host !== location.host) ref = r.host; } } catch (e) {}
+    var app = /KAKAOTALK/i.test(ua) ? "kakao" : /Instagram/i.test(ua) ? "insta" : /NAVER/i.test(ua) ? "naver" : "";
+    var body = JSON.stringify({ v: vid, n: isNew ? 1 : 0, p: path.slice(0, 300), t: (document.title || "").slice(0, 120), d: dev, r: ref, a: app });
+    var send = function () {
+      if (navigator.sendBeacon && navigator.sendBeacon("/.netlify/functions/stat", new Blob([body], { type: "text/plain" }))) return;
+      fetch("/.netlify/functions/stat", { method: "POST", body: body, keepalive: true }).catch(function () {});
+    };
+    if (document.readyState === "complete") setTimeout(send, 300); else addEventListener("load", function () { setTimeout(send, 300); });
+  } catch (e) {}
+})();
+
+</script></head>
+<body>
+
+  <!-- ==================================================== -->
+  <!-- 1. GOOLE HOME SCREEN (알파벳 2개 빨간색 적용)         -->
+  <!-- ==================================================== -->
+  <div id="home-screen" class="screen active">
+    <header class="home-top-nav">
+      <a href="#" onclick="event.preventDefault()">Goole 정보</a>
+      <a href="#" onclick="event.preventDefault()">스토어</a>
+      <a href="#" onclick="event.preventDefault()">Gmail</a>
+      <a href="#" onclick="event.preventDefault()">이미지</a>
+      <div class="apps-icon" title="Goole 앱">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <a href="#" class="sign-in-btn" onclick="event.preventDefault()">로그인</a>
+    </header>
+
+    <main class="home-main">
+      <!-- 요청사항: 알파벳 2개(o, e) 빨간색, 나머지 검정색 -->
+      <div class="goole-logo" onclick="resetToHome()">
+        <span class="logo-black">G</span><span class="logo-red">o</span><span class="logo-black">o</span><span class="logo-black">l</span><span class="logo-red">e</span>
+      </div>
+
+      <div class="search-box-container">
+        <form id="home-search-form" onsubmit="handleSearch(event)">
+          <div class="search-bar">
+            <svg class="search-icon-svg" focusable="false" viewBox="0 0 24 24">
+              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+            </svg>
+            <input type="text" id="home-search-input" class="search-input" placeholder="" autocomplete="off" autofocus>
+            <div class="search-tools-icons">
+              <!-- Mic Icon -->
+              <svg viewBox="0 0 24 24">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+              </svg>
+              <!-- Lens Camera Icon -->
+              <svg viewBox="0 0 24 24">
+                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                <path d="M19.5 6.5H17l-1.5-2h-7L7 6.5H4.5A2.5 2.5 0 0 0 2 9v9a2.5 2.5 0 0 0 2.5 2.5h15a2.5 2.5 0 0 0 2.5-2.5V9a2.5 2.5 0 0 0-2.5-2.5Z"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="home-buttons" style="justify-content: center;">
+            <button type="submit" class="goole-btn">Goole 검색</button>
+            <button type="button" class="goole-btn" onclick="handleSearch(event)">I'm Feeling Lucky</button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <footer class="home-footer">
+      <div class="footer-loc">대한민국</div>
+      <div class="footer-links">
+        <div class="footer-group">
+          <a href="#" onclick="event.preventDefault()">광고</a>
+          <a href="#" onclick="event.preventDefault()">비즈니스</a>
+          <a href="#" onclick="event.preventDefault()">검색의 원리</a>
+        </div>
+        <div class="footer-group">
+          <a href="#" onclick="event.preventDefault()">개인정보처리방침</a>
+          <a href="#" onclick="event.preventDefault()">약관</a>
+          <a href="#" onclick="event.preventDefault()">설정</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- 2. GOOLE SEARCH RESULTS SCREEN                       -->
+  <!-- ==================================================== -->
+  <div id="results-screen" class="screen">
+    <header class="results-header">
+      <div class="results-header-top">
+        <div class="results-logo" onclick="resetToHome()">
+          <span class="logo-black">G</span><span class="logo-red">o</span><span class="logo-black">o</span><span class="logo-black">l</span><span class="logo-red">e</span>
+        </div>
+        <div class="results-search-bar">
+          <input type="text" id="results-search-input" class="results-search-input" value="나루코인 배동찬" onkeydown="if(event.key==='Enter') goToResults()">
+          <div class="search-tools-icons">
+            <svg viewBox="0 0 24 24" style="width:19px;height:19px;fill:#444;">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+            <svg class="search-icon-svg" style="width:19px;height:19px;cursor:pointer;fill:#444;" onclick="goToResults()" viewBox="0 0 24 24">
+              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-nav-tabs">
+        <div class="tab-item active">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          전체
+        </div>
+        <div class="tab-item">뉴스</div>
+        <div class="tab-item">동영상</div>
+        <div class="tab-item">이미지</div>
+        <div class="tab-item">지도</div>
+        <div class="tab-item">더보기</div>
+      </div>
+    </header>
+
+    <main class="results-body">
+      <div class="results-meta">검색결과 약 21,300개</div>
+
+      <div class="news-cards-list">
+        <!-- 1번째 기사 -->
+        <div class="news-card">
+          <div class="news-card-publisher">
+            <span class="publisher-badge">언론사</span>
+            <span class="publisher-name">대한경제</span>
+          </div>
+          <div class="news-card-title">'연 20% 이자 보장' 나루코인, 출금 전면 중단에 투자자 패닉</div>
+          <div class="news-card-desc">미 달러 연동을 표방하며 고수익 스테이킹 서비스를 운영해온 나루코인이 돌연 출금을 정지했다. 배동찬 대표 측은 일시적 유동성 이슈라며 진화에 나섰으나 투자자들의 불안은 걷잡을 수 없이 커지고 있다.</div>
+        </div>
+
+        <!-- 2번째 기사 -->
+        <div class="news-card">
+          <div class="news-card-publisher">
+            <span class="publisher-badge">언론사</span>
+            <span class="publisher-name">코인인사이트</span>
+          </div>
+          <div class="news-card-title">나루코인 1달러 페깅 붕괴 전조? 커뮤니티 의혹 증폭</div>
+          <div class="news-card-desc">블록체인 온체인 데이터 분석 결과 나루코인의 준비자산 지갑에서 의문의 대규모 출금이 발생한 것으로 확인됐다. 배동찬 대표의 공식 해명 요구가 빗발치고 있다.</div>
+        </div>
+
+        <!-- 3번째 기사 -->
+        <div class="news-card">
+          <div class="news-card-publisher">
+            <span class="publisher-badge">언론사</span>
+            <span class="publisher-name">서울금융뉴스</span>
+          </div>
+          <div class="news-card-title">금융당국, 나루코인 유사수신·사기 혐의 긴급 조사 착수</div>
+          <div class="news-card-desc">금융감독원과 경찰이 나루 프로젝트의 신규 투자금 돌려막기(폰지 사기) 정황을 포착하고 강제 수사에 돌입했다. 핵심 인물인 배동찬 대표에 대해 출국금지 조치가 내려진 것으로 전해졌다.</div>
+        </div>
+
+        <!-- 4번째 기사 -->
+        <div class="news-card">
+          <div class="news-card-publisher">
+            <span class="publisher-badge">언론사</span>
+            <span class="publisher-name">투데이마켓</span>
+          </div>
+          <div class="news-card-title">나루코인 피해자 대책위 "피해 규모 최소 수천억 원 추정"</div>
+          <div class="news-card-desc">전국 각지에서 피해를 호소하는 투자자 수천 명이 모여 비상대책위원회를 구성했다. 한 투자자는 "배동찬 대표의 1달러 보장 말을 믿고 전 재산을 넣었다"며 울분을 토했다.</div>
+        </div>
+
+        <!-- 5번째 기사 -->
+        <div class="news-card">
+          <div class="news-card-publisher">
+            <span class="publisher-badge">언론사</span>
+            <span class="publisher-name">블록체인저널</span>
+          </div>
+          <div class="news-card-title">나루 프로젝트 본사 가보니 '텅 빈 사무실'... 배동찬 대표 잠적설까지</div>
+          <div class="news-card-desc">강남구 테헤란로에 위치한 나루 프로젝트 본사는 직원들이 모두 철수한 채 문이 굳게 닫혀 있었다. 인근 건물 관계자는 "며칠 전부터 컴퓨터 등을 빼내는 모습이 목격됐다"고 전했다.</div>
+        </div>
+
+        <!-- 6번째 기사 (⭐️ 클릭 시 상세 기사 화면으로 이동) -->
+        <div class="news-card target-article" onclick="goToArticle()">
+          <div class="news-card-publisher">
+            <span class="publisher-badge" style="background:#0b224e;color:#fff;">단독</span>
+            <span class="publisher-name">한서일보</span>
+          </div>
+          <div class="news-card-title">‘90% 폭락’ 나루코인 사기 의혹… 배동찬 대표 체포</div>
+          <div class="news-card-desc">미 달러화에 가치를 연동한 스테이블 코인이라며 투자자들을 끌어모은 ‘나루코인’이 하루 사이 90% 이상 폭락한 가운데, 경찰이 나루 프로젝트 대표 배동찬을 사기 혐의로 체포했다...</div>
+        </div>
+
+        <!-- 7번째 기사 -->
+        <div class="news-card">
+          <div class="news-card-publisher">
+            <span class="publisher-badge">언론사</span>
+            <span class="publisher-name">경인일보</span>
+          </div>
+          <div class="news-card-title">경찰, 나루코인 배동찬 대표 구속영장 신청 방침... 은닉 재산 추적</div>
+          <div class="news-card-desc">경찰청 금융범죄수사대는 배동찬 대표를 긴급체포한 뒤 계좌 추적 및 압수수색을 진행 중이다. 해외 페이퍼컴퍼니를 통한 자금 세탁 여부도 중점적으로 살피고 있다.</div>
+        </div>
+
+        <!-- 8번째 기사 -->
+        <div class="news-card">
+          <div class="news-card-publisher">
+            <span class="publisher-badge">언론사</span>
+            <span class="publisher-name">종합경제타임스</span>
+          </div>
+          <div class="news-card-title">제2의 루나 사태 되나? 나루코인 배동찬 체포 소식에 가상자산 시장 '술렁'</div>
+          <div class="news-card-desc">알고리즘 및 예치 기반 스테이블코인의 취약점이 다시금 드러났다. 전문가들은 허위 공시와 불투명한 준비자산 구조에 대한 규제 법안 마련이 시급하다고 입을 모았다.</div>
+        </div>
+
+        <!-- 9번째 기사 -->
+        <div class="news-card">
+          <div class="news-card-publisher">
+            <span class="publisher-badge">언론사</span>
+            <span class="publisher-name">한국IT경제</span>
+          </div>
+          <div class="news-card-title">'혁신 핀테크라더니'… 전문가들 "나루코인, 전형적인 다단계 금융사기 수법"</div>
+          <div class="news-card-desc">가상자산 전문가들은 나루 프로젝트의 스테이킹 수익 지급 구조가 실질 사업 모델 없이 신규 투자자의 돈으로 충당된 전형적 폰지 구조였다고 지적했다.</div>
+        </div>
+
+        <!-- 10번째 기사 -->
+        <div class="news-card">
+          <div class="news-card-publisher">
+            <span class="publisher-badge">언론사</span>
+            <span class="publisher-name">디지털에셋뉴스</span>
+          </div>
+          <div class="news-card-title">국내 주요 거래소, 나루코인 일제히 유의종목 지정 및 거래지원 종료 예고</div>
+          <div class="news-card-desc">원화마켓 거래소 협의체는 배동찬 대표 체포와 페깅 붕괴 사태에 따라 나루코인에 대한 투자유의 종목 지정을 공지하고 상장폐지 절차 검토에 들어갔다.</div>
+        </div>
+
+        <!-- 11번째 기사 -->
+        <div class="news-card">
+          <div class="news-card-publisher">
+            <span class="publisher-badge">언론사</span>
+            <span class="publisher-name">법률헤럴드</span>
+          </div>
+          <div class="news-card-title">대형 로펌들 '나루코인 사태 피해자 구제' 전담 TF 잇단 발족</div>
+          <div class="news-card-desc">배동찬 대표와 임사진을 상대로 한 특정경제범죄가중처벌법상 사기 혐의 고소 및 은닉 재산 가압류 신청이 잇따르고 있어 법정 공방이 거세질 전망이다.</div>
+        </div>
+      </div>
+
+      <!-- ==================================================== -->
+      <!-- 동영상 섹션 (요청하신 스크린샷 1, 2 형식 완벽 반영)    -->
+      <!-- ==================================================== -->
+      <section class="videos-section">
+        <div class="videos-header">
+          <div class="videos-title">
+            <span>동영상</span>
+          </div>
+          <div class="videos-more-btn" title="옵션">⋮</div>
+        </div>
+
+        <!-- 동영상 1 -->
+        <div class="video-item" onclick="goToArticle()">
+          <div class="video-thumbnail-container">
+            <svg class="video-thumbnail-svg" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="vbg1" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#0f172a"/>
+                  <stop offset="100%" stop-color="#1e293b"/>
+                </linearGradient>
+              </defs>
+              <rect width="320" height="180" fill="url(#vbg1)"/>
+              <circle cx="260" cy="50" r="70" fill="#dc2626" opacity="0.22"/>
+              <circle cx="60" cy="120" r="80" fill="#2563eb" opacity="0.22"/>
+              <rect x="14" y="14" width="46" height="22" rx="4" fill="#dc2626"/>
+              <text x="37" y="30" font-family="'Pretendard', sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">단독</text>
+              <text x="160" y="78" font-family="'Pretendard', sans-serif" font-size="17" font-weight="800" fill="#ffffff" text-anchor="middle">나루코인 배동찬 대표</text>
+              <text x="160" y="106" font-family="'Pretendard', sans-serif" font-size="20" font-weight="900" fill="#facc15" text-anchor="middle">긴급 체포 현장</text>
+              <circle cx="160" cy="140" r="16" fill="rgba(0,0,0,0.7)"/>
+              <polygon points="156,133 167,140 156,147" fill="#ffffff"/>
+              <rect x="10" y="152" width="42" height="18" rx="3" fill="rgba(0,0,0,0.85)"/>
+              <text x="31" y="165" font-family="'Pretendard', sans-serif" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">03:28</text>
+            </svg>
+          </div>
+          <div class="video-info">
+            <div class="video-item-title">[단독] “1달러 무조건 보장” 호언장담하더니… 나루코인 배동찬 대표 전격 체포 현장</div>
+            <div class="video-source">YouTube · 한서일보 NEWS</div>
+            <div class="video-snippet">이들은 투자자들이 대금을 입금하면 해외 거래소에서 다른 코인을 구매해 자신들의 지갑에 옮기는 방식으로 돈을 빼돌렸습니다. 현재까지 파악된 피해자만 수천 명에 이릅니다...</div>
+          </div>
+        </div>
+
+        <!-- 동영상 2 -->
+        <div class="video-item" onclick="goToArticle()">
+          <div class="video-thumbnail-container">
+            <svg class="video-thumbnail-svg" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="vbg2" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#18181b"/>
+                  <stop offset="100%" stop-color="#27272a"/>
+                </linearGradient>
+              </defs>
+              <rect width="320" height="180" fill="url(#vbg2)"/>
+              <path d="M 20 50 Q 120 55 180 110 T 300 150" fill="none" stroke="#ef4444" stroke-width="4"/>
+              <polygon points="295,140 310,154 288,156" fill="#ef4444"/>
+              <rect x="14" y="14" width="46" height="22" rx="4" fill="#ef4444"/>
+              <text x="37" y="30" font-family="'Pretendard', sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">특집</text>
+              <text x="160" y="78" font-family="'Pretendard', sans-serif" font-size="26" font-weight="900" fill="#ef4444" text-anchor="middle">▼ 90% 폭락</text>
+              <text x="160" y="106" font-family="'Pretendard', sans-serif" font-size="15" font-weight="700" fill="#e4e4e7" text-anchor="middle">하루 만에 증발한 4천억</text>
+              <circle cx="160" cy="140" r="16" fill="rgba(0,0,0,0.7)"/>
+              <polygon points="156,133 167,140 156,147" fill="#ffffff"/>
+              <rect x="10" y="152" width="42" height="18" rx="3" fill="rgba(0,0,0,0.85)"/>
+              <text x="31" y="165" font-family="'Pretendard', sans-serif" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">05:14</text>
+            </svg>
+          </div>
+          <div class="video-info">
+            <div class="video-item-title">"원금 보장된다더니 하루 만에 90% 증발"… 나루코인 투자 사기 피해자들 피눈물</div>
+            <div class="video-source">YouTube · 대한경제 탐사팀</div>
+            <div class="video-snippet">나루 프로젝트가 홍보한 1달러 페깅 및 고수익 스테이킹은 신규 투자자의 돈으로 기존 이자를 돌려막는 다단계 폰지 사기 구조였던 것으로 경찰 수사 결과 드러났습니다...</div>
+          </div>
+        </div>
+
+        <!-- 동영상 3 -->
+        <div class="video-item" onclick="goToArticle()">
+          <div class="video-thumbnail-container">
+            <svg class="video-thumbnail-svg" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="vbg3" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#091e3a"/>
+                  <stop offset="100%" stop-color="#1e3a8a"/>
+                </linearGradient>
+              </defs>
+              <rect width="320" height="180" fill="url(#vbg3)"/>
+              <rect x="14" y="14" width="46" height="22" rx="4" fill="#2563eb"/>
+              <text x="37" y="30" font-family="'Pretendard', sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">수사</text>
+              <text x="160" y="80" font-family="'Pretendard', sans-serif" font-size="17" font-weight="800" fill="#ffffff" text-anchor="middle">경찰청 금융범죄수사대</text>
+              <text x="160" y="108" font-family="'Pretendard', sans-serif" font-size="19" font-weight="900" fill="#60a5fa" text-anchor="middle">본사 압수수색 현장</text>
+              <circle cx="160" cy="140" r="16" fill="rgba(0,0,0,0.7)"/>
+              <polygon points="156,133 167,140 156,147" fill="#ffffff"/>
+              <rect x="10" y="152" width="42" height="18" rx="3" fill="rgba(0,0,0,0.85)"/>
+              <text x="31" y="165" font-family="'Pretendard', sans-serif" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">12:45</text>
+            </svg>
+          </div>
+          <div class="video-info">
+            <div class="video-item-title">[추적] 경찰, 나루코인 본사 전격 압수수색… "준비자산 달러 실체 없어, 은닉 재산 추적"</div>
+            <div class="video-source">YouTube · 서울금융뉴스</div>
+            <div class="video-snippet">경찰은 배 대표와 연계된 차명 법인 계좌를 동결하고, 준비자산으로 공시된 외화 상당 부분이 허위 장부로 조작된 정황을 포착해 강제 수사를 확대하고 있습니다...</div>
+          </div>
+        </div>
+
+        <!-- 동영상 4 -->
+        <div class="video-item" onclick="goToArticle()">
+          <div class="video-thumbnail-container">
+            <svg class="video-thumbnail-svg" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="vbg4" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#1c1917"/>
+                  <stop offset="100%" stop-color="#292524"/>
+                </linearGradient>
+              </defs>
+              <rect width="320" height="180" fill="url(#vbg4)"/>
+              <rect x="14" y="14" width="58" height="22" rx="4" fill="#b91c1c"/>
+              <text x="43" y="30" font-family="'Pretendard', sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">심층취재</text>
+              <text x="160" y="78" font-family="'Pretendard', sans-serif" font-size="16" font-weight="800" fill="#fbbf24" text-anchor="middle">"노후 자금 전부 날렸다"</text>
+              <text x="160" y="106" font-family="'Pretendard', sans-serif" font-size="18" font-weight="900" fill="#ffffff" text-anchor="middle">나루코인 사태 피해자 인터뷰</text>
+              <circle cx="160" cy="140" r="16" fill="rgba(0,0,0,0.7)"/>
+              <polygon points="156,133 167,140 156,147" fill="#ffffff"/>
+              <rect x="10" y="152" width="42" height="18" rx="3" fill="rgba(0,0,0,0.85)"/>
+              <text x="31" y="165" font-family="'Pretendard', sans-serif" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">08:30</text>
+            </svg>
+          </div>
+          <div class="video-info">
+            <div class="video-item-title">[이슈] "연 20% 이자 준다더니"… 나루코인 배동찬 대표 사기 행각에 수천 명 발동동</div>
+            <div class="video-source">YouTube · KBC 뉴스이슈</div>
+            <div class="video-snippet">투자 설명회 등에서 안정성과 고수익을 동시에 장담하며 자금을 끌어모은 배동찬 대표에 대해 구속영장이 신청될 방침이며, 공범들에 대해서도 수사가 진행 중입니다...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- 관련 기사 섹션                                       -->
+      <!-- ==================================================== -->
+      <section class="related-articles-section">
+        <div class="related-title">관련 뉴스</div>
+        <div class="news-cards-list">
+          <div class="news-card" onclick="goToArticle()">
+            <div class="news-card-publisher">
+              <span class="publisher-badge">종합</span>
+              <span class="publisher-name">한서일보</span>
+            </div>
+            <div class="news-card-title">'나루코인 사태' 일파만파… 전문가 "알고리즘 스테이블코인의 구조적 결함 악용"</div>
+            <div class="news-card-desc">금융 전문가들은 이번 사태가 준비자산 없이 허위 공시로 투자자를 유인한 전형적인 금융 사기극이라며, 가상자산 규제 법안의 조속한 정비를 촉구했다.</div>
+          </div>
+          <div class="news-card" onclick="goToArticle()">
+            <div class="news-card-publisher">
+              <span class="publisher-badge">속보</span>
+              <span class="publisher-name">디지털경제</span>
+            </div>
+            <div class="news-card-title">배동찬 대표 구속영장 청구 방침… 경찰 "해외 도피 및 증거인멸 우려 상당"</div>
+            <div class="news-card-desc">경찰청 금융범죄수사대는 배 대표가 해외 계좌로 자금을 유출한 정황을 확인하고 특경법상 사기 및 배임 혐의로 구속영장을 신청하기로 했다.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- 3. NEWS ARTICLE SCREEN (한서일보)                     -->
+  <!-- ==================================================== -->
+  <div id="article-screen" class="screen">
+    <header class="newspaper-header">
+      <div class="newspaper-nav-bar">
+        <div>2026년 10월 12일 월요일</div>
+        <div style="display:flex;gap:16px;">
+          <span>구독신청</span>
+          <span>로그인</span>
+          <span>PDF보기</span>
+        </div>
+      </div>
+      <div class="newspaper-logo-area">
+        <div class="newspaper-logo" onclick="goToResults()">한서일보</div>
+        <div class="newspaper-tagline">HANSEO DAILY NEWS · 바른 시선 깊은 보도</div>
+      </div>
+      <div class="newspaper-categories">
+        <div class="category-item">종합</div>
+        <div class="category-item">정치</div>
+        <div class="category-item active">사회</div>
+        <div class="category-item">경제</div>
+        <div class="category-item">IT·과학</div>
+        <div class="category-item">오피니언</div>
+      </div>
+    </header>
+
+    <main class="article-container">
+      <div class="article-breadcrumb">사회 > 사건·사고 / 법원·검찰</div>
+      
+      <h1 class="article-main-title">‘90% 폭락’ 나루코인 사기 의혹… 배동찬 대표 체포</h1>
+
+      <div class="article-byline-bar">
+        <div class="article-author-date">
+          <span class="author-name">양정현 기자</span>
+          <span class="publish-time">입력 2026.10.12 18:42 | 수정 2026.10.12 19:15</span>
+        </div>
+        <div style="display:flex;gap:12px;color:#888;">
+          <span title="글자크기">가+</span>
+          <span title="인쇄">🖨️</span>
+          <span title="공유">공유</span>
+        </div>
+      </div>
+
+      <!-- 초록색 크로마 사진 영역 -->
+      <div class="photo-wrapper">
+        <div class="chroma-green-box" id="chroma-box">
+          <!-- VFX 합성용 트래킹 마커 -->
+          <div class="chroma-tracker tracker-tl"></div>
+          <div class="chroma-tracker tracker-tr"></div>
+          <div class="chroma-tracker tracker-bl"></div>
+          <div class="chroma-tracker tracker-br"></div>
+          <div class="chroma-tracker tracker-c"></div>
+        </div>
+        <!-- 사진 밑 작은 글씨 설명 -->
+        <div class="photo-caption">나루코인 배동찬 대표가 체포 당하는 모습</div>
+      </div>
+
+      <!-- 기사 큰글씨 요약 섹션 -->
+      <div class="article-key-summary">
+        <div class="summary-item">1달러 연동·고수익 스테이킹 내세워 투자자 모집</div>
+        <div class="summary-item">준비자산 부풀리고 신규 투자금으로 수익 지급 정황</div>
+        <div class="summary-item">경찰, 투자금 유용·시세 방어 과정 집중 수사</div>
+      </div>
+
+      <!-- 기사 본문 작은글씨 상세 내용 -->
+      <div class="article-body-content">
+        <p>미 달러화에 가치를 연동한 스테이블 코인이라며 투자자들을 끌어모은 ‘나루코인’이 하루 사이 90% 이상 폭락한 가운데, 경찰이 나루 프로젝트 대표 배동찬을 사기 혐의로 체포했다.</p>
+
+        <p>나루 프로젝트는 그동안 나루코인 1개의 가치가 미화 1달러에 연동돼 가격 변동 위험이 적고, 코인을 예치하는 이른바 ‘스테이킹’을 통해 안정적인 이자 수익까지 얻을 수 있다고 홍보해왔다. 특히 배 대표는 투자 설명회 등을 통해 “가격 안정성과 수익성을 동시에 갖춘 코인”이라고 강조하며 투자자들을 모집한 것으로 알려졌다.</p>
+
+        <p>그러나 경찰 조사 결과 나루 측이 코인의 가치를 유지하기 위해 확보했다고 밝힌 달러 등 준비자산 상당 부분이 실제로는 존재하지 않거나 부풀려진 정황이 포착됐다. 또 투자자들에게 지급된 스테이킹 수익 가운데 일부가 실제 사업 수익이 아닌 새로 유입된 투자자들의 자금에서 지급된 정황도 확인됐다. 경찰은 나루 측이 높은 스테이킹 수익을 앞세워 지속적으로 신규 투자자를 끌어들이고, 유입된 자금으로 기존 투자자들의 수익을 지급하면서 외형상 정상적으로 운영되는 것처럼 꾸민 것으로 의심하고 있다. 이 과정에서 투자금 일부가 배 대표와 관계된 법인 및 외부 계좌로 빠져나간 정황도 포착된 것으로 전해졌다.</p>
+
+        <p>나루코인은 최근 대규모 매도가 시작되면서 1달러 연동이 깨졌고, 투자자들이 일제히 코인을 현금화하려 하자 가격이 하루 만에 90% 이상 폭락했다.</p>
+
+        <p>경찰은 배 대표가 애초부터 충분한 준비자산 없이 1달러 가치가 보장되는 것처럼 투자자들을 속였는지, 또 투자금을 다른 목적으로 유용했는지 여부를 집중적으로 조사하고 있다.</p>
+
+        <p>경찰 관계자는 “현재 피해 규모와 투자금의 정확한 흐름을 확인하고 있다”며 “배 대표와 함께 사업을 설계하거나 투자금 관리에 관여한 관계자들에 대해서도 수사를 확대할 방침”이라고 밝혔다.</p>
+
+        <div class="reporter-signoff">
+          한서일보 양정현기자(JJWEK@NALWW.COM)
+        </div>
+      </div>
+
+      <div class="article-footer-copyright">
+        Copyright ⓒ 한서일보. 무단전재 및 재배포 금지.
+      </div>
+    </main>
+  </div>
+
+  <!-- 촬영 및 시연 보조용 플로팅 컨트롤 바 -->
+  <div class="film-controls" id="film-bar">
+    <span>🎬 촬영/시연 모드</span>
+    <button class="film-btn" onclick="resetToHome()">처음으로 (Goole)</button>
+    <button class="film-btn" onclick="goToResults()">검색결과로</button>
+    <button class="film-btn" onclick="toggleFullscreen()">전체화면 (F11)</button>
+    <button class="film-btn" onclick="document.getElementById('film-bar').style.display='none'">컨트롤 숨기기</button>
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(screenId);
+      if (target) {
+        target.classList.add('active');
+        window.scrollTo(0, 0);
+      }
+    }
+
+    // Goole 홈에서 무엇이든 검색하면 검색 결과로 이동
+    function handleSearch(e) {
+      if (e) e.preventDefault();
+      goToResults();
+    }
+
+    function goToResults() {
+      showScreen('results-screen');
+      const resultsInput = document.getElementById('results-search-input');
+      if (resultsInput) {
+        resultsInput.value = "나루코인 배동찬";
+      }
+      history.pushState({ screen: 'results' }, 'Goole 검색 결과', '#results');
+    }
+
+    // 기사 상세 화면으로 이동
+    function goToArticle() {
+      showScreen('article-screen');
+      history.pushState({ screen: 'article' }, '한서일보 기사', '#article');
+    }
+
+    // 초기 홈으로 리셋
+    function resetToHome() {
+      showScreen('home-screen');
+      const homeInput = document.getElementById('home-search-input');
+      if (homeInput) {
+        homeInput.value = '';
+        homeInput.focus();
+      }
+      history.pushState({ screen: 'home' }, 'Goole', '#');
+    }
+
+    // 브라우저 뒤로가기 / 앞으로가기 지원
+    window.addEventListener('popstate', function(e) {
+      if (e.state && e.state.screen) {
+        if (e.state.screen === 'article') {
+          showScreen('article-screen');
+        } else if (e.state.screen === 'results') {
+          showScreen('results-screen');
+        } else {
+          showScreen('home-screen');
+        }
+      } else {
+        const hash = window.location.hash;
+        if (hash === '#article') {
+          showScreen('article-screen');
+        } else if (hash === '#results') {
+          showScreen('results-screen');
+        } else {
+          showScreen('home-screen');
+        }
+      }
+    });
+
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const filmBar = document.getElementById('film-bar');
+        if (filmBar) {
+          filmBar.style.display = (filmBar.style.display === 'none') ? 'flex' : 'none';
+        }
+      }
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert('전체화면 전환은 브라우저에서 F11 키를 눌러주세요.');
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
