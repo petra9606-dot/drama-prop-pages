@@ -5,7 +5,7 @@
   const esc = PV.esc, won = n => Math.abs(n).toLocaleString('ko-KR');
   const st = { pid: 'eunju', fired: false, screen: 'home', sel: null, picker: false, lock: false, push: false, toast: '', flash: false, hot: false };
   const P = () => PROFILES.find(p => p.id === st.pid);
-  const LOGO = '<svg width="26" height="26" viewBox="0 0 56 56"><g transform="translate(-26 -26)" fill="#fff"><path d="M30,29h48v10h-48z"/><path d="M30,49h39v10h-39z"/><path d="M39,69h39v10h-39z"/><path d="M30,29h10v30h-10z"/><path d="M68,49h10v30h-10z"/></g></svg>';
+  const LOGO = '<img class="bk-brand-mark" src="haneul-bank-mark.svg" alt="">';
 
   function computed() {
     const p = P();
@@ -20,7 +20,7 @@
   function home() {
     const p = P();
     return `<div class="app bk pale"><div class="scroll">
-      <div class="bk-home-top"><h1 class="tap" id="homeTitle">홈</h1><span class="bk-pill tap" id="pill">● ${esc(p.user)}님</span><span class="bk-bell">♧<i></i></span></div>
+      <div class="bk-home-top"><h1 class="tap" id="homeTitle"><span class="bk-logo">${LOGO}</span>홈</h1><span class="bk-pill tap" id="pill">● ${esc(p.user)}님</span><span class="bk-bell">♧<i></i></span></div>
       <div class="bk-promo"><div class="bk-sym big">S</div><div style="flex:1;margin-left:16px"><b>일상에 여유를 더하는 금융</b><span>하늘 라이프 혜택 확인하기</span></div><span style="color:#687384;font-size:24px">×</span></div>
       <div class="bk-card bk-acct tap" data-go="list"><div class="t"><b>${esc(p.acctName)}</b><span>${esc(p.acctNo)}</span><em>⋮</em></div>
         <div class="bk-bal">${won(balance())}원</div>
@@ -73,7 +73,7 @@
     if (st.lock) {
       const lt = P().live.t;
       h += `<div class="bk-lock tap" id="lock"><div class="clk">${lt}</div><div class="dt">11월 10일 월요일</div>
-        ${st.fired ? `<div class="nt"><div class="lg">${LOGO.replace('26', '20').replace('26', '20')}</div><div style="flex:1"><div class="h"><b>하늘은행</b><span>지금</span></div><p>${esc(pushText())}</p></div></div>` : ''}
+        ${st.fired ? `<div class="nt"><div class="lg">${LOGO}</div><div style="flex:1"><div class="h"><b>하늘은행</b><span>지금</span></div><p>${esc(pushText())}</p></div></div>` : ''}
         <div class="hint">${st.fired ? '알림을 누르면 앱으로 돌아가요' : '화면 꺼짐 · 잠시 뒤 알림이 와요'}</div></div>`;
     }
     if (st.picker) h += `<div class="bk-dim" id="dim"><div class="bk-dialog"><h3>계좌 선택</h3>${PROFILES.map(x => `<div class="p tap${x.id === st.pid ? ' on' : ''}" data-pick="${x.id}">${esc(x.label)}${x.id === st.pid ? '<i>✓</i>' : ''}</div>`).join('')}<div class="x tap" id="pickClose">닫기</div></div></div>`;

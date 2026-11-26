@@ -183,7 +183,10 @@ const $ = id => document.getElementById(id);
 $('tabs').innerHTML = APPS.map(a => '<button data-app="' + a.id + '">' + esc(a.name) + '</button>').join('');
 $('tabs').querySelectorAll('button').forEach(b => b.addEventListener('click', () => select(b.dataset.app, 0)));
 
-function shotSrc(i) { return 'shots/' + app.id + '/' + app.shots[i][0] + '.png' + (app.id === 'rider' ? '?v=16' : app.id === 'mail' ? '?v=8' : ''); }
+function shotSrc(i) {
+  const version = { rider: '16', mail: '8', bank: 'hn1' }[app.id];
+  return 'shots/' + app.id + '/' + app.shots[i][0] + '.png' + (version ? '?v=' + version : '');
+}
 
 function paint() {
   const s = app.shots[index];
